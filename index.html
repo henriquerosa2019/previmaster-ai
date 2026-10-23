@@ -46,8 +46,9 @@
             <h1 class="text-lg font-extrabold tracking-tight text-white">PreviMaster <span class="text-sky-400">AI</span></h1>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sky-950 text-sky-400 border border-sky-800/80">SaaS Previdenciário</span>
             <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-950 text-purple-300 border border-purple-800/80">Matriz EC 103/2019</span>
+            <span class="hidden md:inline-block px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-slate-800 text-sky-300 border border-slate-700">💻 Henrique Rosa - Antigravity @2026</span>
           </div>
-          <p class="text-xs text-slate-400">Software Especializado em Planejamento Previdenciário Computadorizado & Atuária</p>
+          <p class="text-xs text-slate-400">Software Especializado em Planejamento Previdenciário Computadorizado & Atuária • <span class="text-sky-300 font-semibold">Desenvolvedor : Henrique Rosa - Antigravity @2026</span></p>
         </div>
       </div>
 
@@ -263,14 +264,14 @@
               <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">O Segredo do Cálculo</span>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
-              A exclusão de contribuições gera dois efeitos opostos: <strong>(1) Aumenta a média dos salários restantes</strong> (efeito positivo), mas <strong>(2) Reduz o coeficiente em 2% ao ano que exceder 20 anos</strong> (efeito redutor). A Matriz Computadorizada testa <strong>todas as 245 combinações possíveis</strong> e encontra onde essa balança atinge a maior RMI líquida:
+              A exclusão de contribuições gera dois efeitos opostos: <strong>(1) Aumenta a média dos salários restantes</strong> (efeito positivo), mas <strong>(2) Reduz o coeficiente em 2% ao ano que exceder 20 anos</strong> (efeito redutor). A Matriz Computadorizada testa <strong>todas as 241 combinações possíveis (k = 0 a 240)</strong> e encontra onde essa balança atinge a maior RMI líquida mantendo o piso legal de 15 anos:
             </p>
           </div>
 
           <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30 text-center min-w-[200px]">
             <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Ponto Ótimo Encontrado</span>
-            <span class="text-xl font-mono font-black text-emerald-400 block">k = 244 descartes</span>
-            <span class="text-[11px] text-emerald-300 font-bold block">+ R$ 977,00/mês líquido</span>
+            <span class="text-xl font-mono font-black text-emerald-400 block">k = 240 descartes</span>
+            <span class="text-[11px] text-emerald-300 font-bold block">+ R$ 832,49/mês líquido</span>
           </div>
         </div>
       </div>
@@ -292,7 +293,7 @@
             <h4 class="text-base font-bold text-white flex items-center gap-2">
               <span>📈</span> Curva de Sensibilidade da Matriz Combinatória
             </h4>
-            <p class="text-xs text-slate-400">Veja a Média subindo em azul, o Coeficiente caindo em âmbar e a RMI final atingindo o pico verde em k = 244:</p>
+            <p class="text-xs text-slate-400">Veja a Média subindo em azul, o Coeficiente caindo em âmbar e a RMI final atingindo o pico verde em k = 240 (15 anos de TC rigorosamente preservados):</p>
           </div>
           <div class="flex items-center gap-3 text-xs">
             <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> RMI Final</span>
@@ -313,7 +314,7 @@
             <h4 class="text-base font-bold text-white flex items-center gap-2">
               <span>📋</span> Tabela Completa da Matriz de Combinação de Descartes
             </h4>
-            <span id="matriz-count" class="text-xs text-slate-400">245 combinações testadas</span>
+            <span id="matriz-count" class="text-xs text-slate-400">241 combinações testadas</span>
           </div>
 
           <div class="flex items-center gap-2">
@@ -359,32 +360,32 @@
           </p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
             <div class="bg-slate-950/70 p-3 rounded-lg border border-emerald-800/60 space-y-1">
-              <span class="font-bold text-emerald-400 block uppercase tracking-wider text-[11px]">🏆 25 Melhores (Preservados)</span>
+              <span class="font-bold text-emerald-400 block uppercase tracking-wider text-[11px]">🏆 29 Melhores (Preservados)</span>
               <p class="text-slate-300">
-                Cooperativas (2021-2022 no teto legal) e Clube Naval (2012-2019). Todos corrigidos superam <strong>R$ 5.080 a R$ 8.444</strong>.
+                Cooperativas (2021-2022 no teto legal) e Clube Naval (2012-2019). Todos corrigidos superam <strong>R$ 5.062 a R$ 8.444</strong>.
               </p>
               <div class="pt-1 border-t border-slate-800 font-mono text-emerald-300 font-bold">
-                Média de Ouro: R$ 6.401,98
+                Média de Ouro: R$ 6.218,65
               </div>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-lg border border-rose-900/60 space-y-1">
-              <span class="font-bold text-rose-400 block uppercase tracking-wider text-[11px]">🚫 244 Piores (Descartados)</span>
+              <span class="font-bold text-rose-400 block uppercase tracking-wider text-[11px]">🚫 240 Piores (Descartados)</span>
               <p class="text-slate-300">
-                Expurgados <strong>todos os 45 meses de MEI</strong>, todos os carnês GPS de salário mínimo e meses antigos, que derrubavam a média para a metade.
+                Expurgados <strong>todos os 41 meses de MEI</strong>, todos os carnês GPS de salário mínimo e meses antigos, mantendo os 180 meses (15 anos) exigidos.
               </p>
               <div class="pt-1 border-t border-slate-800 font-mono text-rose-300 font-bold">
-                Média Expurgada: R$ 2.894,76
+                Média Expurgada: R$ 2.858,00
               </div>
             </div>
 
             <div class="bg-slate-950/70 p-3 rounded-lg border border-sky-800/60 space-y-1">
               <span class="font-bold text-sky-400 block uppercase tracking-wider text-[11px]">⚖️ RMI Final Otimizada</span>
               <p class="text-slate-300">
-                Mesmo com coeficiente de 60% (15 anos preservados), <strong>60% de R$ 6.401,98</strong> gera <strong>R$ 3.841,19</strong>, superando em muito os R$ 2.898 base!
+                Mesmo com coeficiente de 60% (15 anos mantidos), <strong>60% de R$ 6.218,65</strong> gera <strong>R$ 3.731,19</strong>, superando os R$ 2.898,70 base!
               </p>
               <div class="pt-1 border-t border-slate-800 font-mono text-emerald-400 font-bold">
-                Ganho: + R$ 942,49/mês (+ R$ 226k em 20a)
+                Ganho: + R$ 832,49/mês (+ R$ 199.797,60 em 20a)
               </div>
             </div>
           </div>
@@ -426,7 +427,7 @@
                 </div>
               </div>
               <span id="melhores-count" class="px-2.5 py-1 rounded-lg bg-emerald-900/60 text-emerald-300 font-mono font-bold text-xs border border-emerald-700">
-                25 salários
+                29 salários
               </span>
             </div>
 
@@ -793,6 +794,11 @@
     </div>
     <p>PreviMaster AI • Software Computadorizado de Planejamento Previdenciário • Base Legal: EC 103/2019, Lei 8.213/91 e IN 128/2022</p>
     <p class="text-[11px] text-slate-600">Calculado para Henrique da Silva Rosa • Índices oficiais INPC / IBGE / BACEN série SGS 188</p>
+    <div class="pt-2">
+      <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-sky-950/90 text-sky-300 border border-sky-800/80 shadow-md">
+        💻 Desenvolvedor : Henrique Rosa - Antigravity @2026
+      </span>
+    </div>
   </footer>
 
   <!-- Script Principal da Aplicação -->

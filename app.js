@@ -22,19 +22,19 @@ const CNIS_DATA = {
     "total_meses_mei": 45,
     "custo_complementacao_darf1910": 11250.0,
     "impacto_na_media": "Altamente Prejudicial se incluído (salários de 1 SM derrubam a média)",
-    "recomendacao": "NÃO COMPLEMENTAR O MEI. A complementação custaria ~R$ 11.250 em DARFs 1910 com SELIC sem gerar benefício proporcional. O descarte inteligente das competências MEI gera R$ 942.49/mês a mais de RMI vitalícia sem gastar nada."
+    "recomendacao": "NÃO COMPLEMENTAR O MEI. A complementação custaria ~R$ 11.250 em DARFs 1910 com SELIC sem gerar benefício proporcional. O descarte inteligente das competências MEI gera R$ 832.49/mês a mais de RMI vitalícia sem gastar nada."
   },
   "resumo_numerico": {
     "total_competencias_pbc": 269,
     "media_sem_descarte": 3220.78,
     "coef_sem_descarte": 90.0,
     "rmi_sem_descarte": 2898.7,
-    "descartes_otimos": 244,
-    "media_otimizada": 6401.98,
+    "descartes_otimos": 240,
+    "media_otimizada": 6218.65,
     "coef_otimizado": 60.0,
-    "rmi_otimizada": 3841.19,
-    "ganho_mensal_rmi": 942.49,
-    "patrimonio_vitalicio_ganho": 226197.6
+    "rmi_otimizada": 3731.19,
+    "ganho_mensal_rmi": 832.49,
+    "patrimonio_vitalicio_ganho": 199797.6
   },
   "marcos_estrategicos": [
     {
@@ -94,18 +94,32 @@ const CNIS_DATA = {
       "patrimonio_vitalicio": 67749.6
     },
     {
-      "descartes": 244,
-      "salarios_restantes": 25,
-      "media_corrigida": 6401.98,
+      "descartes": 180,
+      "salarios_restantes": 89,
+      "media_corrigida": 5321.24,
+      "tc_anos_resultante": 20.0,
+      "carencia_restante": 240,
+      "coeficiente_perc": 60.0,
+      "rmi": 3192.74,
+      "delta_rmi": 294.04,
+      "tag": "Cenário Transição Piso 20 Anos (Coef. 60%)",
+      "faixa_descartada": "01/2009 a 04/2013",
+      "maior_salario_expurgado": 4636.45,
+      "patrimonio_vitalicio": 70569.6
+    },
+    {
+      "descartes": 240,
+      "salarios_restantes": 29,
+      "media_corrigida": 6218.65,
       "tc_anos_resultante": 15.0,
       "carencia_restante": 180,
       "coeficiente_perc": 60.0,
-      "rmi": 3841.19,
-      "delta_rmi": 942.49,
-      "tag": "Ponto Ótimo Global Atuarial 👑",
-      "faixa_descartada": "01/2009 a 01/2018",
-      "maior_salario_expurgado": 5078.48,
-      "patrimonio_vitalicio": 226197.6
+      "rmi": 3731.19,
+      "delta_rmi": 832.49,
+      "tag": "Ponto Ótimo Global Atuarial (15 Anos Rigorosamente Preservados) 👑",
+      "faixa_descartada": "01/2009 a 06/2017",
+      "maior_salario_expurgado": 5061.12,
+      "patrimonio_vitalicio": 199797.6
     }
   ],
   "matriz_descarte_completa": [
@@ -2638,7 +2652,7 @@ const CNIS_DATA = {
       "coeficiente_perc": 60.0,
       "rmi": 3192.74,
       "delta_rmi": 294.04,
-      "tag": "Intermediário",
+      "tag": "Cenário Transição Piso 20 Anos (Coef. 60%)",
       "faixa_descartada": "01/2009 a 04/2013",
       "maior_salario_expurgado": 4636.45,
       "patrimonio_vitalicio": 70569.6
@@ -3478,66 +3492,10 @@ const CNIS_DATA = {
       "coeficiente_perc": 60.0,
       "rmi": 3731.19,
       "delta_rmi": 832.49,
-      "tag": "Intermediário",
+      "tag": "Ponto Ótimo Global Atuarial (15 Anos Rigorosamente Preservados) 👑",
       "faixa_descartada": "01/2009 a 06/2017",
       "maior_salario_expurgado": 5061.12,
       "patrimonio_vitalicio": 199797.6
-    },
-    {
-      "descartes": 241,
-      "salarios_restantes": 28,
-      "media_corrigida": 6259.93,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3755.96,
-      "delta_rmi": 857.26,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 12/2017",
-      "maior_salario_expurgado": 5062.78,
-      "patrimonio_vitalicio": 205742.4
-    },
-    {
-      "descartes": 242,
-      "salarios_restantes": 27,
-      "media_corrigida": 6303.93,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3782.36,
-      "delta_rmi": 883.66,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 08/2018",
-      "maior_salario_expurgado": 5072.13,
-      "patrimonio_vitalicio": 212078.4
-    },
-    {
-      "descartes": 243,
-      "salarios_restantes": 26,
-      "media_corrigida": 6351.08,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3810.65,
-      "delta_rmi": 911.95,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 10/2017",
-      "maior_salario_expurgado": 5078.04,
-      "patrimonio_vitalicio": 218868.0
-    },
-    {
-      "descartes": 244,
-      "salarios_restantes": 25,
-      "media_corrigida": 6401.98,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3841.19,
-      "delta_rmi": 942.49,
-      "tag": "Ponto Ótimo Global Atuarial 👑",
-      "faixa_descartada": "01/2009 a 01/2018",
-      "maior_salario_expurgado": 5078.48,
-      "patrimonio_vitalicio": 226197.6
     }
   ],
   "descarte_curve": [
@@ -6070,7 +6028,7 @@ const CNIS_DATA = {
       "coeficiente_perc": 60.0,
       "rmi": 3192.74,
       "delta_rmi": 294.04,
-      "tag": "Intermediário",
+      "tag": "Cenário Transição Piso 20 Anos (Coef. 60%)",
       "faixa_descartada": "01/2009 a 04/2013",
       "maior_salario_expurgado": 4636.45,
       "patrimonio_vitalicio": 70569.6
@@ -6910,66 +6868,10 @@ const CNIS_DATA = {
       "coeficiente_perc": 60.0,
       "rmi": 3731.19,
       "delta_rmi": 832.49,
-      "tag": "Intermediário",
+      "tag": "Ponto Ótimo Global Atuarial (15 Anos Rigorosamente Preservados) 👑",
       "faixa_descartada": "01/2009 a 06/2017",
       "maior_salario_expurgado": 5061.12,
       "patrimonio_vitalicio": 199797.6
-    },
-    {
-      "descartes": 241,
-      "salarios_restantes": 28,
-      "media_corrigida": 6259.93,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3755.96,
-      "delta_rmi": 857.26,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 12/2017",
-      "maior_salario_expurgado": 5062.78,
-      "patrimonio_vitalicio": 205742.4
-    },
-    {
-      "descartes": 242,
-      "salarios_restantes": 27,
-      "media_corrigida": 6303.93,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3782.36,
-      "delta_rmi": 883.66,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 08/2018",
-      "maior_salario_expurgado": 5072.13,
-      "patrimonio_vitalicio": 212078.4
-    },
-    {
-      "descartes": 243,
-      "salarios_restantes": 26,
-      "media_corrigida": 6351.08,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3810.65,
-      "delta_rmi": 911.95,
-      "tag": "Intermediário",
-      "faixa_descartada": "01/2009 a 10/2017",
-      "maior_salario_expurgado": 5078.04,
-      "patrimonio_vitalicio": 218868.0
-    },
-    {
-      "descartes": 244,
-      "salarios_restantes": 25,
-      "media_corrigida": 6401.98,
-      "tc_anos_resultante": 15.0,
-      "carencia_restante": 180,
-      "coeficiente_perc": 60.0,
-      "rmi": 3841.19,
-      "delta_rmi": 942.49,
-      "tag": "Ponto Ótimo Global Atuarial 👑",
-      "faixa_descartada": "01/2009 a 01/2018",
-      "maior_salario_expurgado": 5078.48,
-      "patrimonio_vitalicio": 226197.6
     }
   ],
   "salarios_pbc": [
@@ -9371,7 +9273,7 @@ const CNIS_DATA = {
       "teto_competencia": 5531.31,
       "fator_inpc": 1.568302,
       "valor_corrigido": 5078.04,
-      "descartado_no_otimo": true
+      "descartado_no_otimo": false
     },
     {
       "comp": "11/2017",
@@ -9395,7 +9297,7 @@ const CNIS_DATA = {
       "teto_competencia": 5531.31,
       "fator_inpc": 1.561424,
       "valor_corrigido": 5062.78,
-      "descartado_no_otimo": true
+      "descartado_no_otimo": false
     },
     {
       "comp": "01/2018",
@@ -9407,7 +9309,7 @@ const CNIS_DATA = {
       "teto_competencia": 5645.8,
       "fator_inpc": 1.557841,
       "valor_corrigido": 5078.48,
-      "descartado_no_otimo": true
+      "descartado_no_otimo": false
     },
     {
       "comp": "02/2018",
@@ -9491,7 +9393,7 @@ const CNIS_DATA = {
       "teto_competencia": 5645.8,
       "fator_inpc": 1.518494,
       "valor_corrigido": 5072.13,
-      "descartado_no_otimo": true
+      "descartado_no_otimo": false
     },
     {
       "comp": "09/2018",
@@ -11654,8 +11556,8 @@ const CNIS_DATA = {
       "carencia_cumprida": "200+ meses (Mínimo 180)",
       "tempo_contribuicao": "35 anos projetados (Mínimo 15)",
       "rmi_sem_descarte": 2898.7,
-      "rmi_otimizada": 3841.19,
-      "ganho_mensal": 942.49,
+      "rmi_otimizada": 3731.19,
+      "ganho_mensal": 832.49,
       "status": "Elegível com certeza absoluta na data de 65 anos",
       "recomendacao": "CENÁRIO DE OURO: Descartar as menores contribuições (MEI) para alcançar a RMI máxima vitalícia."
     },
@@ -11665,7 +11567,7 @@ const CNIS_DATA = {
       "elegivel": false,
       "data_implemento": "Requer 40 anos e 6 meses de tempo total",
       "idade_minima": "60 anos (Cumprida em 06/06/2025)",
-      "rmi_estimada": 6401.98,
+      "rmi_estimada": 6218.65,
       "status": "Inviável a curto prazo sem recolhimentos complementares vultosos",
       "recomendacao": "Não recomendada pelo custo proibitivo de guias em atraso."
     },
@@ -12147,6 +12049,7 @@ function renderParecerMeuINSS() {
         <div class="flex justify-between items-end pt-8">
           <div>
             <p>Rio de Janeiro - RJ, ${new Date().toLocaleDateString('pt-BR')}.</p>
+            <p class="text-[11px] text-slate-500 font-medium mt-1">Elaborado por: <strong>Desenvolvedor : Henrique Rosa - Antigravity @2026</strong></p>
           </div>
           <div class="text-center">
             <div class="w-64 border-b border-slate-800 mb-1"></div>
