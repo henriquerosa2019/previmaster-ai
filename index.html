@@ -61,6 +61,10 @@
           <span>📥</span>
           <span>Analisar Novo CNIS</span>
         </button>
+        <button onclick="abrirModalLimpar()" class="px-3.5 py-1.5 rounded-lg bg-rose-950/70 hover:bg-rose-900/90 text-rose-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 border border-rose-800/80 transition-all shadow-sm" title="Apagar dados do CNIS atual da tela">
+          <span>🗑️</span>
+          <span>Apagar Dados CNIS</span>
+        </button>
         <button onclick="imprimirParecerMeuINSS()" class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-sky-600/30 transition-all">
           <span>📄</span>
           <span>Emitir Parecer (PDF)</span>
@@ -72,16 +76,46 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
+    <!-- Banner Dinâmico: Tela Limpa para Novo CNIS -->
+    <div id="banner-tela-limpa" class="hidden glass-panel p-4 rounded-2xl border border-sky-600/70 bg-gradient-to-r from-sky-950/70 via-slate-900 to-slate-950 text-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center text-xl shrink-0">
+          ✨
+        </div>
+        <div>
+          <span class="font-bold text-sky-300 block text-sm">Tela Limpa para Novo Extrato CNIS</span>
+          <span class="text-xs text-slate-300">Os dados do segurado anterior foram removidos. Carregue um novo extrato em PDF ou restaure o caso demonstrativo a qualquer momento.</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="abrirModalUpload()" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+          <span>📥</span>
+          <span>Analisar Novo CNIS (PDF)</span>
+        </button>
+        <button onclick="restaurarCasoDemonstrativo()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 text-xs font-semibold transition-all flex items-center gap-1.5">
+          <span>🔄</span>
+          <span>Restaurar Demonstração</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Card de Perfil do Segurado -->
     <section class="glass-panel rounded-2xl p-5 border border-slate-700/60 shadow-xl">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div class="space-y-1">
-          <div class="flex items-center gap-2.5">
+          <div class="flex flex-wrap items-center gap-2.5">
             <h2 id="profile-nome" class="text-xl font-bold text-white tracking-wide">HENRIQUE DA SILVA ROSA</h2>
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1">
+            <span id="profile-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CNIS 100% Auditado
             </span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Caso Demonstrativo</span>
+            
+            <button id="btn-restaurar-demo" onclick="restaurarCasoDemonstrativo()" class="hidden px-2.5 py-0.5 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 hover:text-white border border-sky-700 text-xs font-bold transition-all shadow-sm flex items-center gap-1">
+              <span>🔄</span> Restaurar Demonstração
+            </button>
+            <button onclick="abrirModalLimpar()" class="px-2 py-0.5 rounded-lg bg-slate-800/80 hover:bg-rose-950 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-800 text-xs font-medium transition-all flex items-center gap-1" title="Apagar dados do CNIS da tela">
+              <span>🗑️</span> Limpar Tela
+            </button>
           </div>
           <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-300">
             <span><strong>CPF:</strong> <span id="profile-cpf" class="font-mono text-slate-200">797.886.107-49</span></span>
@@ -763,13 +797,13 @@
         <button onclick="fecharModalUpload()" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
       </div>
 
-      <div class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-2xl p-8 text-center space-y-3 cursor-pointer transition-all bg-slate-900/50">
+      <div onclick="document.getElementById('cnis-file-input').click()" class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-2xl p-8 text-center space-y-3 cursor-pointer transition-all bg-slate-900/50">
         <div class="w-12 h-12 rounded-full bg-sky-950/80 text-sky-400 mx-auto flex items-center justify-center text-2xl">
           📄
         </div>
         <div>
-          <span class="text-xs font-semibold text-slate-200 block">Arraste o arquivo CNIS em PDF aqui</span>
-          <span class="text-[11px] text-slate-400">ou clique para selecionar do seu dispositivo</span>
+          <span class="text-xs font-semibold text-slate-200 block">Clique ou arraste o arquivo CNIS em PDF aqui</span>
+          <span class="text-[11px] text-slate-400">Suporte a extratos completos do Meu INSS (com remunerações)</span>
         </div>
         <input type="file" id="cnis-file-input" accept=".pdf" class="hidden">
       </div>
@@ -777,6 +811,42 @@
       <div class="text-[11px] text-slate-400 bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1">
         <span class="text-sky-400 font-semibold block">🔒 Privacidade e LGPD Garantidas:</span>
         <p>O processamento é realizado de forma segura e confidencial. Os dados são utilizados unicamente para gerar os cálculos da aposentadoria.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO PARA APAGAR DADOS DO CNIS DA TELA -->
+  <div id="modal-confirmar-limpar" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 rounded-3xl border border-rose-800/80 max-w-md w-full shadow-2xl space-y-5 bg-slate-900/95">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-rose-950/80 border border-rose-700/80 flex items-center justify-center text-xl text-rose-400 shrink-0">
+          🗑️
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-base font-bold text-white">Apagar Dados do CNIS Atual?</h3>
+          <p class="text-xs text-slate-300">
+            Esta ação limpará todas as informações pessoais, salários de contribuição, cálculos da matriz de descartes e parecer técnico da tela atual.
+          </p>
+        </div>
+      </div>
+
+      <div class="p-3 bg-rose-950/30 rounded-xl border border-rose-900/60 text-xs text-rose-300 space-y-1">
+        <span class="font-bold flex items-center gap-1.5">
+          <span>⚠️</span> Atenção:
+        </span>
+        <p class="text-[11px] text-slate-300">
+          Você terá uma tela 100% limpa para analisar um novo extrato de cliente. Poderá também <strong>restaurar o Caso Demonstrativo</strong> a qualquer momento com 1 clique.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
+        <button onclick="fecharModalLimpar()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all">
+          Cancelar
+        </button>
+        <button onclick="executarLimpezaCNIS()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-lg shadow-rose-600/30 flex items-center gap-1.5">
+          <span>🗑️</span>
+          <span>Sim, Apagar Dados</span>
+        </button>
       </div>
     </div>
   </div>
@@ -815,6 +885,12 @@
     }
     function fecharModalUpload() {
       document.getElementById('modal-upload').classList.add('hidden');
+    }
+    function abrirModalLimpar() {
+      document.getElementById('modal-confirmar-limpar').classList.remove('hidden');
+    }
+    function fecharModalLimpar() {
+      document.getElementById('modal-confirmar-limpar').classList.add('hidden');
     }
   </script>
 </body>

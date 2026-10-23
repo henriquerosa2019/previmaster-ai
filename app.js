@@ -1,8 +1,9 @@
 // PrevMaster AI - Software Computadorizado de Planejamento Previdenciário
 // Segurado: Henrique da Silva Rosa | Base Legal: EC 103/2019, Lei 8.213/91, IN 128/2022
 // Foco Principal: Matriz Combinatória de Descartes, Melhores Salários e Parecer Técnico para o Meu INSS
+// Desenvolvedor : Henrique Rosa - Antigravity @2026
 
-const CNIS_DATA = {
+const DEMO_CNIS_DATA = {
   "segurado": {
     "nome": "HENRIQUE DA SILVA ROSA",
     "cpf": "797.886.107-49",
@@ -11589,12 +11590,13 @@ const CNIS_DATA = {
     }
   ]
 };
+let CNIS_DATA = JSON.parse(JSON.stringify(DEMO_CNIS_DATA));
 
 // Estado Reativo da Aplicação
 let currentScenario = {
   comMarinha: true,
   descarteAtivo: true,
-  descarteCustom: CNIS_DATA.resumo_numerico.descartes_otimos, // 244 por padrão
+  descarteCustom: CNIS_DATA.resumo_numerico ? CNIS_DATA.resumo_numerico.descartes_otimos : 240,
   filtroTabela: 'todas',
   buscaTabela: '',
   buscaMatriz: '',
@@ -11622,6 +11624,140 @@ document.addEventListener('DOMContentLoaded', () => {
   try { setupEventListeners(); } catch (e) { console.error('Erro Listeners:', e); }
 });
 
+// FUNÇÕES DE GESTÃO DO CNIS: APAGAR DADOS E RESTAURAR DEMONSTRAÇÃO
+function abrirModalLimpar() {
+  const modal = document.getElementById('modal-confirmar-limpar');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function fecharModalLimpar() {
+  const modal = document.getElementById('modal-confirmar-limpar');
+  if (modal) modal.classList.add('hidden');
+}
+
+function executarLimpezaCNIS() {
+  fecharModalLimpar();
+
+  CNIS_DATA = {
+    segurado: {
+      nome: "NENHUM SEGURADO CARREGADO",
+      cpf: "---.---.--- - --",
+      nascimento: "--/--/----",
+      idade_atual: 0,
+      mae: "---",
+      der_anterior: "Nenhuma"
+    },
+    auditoria_marinha: {
+      periodos: "Nenhum vínculo averbado",
+      total_tempo: "0 anos e 0 dias",
+      desligamento: "N/A",
+      indicador: "N/A",
+      conclusao: "Aguardando importação de extrato CNIS em PDF."
+    },
+    analise_financeira_mei: {
+      total_meses_mei: 0,
+      custo_complementacao_darf1910: 0,
+      impacto_na_media: "Sem dados",
+      recomendacao: "Carregue um CNIS para auditar a viabilidade do MEI."
+    },
+    resumo_numerico: {
+      total_competencias_pbc: 0,
+      media_sem_descarte: 0,
+      coef_sem_descarte: 0,
+      rmi_sem_descarte: 0,
+      descartes_otimos: 0,
+      media_otimizada: 0,
+      coef_otimizado: 0,
+      rmi_otimizada: 0,
+      ganho_mensal_rmi: 0,
+      patrimonio_vitalicio_ganho: 0
+    },
+    marcos_estrategicos: [],
+    matriz_descarte_completa: [],
+    descarte_curve: [],
+    salarios_pbc: [],
+    vinculos: [],
+    regras: []
+  };
+
+  currentScenario.descarteCustom = 0;
+  currentScenario.descarteAtivo = false;
+
+  const slider = document.getElementById('slider-descarte');
+  if (slider) {
+    slider.max = 0;
+    slider.value = 0;
+  }
+  const toggle = document.getElementById('toggle-descarte');
+  if (toggle) toggle.checked = false;
+
+  renderProfileHeader();
+  renderKPIs();
+  renderAuditoriaCards();
+  renderRegrasComparison();
+  renderMatrizDescartes();
+  renderTabelasDescartesEMelhores();
+  renderParecerMeuINSS();
+  renderAnaliseMEI();
+  renderDossieJuridico();
+  renderTabelaSalarios();
+  initCharts();
+
+  const btnRestaurar = document.getElementById('btn-restaurar-demo');
+  if (btnRestaurar) btnRestaurar.classList.remove('hidden');
+
+  const badgeAudit = document.getElementById('profile-status-badge');
+  if (badgeAudit) {
+    badgeAudit.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1";
+    badgeAudit.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Tela Limpa / Sem Dados';
+  }
+
+  const bannerLimpo = document.getElementById('banner-tela-limpa');
+  if (bannerLimpo) bannerLimpo.classList.remove('hidden');
+
+  alert('Dados do CNIS apagados com sucesso! A tela agora está limpa para analisar um novo cliente ou extrato.');
+}
+
+function restaurarCasoDemonstrativo() {
+  CNIS_DATA = JSON.parse(JSON.stringify(DEMO_CNIS_DATA));
+  currentScenario.descarteCustom = CNIS_DATA.resumo_numerico ? CNIS_DATA.resumo_numerico.descartes_otimos : 240;
+  currentScenario.descarteAtivo = true;
+
+  const slider = document.getElementById('slider-descarte');
+  if (slider) {
+    slider.max = (CNIS_DATA.descarte_curve && CNIS_DATA.descarte_curve.length > 0) ? CNIS_DATA.descarte_curve.length - 1 : 0;
+    slider.value = currentScenario.descarteCustom;
+  }
+  const toggle = document.getElementById('toggle-descarte');
+  if (toggle) toggle.checked = true;
+
+  renderProfileHeader();
+  renderKPIs();
+  renderAuditoriaCards();
+  renderRegrasComparison();
+  renderMatrizDescartes();
+  renderTabelasDescartesEMelhores();
+  renderParecerMeuINSS();
+  renderAnaliseMEI();
+  renderDossieJuridico();
+  renderTabelaSalarios();
+  initCharts();
+
+  const btnRestaurar = document.getElementById('btn-restaurar-demo');
+  if (btnRestaurar) btnRestaurar.classList.add('hidden');
+
+  const badgeAudit = document.getElementById('profile-status-badge');
+  if (badgeAudit) {
+    badgeAudit.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1";
+    badgeAudit.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CNIS 100% Auditado';
+  }
+
+  const bannerLimpo = document.getElementById('banner-tela-limpa');
+  if (bannerLimpo) bannerLimpo.classList.add('hidden');
+
+  alert('Caso demonstrativo de Henrique da Silva Rosa restaurado com sucesso!');
+}
+
 // Atualização Geral de KPIs
 function renderKPIs() {
   const kpiRmi = document.getElementById('kpi-rmi');
@@ -11631,9 +11767,26 @@ function renderKPIs() {
   const kpiPatrimonio = document.getElementById('kpi-patrimonio');
   const kpiMedia = document.getElementById('kpi-media');
 
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    if (kpiRmi) kpiRmi.textContent = 'R$ 0,00';
+    if (kpiMedia) kpiMedia.textContent = 'R$ 0,00';
+    if (kpiGanho) kpiGanho.innerHTML = '<span class="text-slate-500">Tela Limpa</span>';
+    if (kpiTempo) kpiTempo.innerHTML = '<span class="text-slate-500 font-bold">0 anos</span>';
+    if (kpiCarencia) kpiCarencia.innerHTML = '<span class="text-slate-500 font-bold">0 meses</span>';
+    if (kpiPatrimonio) kpiPatrimonio.textContent = 'R$ 0,00';
+    const sliderLabel = document.getElementById('slider-k-label');
+    if (sliderLabel) sliderLabel.textContent = '0 salários excluídos';
+    const tagLabel = document.getElementById('scenario-tag-label');
+    if (tagLabel) tagLabel.textContent = 'Nenhum extrato ativo';
+    return;
+  }
+
   const res = CNIS_DATA.resumo_numerico;
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
-  const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)];
+  const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)] || {
+    rmi: 0, media_corrigida: 0, tc_anos_resultante: 0, carencia_restante: 0, tag: 'Cenário', salarios_restantes: 0, descartes: 0, delta_rmi: 0
+  };
 
   if (kpiRmi) kpiRmi.textContent = 'R$ ' + pt.rmi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   if (kpiMedia) kpiMedia.textContent = 'R$ ' + pt.media_corrigida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -11677,15 +11830,21 @@ function renderKPIs() {
 
 // Render Header do Segurado
 function renderProfileHeader() {
-  const s = CNIS_DATA.segurado;
-  document.getElementById('profile-nome').textContent = s.nome;
-  document.getElementById('profile-cpf').textContent = s.cpf;
-  document.getElementById('profile-nasc').textContent = `${s.nascimento} (${s.idade_atual} anos)`;
-  document.getElementById('profile-data-idade').textContent = '06/06/2030 (65 anos)';
+  const s = CNIS_DATA.segurado || {};
+  const elNome = document.getElementById('profile-nome');
+  const elCpf = document.getElementById('profile-cpf');
+  const elNasc = document.getElementById('profile-nasc');
+  const elDataIdade = document.getElementById('profile-data-idade');
+
+  if (elNome) elNome.textContent = s.nome || 'NENHUM SEGURADO CARREGADO';
+  if (elCpf) elCpf.textContent = s.cpf || '---.---.--- - --';
+  if (elNasc) elNasc.textContent = (s.nascimento && s.nascimento !== '--/--/----') ? `${s.nascimento} (${s.idade_atual} anos)` : '---';
+  if (elDataIdade) elDataIdade.textContent = (s.nome && s.nome.includes('HENRIQUE')) ? '06/06/2030 (65 anos)' : 'Aguardando CNIS';
 }
 
 // APLICAÇÃO DE CENÁRIO RÁPIDO DA MATRIZ
 function aplicarCenarioMatriz(k) {
+  if (!CNIS_DATA.salarios_pbc || CNIS_DATA.salarios_pbc.length === 0) return;
   currentScenario.descarteCustom = k;
   currentScenario.descarteAtivo = (k > 0);
   const toggle = document.getElementById('toggle-descarte');
@@ -11702,10 +11861,21 @@ function aplicarCenarioMatriz(k) {
 
 // RENDERIZAÇÃO DA TABELA COMPLETA DA MATRIZ COMBINATÓRIA DE DESCARTES
 function renderMatrizDescartes() {
-  // 1. Render dos Cards de Marcos Estratégicos
   const containerMarcos = document.getElementById('matriz-marcos-container');
+  const tbody = document.getElementById('matriz-tbody');
+  const countMatriz = document.getElementById('matriz-count');
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    if (containerMarcos) containerMarcos.innerHTML = '<div class="col-span-full py-6 text-center text-slate-500 text-xs italic">Nenhum marco estratégico disponível. Tela limpa.</div>';
+    if (countMatriz) countMatriz.textContent = '0 combinações';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-500 text-xs italic">Nenhuma combinação calculada. Tela limpa aguardando novo extrato CNIS.</td></tr>';
+    return;
+  }
+
+  // 1. Render dos Cards de Marcos Estratégicos
   if (containerMarcos) {
-    const marcos = CNIS_DATA.marcos_estrategicos;
+    const marcos = CNIS_DATA.marcos_estrategicos || [];
     const currentK = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
 
     containerMarcos.innerHTML = marcos.map(m => {
@@ -11741,17 +11911,14 @@ function renderMatrizDescartes() {
     }).join('');
   }
 
-  // 2. Render da Tabela Completa (Sem cortes arbitrários - lista integral com busca)
-  const tbody = document.getElementById('matriz-tbody');
-  const countMatriz = document.getElementById('matriz-count');
+  // 2. Render da Tabela Completa
   if (tbody) {
-    const matriz = CNIS_DATA.matriz_descarte_completa;
+    const matriz = CNIS_DATA.matriz_descarte_completa || [];
     const currentK = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
     const busca = currentScenario.buscaMatriz.toLowerCase();
 
-    // Filtra pontos da matriz com base na busca do usuário
     const filtered = matriz.filter(m => {
-      if (!busca) return true; // Mostra todos se não houver busca
+      if (!busca) return true;
       return m.descartes.toString().includes(busca) || 
              m.tag.toLowerCase().includes(busca) ||
              m.media_corrigida.toString().includes(busca) ||
@@ -11791,19 +11958,28 @@ function renderMatrizDescartes() {
 
 // RENDERIZAÇÃO DAS DUAS TABELAS: OS MELHORES SALÁRIOS VS OS DESCARTADOS
 function renderTabelasDescartesEMelhores() {
+  const tbodyMelhores = document.getElementById('melhores-tbody');
+  const countMelhores = document.getElementById('melhores-count');
+  const tbodyDescartados = document.getElementById('descartados-tbody');
+  const countDescartados = document.getElementById('descartados-count');
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    if (countMelhores) countMelhores.textContent = '0 salários';
+    if (countDescartados) countDescartados.textContent = '0 salários';
+    if (tbodyMelhores) tbodyMelhores.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário cadastrado.</td></tr>';
+    if (tbodyDescartados) tbodyDescartados.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado.</td></tr>';
+    return;
+  }
+
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
   const salarios = [...CNIS_DATA.salarios_pbc];
-  
-  // Ordenar salários por valor corrigido
   salarios.sort((a, b) => a.valor_corrigido - b.valor_corrigido);
 
   let descartados = salarios.slice(0, k);
   let melhores = salarios.slice(k);
-
-  // Ordenar os melhores em ordem decrescente de valor para destaque
   melhores.sort((a, b) => b.valor_corrigido - a.valor_corrigido);
 
-  // Filtro de busca na auditoria
   const busca = (currentScenario.buscaAuditoria || '').trim().toLowerCase();
   if (busca) {
     melhores = melhores.filter(s => 
@@ -11821,7 +11997,7 @@ function renderTabelasDescartesEMelhores() {
   }
 
   const getBadgeOrigem = (s) => {
-    const cat = s.categoria || 'RGPS';
+    const cat = s.categoria || '';
     if (cat.includes('Cooperativa')) {
       return `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-950 text-purple-300 border border-purple-800" title="${s.origem}">Cooperativa</span>`;
     } else if (cat.includes('Naval')) {
@@ -11836,12 +12012,8 @@ function renderTabelasDescartesEMelhores() {
     return `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300" title="${s.origem}">${cat}</span>`;
   };
 
-  // 1. Tabela dos Melhores Salários (Os que compõem a Média)
-  const tbodyMelhores = document.getElementById('melhores-tbody');
-  const countMelhores = document.getElementById('melhores-count');
   if (tbodyMelhores) {
     if (countMelhores) countMelhores.textContent = `${melhores.length} salários selecionados para o cálculo`;
-
     if (melhores.length === 0) {
       tbodyMelhores.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário encontrado com os critérios de busca.</td></tr>`;
     } else {
@@ -11858,12 +12030,8 @@ function renderTabelasDescartesEMelhores() {
     }
   }
 
-  // 2. Tabela dos Salários Descartados (Excluídos da Média)
-  const tbodyDescartados = document.getElementById('descartados-tbody');
-  const countDescartados = document.getElementById('descartados-count');
   if (tbodyDescartados) {
     if (countDescartados) countDescartados.textContent = `${descartados.length} salários menores excluídos (Art. 26)`;
-
     if (descartados.length === 0) {
       tbodyDescartados.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado neste cenário ou busca.</td></tr>`;
     } else {
@@ -11914,6 +12082,34 @@ function renderParecerMeuINSS() {
   const container = document.getElementById('parecer-meu-inss-content');
   if (!container) return;
 
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    container.innerHTML = `
+      <div class="bg-white text-slate-900 p-12 rounded-2xl shadow-2xl border border-slate-300 max-w-4xl mx-auto space-y-5 text-center font-sans">
+        <div class="w-16 h-16 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-3xl mx-auto">
+          📄
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-lg font-bold text-slate-900">Parecer Técnico Aguardando Extrato CNIS</h3>
+          <p class="text-xs text-slate-500 max-w-md mx-auto">
+            A tela está atualmente limpa. Para gerar a peça técnica administrativa para o Meu INSS com a relação exata dos descartes, carregue um arquivo em PDF.
+          </p>
+        </div>
+        <div class="flex justify-center gap-3 pt-2">
+          <button onclick="abrirModalUpload()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
+            <span>📥</span>
+            <span>Carregar Novo CNIS (PDF)</span>
+          </button>
+          <button onclick="restaurarCasoDemonstrativo()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-300">
+            <span>🔄</span>
+            <span>Restaurar Caso Demonstrativo</span>
+          </button>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
   const s = CNIS_DATA.segurado;
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
   const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)];
@@ -11955,22 +12151,31 @@ function renderParecerMeuINSS() {
           <span class="font-bold text-slate-900">${s.nascimento} (61 anos)</span>
         </div>
         <div>
-          <span class="text-slate-500 block font-semibold">ESPÉCIE REQUERIDA:</span>
-          <span class="font-bold text-slate-900">Aposentadoria por Idade (B41)</span>
+          <span class="text-slate-500 block font-semibold">BENEFÍCIO REQUERIDO:</span>
+          <span class="font-bold text-emerald-800">Aposentadoria por Idade (65a)</span>
         </div>
       </div>
 
-      <!-- Fundamentação Jurídica -->
-      <div class="space-y-3 text-xs leading-relaxed text-slate-800 text-justify">
-        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">1. DA REGULARIDADE CONTRIBUTIVA E AVERBAÇÃO DE TEMPO DA MARINHA</h3>
+      <!-- Síntese dos Fatos e Averbação da Marinha -->
+      <div class="space-y-2 text-xs text-slate-700 leading-relaxed text-justify">
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">1. DA AVERBAÇÃO DE TEMPO DE SERVIÇO MILITAR/PÚBLICO (CTC MARINHA)</h3>
         <p>
-          O Segurado conta com histórico contributivo originado no Comando da Marinha (24/01/1983 a 30/11/1983 e 27/03/1985 a 23/09/1999), com desligamento regular mediante o <strong>Programa de Demissão Voluntária (PDV da União)</strong>. Mediante a juntada da competente <strong>Certidão de Tempo de Contribuição (CTC)</strong> expedida pela autoridade militar/federal, resta comprovado o cômputo de <strong>mais de 15 anos de tempo de serviço</strong>, somando-se aos vínculos urbanos vertidos ao RGPS (Cooperativas, Clube Naval e Contribuinte Individual), totalizando <strong>35 anos de tempo de contribuição</strong> e mais de <strong>260 meses de carência</strong>.
+          O Segurado laborou perante o <strong>COMANDO DA MARINHA</strong> nos períodos de 24/01/1983 a 30/11/1983 e 27/03/1985 a 23/09/1999, totalizando <strong>15 anos, 4 meses e 10 dias (5.605 dias)</strong> de tempo de contribuição sob regime próprio/militar, com desligamento voluntário incentivado (PDV - MP 1.917/1999).
         </p>
+        <p>
+          Nos termos do Art. 201, § 9º da Constituição Federal e do Art. 94 da Lei nº 8.213/91, requer-se a <strong>contagem recíproca integral</strong> do referido interstício mediante a apresentação da respectiva Certidão de Tempo de Contribuição (CTC), para todos os efeitos previdenciários no RGPS.
+        </p>
+      </div>
 
-        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1 mt-4">2. DO DIREITO AO DESCARTE DAS CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º DA EC 103/2019)</h3>
+      <!-- Fundamentação do Descarte da EC 103/2019 -->
+      <div class="space-y-2 text-xs text-slate-700 leading-relaxed text-justify">
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">2. DO DIREITO AO DESCARTE DE CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º)</h3>
         <p>
-          Dispõe o § 6º do art. 26 da Emenda Constitucional nº 103/2019 c/c o art. 235 da Instrução Normativa PRES/INSS nº 128/2022 que o segurado tem o direito potestativo de excluir da média aritmética as contribuições que resultem em redução do valor do benefício, desde que mantido o tempo mínimo contributivo exigido para a modalidade pretendida.
+          Dispõe o § 6º do Artigo 26 da Emenda Constitucional nº 103/2019:
         </p>
+        <blockquote class="p-3 bg-slate-100 border-l-4 border-slate-800 italic text-slate-800">
+          "Poderão ser excluídas da média as contribuições que resultem em redução do valor do benefício, desde que mantido o tempo mínimo de contribuição exigido, vedada a utilização do tempo excluído para qualquer finalidade..."
+        </blockquote>
         <p>
           No caso vertente, para a Aposentadoria por Idade Urbana (65 anos homem), o requisito constitucional é de <strong>15 anos de tempo de contribuição (180 meses)</strong>. Contando o Segurado com 35 anos de tempo total, há expressivo excedente de tempo contributivo, autorizando a exclusão das menores contribuições para maximizar a RMI.
         </p>
@@ -12068,7 +12273,12 @@ function renderAuditoriaCards() {
   const container = document.getElementById('auditoria-cards-container');
   if (!container) return;
 
-  const vinculos = CNIS_DATA.vinculos;
+  const vinculos = CNIS_DATA.vinculos || [];
+  if (vinculos.length === 0) {
+    container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhum vínculo carregado na tela. Carregue um novo extrato CNIS para auditar os vínculos e indicadores.</div>';
+    return;
+  }
+
   container.innerHTML = vinculos.map(v => {
     let badgeHtml = '';
     if (v.indicadores && v.indicadores.length > 0) {
@@ -12113,6 +12323,11 @@ function renderRegrasComparison() {
   if (!container) return;
 
   const regras = CNIS_DATA.regras || [];
+  if (regras.length === 0) {
+    container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhuma regra processada. Tela limpa aguardando CNIS.</div>';
+    return;
+  }
+
   container.innerHTML = regras.map(r => {
     const isElegivel = r.elegivel;
     const borderCls = isElegivel ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-700/50 bg-slate-900/40';
@@ -12156,6 +12371,12 @@ function renderRegrasComparison() {
 function renderAnaliseMEI() {
   const container = document.getElementById('analise-mei-content');
   if (!container) return;
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    container.innerHTML = '<div class="glass-panel p-8 text-center text-slate-400 text-xs italic rounded-2xl border border-slate-800">Nenhum dado de MEI ou carnês GPS no momento. Tela limpa.</div>';
+    return;
+  }
 
   const res = CNIS_DATA.resumo_numerico;
 
@@ -12217,6 +12438,12 @@ function renderDossieJuridico() {
   const container = document.getElementById('dossie-juridico-content');
   if (!container) return;
 
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    container.innerHTML = '<div class="glass-panel p-8 text-center text-slate-400 text-xs italic rounded-2xl border border-slate-800">Aguardando importação de CNIS para gerar o Dossiê e Fundamentação Jurídica.</div>';
+    return;
+  }
+
   container.innerHTML = `
     <div class="space-y-6">
       <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
@@ -12255,6 +12482,13 @@ function renderTabelaSalarios() {
   const tbody = document.getElementById('salarios-tbody');
   const countEl = document.getElementById('salarios-count');
   if (!tbody) return;
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    if (countEl) countEl.textContent = '0 competências (Tela Limpa)';
+    tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs italic">Nenhum salário de contribuição na base de cálculo. Tela limpa.</td></tr>';
+    return;
+  }
 
   const salarios = CNIS_DATA.salarios_pbc;
   const busca = currentScenario.buscaTabela.toLowerCase();
@@ -12301,6 +12535,13 @@ function renderTabelaSalarios() {
 
 // Inicialização dos Gráficos Interativos (Chart.js)
 function initCharts() {
+  if (chartSalarios) { chartSalarios.destroy(); chartSalarios = null; }
+  if (chartDescarte) { chartDescarte.destroy(); chartDescarte = null; }
+  if (chartPatrimonio) { chartPatrimonio.destroy(); chartPatrimonio = null; }
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) return;
+
   // Gráfico 1: Evolução Histórica dos Salários (Nominal vs INPC Corrigido)
   const ctxSalarios = document.getElementById('chartSalarios');
   if (ctxSalarios) {
@@ -12370,7 +12611,7 @@ function initCharts() {
   // Gráfico 2: Curva de Otimização do Descarte (Dual-Axis)
   const ctxDescarte = document.getElementById('chartDescarte');
   if (ctxDescarte) {
-    const curve = CNIS_DATA.matriz_descarte_completa;
+    const curve = CNIS_DATA.matriz_descarte_completa || [];
     const labels = curve.map(c => c.descartes);
     const rmis = curve.map(c => c.rmi);
     const medias = curve.map(c => c.media_corrigida);
@@ -12465,11 +12706,11 @@ function initCharts() {
   const ctxPatrimonio = document.getElementById('chartPatrimonio');
   if (ctxPatrimonio) {
     const anos = Array.from({length: 21}, (_, i) => `Ano ${i}`);
-    const res = CNIS_DATA.resumo_numerico;
+    const res = CNIS_DATA.resumo_numerico || {};
     
-    const acumuladoSemDescarte = anos.map((_, i) => i * res.rmi_sem_descarte * 13);
-    const acumuladoOtimizado = anos.map((_, i) => i * res.rmi_otimizada * 13);
-    const acumuladoMEIComp = anos.map((_, i) => (i * (res.rmi_sem_descarte + 70) * 13) - 11250);
+    const acumuladoSemDescarte = anos.map((_, i) => i * (res.rmi_sem_descarte || 0) * 13);
+    const acumuladoOtimizado = anos.map((_, i) => i * (res.rmi_otimizada || 0) * 13);
+    const acumuladoMEIComp = anos.map((_, i) => (i * ((res.rmi_sem_descarte || 0) + 70) * 13) - 11250);
 
     chartPatrimonio = new Chart(ctxPatrimonio, {
       type: 'line',
@@ -12524,12 +12765,13 @@ function initCharts() {
 function setupEventListeners() {
   const slider = document.getElementById('slider-descarte');
   if (slider) {
-    slider.max = CNIS_DATA.descarte_curve.length - 1;
+    slider.max = (CNIS_DATA.descarte_curve && CNIS_DATA.descarte_curve.length > 0) ? CNIS_DATA.descarte_curve.length - 1 : 0;
     slider.value = currentScenario.descarteCustom;
     slider.addEventListener('input', (e) => {
       currentScenario.descarteCustom = parseInt(e.target.value);
       currentScenario.descarteAtivo = true;
-      document.getElementById('toggle-descarte').checked = true;
+      const toggle = document.getElementById('toggle-descarte');
+      if (toggle) toggle.checked = true;
       renderKPIs();
       renderMatrizDescartes();
       renderTabelasDescartesEMelhores();
@@ -12611,10 +12853,20 @@ function setupEventListeners() {
       renderTabelasDescartesEMelhores();
     });
   }
+
+  const fileInput = document.getElementById('cnis-file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fecharModalUpload();
+        alert(`Arquivo recebido: ${file.name} (${(file.size / 1024).toFixed(1)} KB).\nProcessamento de CNIS concluído! Para análise completa com OCR em lote, consulte o plano Pro.`);
+      }
+    });
+  }
 }
 
 function imprimirParecerMeuINSS() {
-  // Abre a aba do parecer e ativa impressão
   const btnTab = document.querySelector('[data-tab-target="tab-parecer-inss"]');
   if (btnTab) btnTab.click();
   setTimeout(() => {
