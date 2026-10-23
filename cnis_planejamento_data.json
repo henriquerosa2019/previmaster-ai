@@ -10564,5 +10564,46 @@
       "situacao": "99 - INDEFERIDO",
       "motivo": "Falta de tempo de contribuição (INSS computou apenas 14a 02m 01d pois desconsiderou Comando da Marinha sem CTC)."
     }
+  ],
+  "regras": [
+    {
+      "id": "regra_idade",
+      "nome": "Aposentadoria por Idade Urbana (Art. 18 / EC 103)",
+      "elegivel": true,
+      "data_implemento": "06/06/2030 (Aos 65 anos)",
+      "carencia_cumprida": "200+ meses (Mínimo 180)",
+      "tempo_contribuicao": "35 anos projetados (Mínimo 15)",
+      "rmi_sem_descarte": 2907.13,
+      "rmi_otimizada": 3884.13,
+      "ganho_mensal": 977.0,
+      "status": "Elegível com certeza absoluta na data de 65 anos",
+      "recomendacao": "CENÁRIO DE OURO: Descartar as menores contribuições (MEI) para alcançar a RMI máxima vitalícia."
+    },
+    {
+      "id": "transicao_pedagio_100",
+      "nome": "Transição Pedágio 100% (Art. 20 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Requer 40 anos e 6 meses de tempo total",
+      "idade_minima": "60 anos (Cumprida em 06/06/2025)",
+      "rmi_estimada": 6473.54,
+      "status": "Inviável a curto prazo sem recolhimentos complementares vultosos",
+      "recomendacao": "Não recomendada pelo custo proibitivo de guias em atraso."
+    },
+    {
+      "id": "transicao_pedagio_50",
+      "nome": "Transição Pedágio 50% (Art. 17 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Inaplicável",
+      "status": "Não atingiu 33 anos de TC em 13/11/2019",
+      "recomendacao": "Cláusula de barreira intransponível."
+    },
+    {
+      "id": "transicao_pontos",
+      "nome": "Transição por Pontos (Art. 15 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Atinge 105 pontos próximo a 2030",
+      "status": "Converge temporalmente com a regra por idade",
+      "recomendacao": "A regra por idade é mais segura e rentável juridicamente."
+    }
   ]
 }

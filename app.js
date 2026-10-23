@@ -10568,6 +10568,47 @@ const CNIS_DATA = {
       "situacao": "99 - INDEFERIDO",
       "motivo": "Falta de tempo de contribuição (INSS computou apenas 14a 02m 01d pois desconsiderou Comando da Marinha sem CTC)."
     }
+  ],
+  "regras": [
+    {
+      "id": "regra_idade",
+      "nome": "Aposentadoria por Idade Urbana (Art. 18 / EC 103)",
+      "elegivel": true,
+      "data_implemento": "06/06/2030 (Aos 65 anos)",
+      "carencia_cumprida": "200+ meses (Mínimo 180)",
+      "tempo_contribuicao": "35 anos projetados (Mínimo 15)",
+      "rmi_sem_descarte": 2907.13,
+      "rmi_otimizada": 3884.13,
+      "ganho_mensal": 977.0,
+      "status": "Elegível com certeza absoluta na data de 65 anos",
+      "recomendacao": "CENÁRIO DE OURO: Descartar as menores contribuições (MEI) para alcançar a RMI máxima vitalícia."
+    },
+    {
+      "id": "transicao_pedagio_100",
+      "nome": "Transição Pedágio 100% (Art. 20 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Requer 40 anos e 6 meses de tempo total",
+      "idade_minima": "60 anos (Cumprida em 06/06/2025)",
+      "rmi_estimada": 6473.54,
+      "status": "Inviável a curto prazo sem recolhimentos complementares vultosos",
+      "recomendacao": "Não recomendada pelo custo proibitivo de guias em atraso."
+    },
+    {
+      "id": "transicao_pedagio_50",
+      "nome": "Transição Pedágio 50% (Art. 17 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Inaplicável",
+      "status": "Não atingiu 33 anos de TC em 13/11/2019",
+      "recomendacao": "Cláusula de barreira intransponível."
+    },
+    {
+      "id": "transicao_pontos",
+      "nome": "Transição por Pontos (Art. 15 / EC 103)",
+      "elegivel": false,
+      "data_implemento": "Atinge 105 pontos próximo a 2030",
+      "status": "Converge temporalmente com a regra por idade",
+      "recomendacao": "A regra por idade é mais segura e rentável juridicamente."
+    }
   ]
 };
 
@@ -10578,7 +10619,9 @@ let currentScenario = {
   descarteCustom: CNIS_DATA.resumo_numerico.descartes_otimos, // 244 por padrão
   filtroTabela: 'todas',
   buscaTabela: '',
-  buscaMatriz: ''
+  buscaMatriz: '',
+  buscaAuditoria: '',
+  modoAuditoria: 'ambos'
 };
 
 let chartSalarios = null;
@@ -10587,18 +10630,18 @@ let chartPatrimonio = null;
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  renderProfileHeader();
-  renderKPIs();
-  renderAuditoriaCards();
-  renderRegrasComparison();
-  renderMatrizDescartes();
-  renderTabelasDescartesEMelhores();
-  renderParecerMeuINSS();
-  renderAnaliseMEI();
-  renderDossieJuridico();
-  renderTabelaSalarios();
-  initCharts();
-  setupEventListeners();
+  try { renderProfileHeader(); } catch (e) { console.error('Erro profile:', e); }
+  try { renderKPIs(); } catch (e) { console.error('Erro KPIs:', e); }
+  try { renderAuditoriaCards(); } catch (e) { console.error('Erro Auditoria:', e); }
+  try { renderRegrasComparison(); } catch (e) { console.error('Erro Regras:', e); }
+  try { renderMatrizDescartes(); } catch (e) { console.error('Erro Matriz:', e); }
+  try { renderTabelasDescartesEMelhores(); } catch (e) { console.error('Erro Tabelas Descartes:', e); }
+  try { renderParecerMeuINSS(); } catch (e) { console.error('Erro Parecer:', e); }
+  try { renderAnaliseMEI(); } catch (e) { console.error('Erro MEI:', e); }
+  try { renderDossieJuridico(); } catch (e) { console.error('Erro Dossiê:', e); }
+  try { renderTabelaSalarios(); } catch (e) { console.error('Erro Salários:', e); }
+  try { initCharts(); } catch (e) { console.error('Erro Charts:', e); }
+  try { setupEventListeners(); } catch (e) { console.error('Erro Listeners:', e); }
 });
 
 // Atualização Geral de KPIs
@@ -10776,11 +10819,28 @@ function renderTabelasDescartesEMelhores() {
   // Ordenar salários por valor corrigido
   salarios.sort((a, b) => a.valor_corrigido - b.valor_corrigido);
 
-  const descartados = salarios.slice(0, k);
-  const melhores = salarios.slice(k);
+  let descartados = salarios.slice(0, k);
+  let melhores = salarios.slice(k);
 
   // Ordenar os melhores em ordem decrescente de valor para destaque
   melhores.sort((a, b) => b.valor_corrigido - a.valor_corrigido);
+
+  // Filtro de busca na auditoria
+  const busca = (currentScenario.buscaAuditoria || '').trim().toLowerCase();
+  if (busca) {
+    melhores = melhores.filter(s => 
+      s.comp.toLowerCase().includes(busca) || 
+      (s.origem && s.origem.toLowerCase().includes(busca)) ||
+      s.valor_nominal.toString().includes(busca) ||
+      s.valor_corrigido.toString().includes(busca)
+    );
+    descartados = descartados.filter(s => 
+      s.comp.toLowerCase().includes(busca) || 
+      (s.origem && s.origem.toLowerCase().includes(busca)) ||
+      s.valor_nominal.toString().includes(busca) ||
+      s.valor_corrigido.toString().includes(busca)
+    );
+  }
 
   // 1. Tabela dos Melhores Salários (Os que compõem a Média)
   const tbodyMelhores = document.getElementById('melhores-tbody');
@@ -10788,16 +10848,20 @@ function renderTabelasDescartesEMelhores() {
   if (tbodyMelhores) {
     if (countMelhores) countMelhores.textContent = `${melhores.length} salários selecionados para o cálculo`;
 
-    tbodyMelhores.innerHTML = melhores.map((s, idx) => `
-      <tr class="border-b border-slate-800/60 hover:bg-slate-800/40">
-        <td class="py-2 px-3 font-mono text-emerald-400 font-bold text-center">#${idx + 1}</td>
-        <td class="py-2 px-3 font-mono font-semibold text-slate-200">${s.comp}</td>
-        <td class="py-2 px-3 text-slate-300 text-xs truncate max-w-xs" title="${s.origem}">${s.origem}</td>
-        <td class="py-2 px-3 font-mono text-slate-400 text-right">R$ ${s.valor_nominal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-        <td class="py-2 px-3 font-mono text-sky-400 text-right">${s.fator_inpc.toFixed(4)}</td>
-        <td class="py-2 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${s.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-      </tr>
-    `).join('');
+    if (melhores.length === 0) {
+      tbodyMelhores.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário encontrado com os critérios de busca.</td></tr>`;
+    } else {
+      tbodyMelhores.innerHTML = melhores.map((s, idx) => `
+        <tr class="border-b border-slate-800/60 hover:bg-slate-800/40">
+          <td class="py-2 px-3 font-mono text-emerald-400 font-bold text-center">#${idx + 1}</td>
+          <td class="py-2 px-3 font-mono font-semibold text-slate-200">${s.comp}</td>
+          <td class="py-2 px-3 text-slate-300 text-xs truncate max-w-xs" title="${s.origem}">${s.origem}</td>
+          <td class="py-2 px-3 font-mono text-slate-400 text-right">R$ ${s.valor_nominal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-2 px-3 font-mono text-sky-400 text-right">${s.fator_inpc.toFixed(4)}</td>
+          <td class="py-2 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${s.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+        </tr>
+      `).join('');
+    }
   }
 
   // 2. Tabela dos Salários Descartados (Excluídos da Média)
@@ -10807,7 +10871,7 @@ function renderTabelasDescartesEMelhores() {
     if (countDescartados) countDescartados.textContent = `${descartados.length} salários menores excluídos (Art. 26)`;
 
     if (descartados.length === 0) {
-      tbodyDescartados.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado neste cenário (Status Quo).</td></tr>`;
+      tbodyDescartados.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado neste cenário ou busca.</td></tr>`;
     } else {
       tbodyDescartados.innerHTML = descartados.map((s, idx) => `
         <tr class="border-b border-slate-800/60 hover:bg-rose-950/20 text-slate-400">
@@ -10820,6 +10884,34 @@ function renderTabelasDescartesEMelhores() {
         </tr>
       `).join('');
     }
+  }
+}
+
+// ALTERNAR VISUALIZAÇÃO DA AUDITORIA DE SALÁRIOS
+function alternarVisualizacaoAuditoria(modo) {
+  currentScenario.modoAuditoria = modo;
+  const colMelhores = document.getElementById('col-melhores-salarios');
+  const colDescartados = document.getElementById('col-descartados-salarios');
+  const btnAmbos = document.getElementById('btn-view-ambos');
+  const btnMelhores = document.getElementById('btn-view-melhores');
+  const btnDescartados = document.getElementById('btn-view-descartados');
+
+  if (btnAmbos) btnAmbos.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold border border-slate-700 flex items-center gap-1.5 transition-all text-xs";
+  if (btnMelhores) btnMelhores.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-emerald-950/80 text-emerald-300 font-bold border border-slate-700 hover:border-emerald-600 flex items-center gap-1.5 transition-all text-xs";
+  if (btnDescartados) btnDescartados.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/80 text-rose-300 font-bold border border-slate-700 hover:border-rose-600 flex items-center gap-1.5 transition-all text-xs";
+
+  if (modo === 'melhores') {
+    if (colMelhores) { colMelhores.classList.remove('hidden'); colMelhores.classList.add('lg:col-span-2'); }
+    if (colDescartados) colDescartados.classList.add('hidden');
+    if (btnMelhores) btnMelhores.className = "px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold border border-emerald-500 flex items-center gap-1.5 shadow-md shadow-emerald-600/30 transition-all text-xs";
+  } else if (modo === 'descartados') {
+    if (colDescartados) { colDescartados.classList.remove('hidden'); colDescartados.classList.add('lg:col-span-2'); }
+    if (colMelhores) colMelhores.classList.add('hidden');
+    if (btnDescartados) btnDescartados.className = "px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold border border-rose-500 flex items-center gap-1.5 shadow-md shadow-rose-600/30 transition-all text-xs";
+  } else {
+    if (colMelhores) { colMelhores.classList.remove('hidden', 'lg:col-span-2'); }
+    if (colDescartados) { colDescartados.classList.remove('hidden', 'lg:col-span-2'); }
+    if (btnAmbos) btnAmbos.className = "px-3 py-1.5 rounded-lg bg-sky-600 text-white font-bold border border-sky-500 flex items-center gap-1.5 shadow-md shadow-sky-600/30 transition-all text-xs";
   }
 }
 
@@ -11025,7 +11117,7 @@ function renderRegrasComparison() {
   const container = document.getElementById('regras-container');
   if (!container) return;
 
-  const regras = CNIS_DATA.regras;
+  const regras = CNIS_DATA.regras || [];
   container.innerHTML = regras.map(r => {
     const isElegivel = r.elegivel;
     const borderCls = isElegivel ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-700/50 bg-slate-900/40';
@@ -11514,6 +11606,14 @@ function setupEventListeners() {
     searchMatriz.addEventListener('input', (e) => {
       currentScenario.buscaMatriz = e.target.value;
       renderMatrizDescartes();
+    });
+  }
+
+  const searchAuditoria = document.getElementById('search-auditoria');
+  if (searchAuditoria) {
+    searchAuditoria.addEventListener('input', (e) => {
+      currentScenario.buscaAuditoria = e.target.value;
+      renderTabelasDescartesEMelhores();
     });
   }
 }
