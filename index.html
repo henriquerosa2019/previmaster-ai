@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PreviMaster AI - Software de Planejamento Previdenciário & Matriz de Descartes</title>
+  <meta name="description" content="Plataforma computadorizada de inteligência atuarial e planejamento previdenciário para advogados e segurados. Matriz de Combinação de Descartes da EC 103/2019 e auditoria de CNIS.">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Estilos Customizados -->
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen text-slate-100 selection:bg-sky-500 selection:text-white pb-12">
+
+  <!-- Topbar Corporativo Previdenciário SaaS -->
+  <header class="border-b border-slate-800 bg-slate-900/95 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 via-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <span class="text-xl">⚖️</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-extrabold tracking-tight text-white">PreviMaster <span class="text-sky-400">AI</span></h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-sky-950 text-sky-400 border border-sky-800/80">SaaS Previdenciário</span>
+            <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-950 text-purple-300 border border-purple-800/80">Matriz EC 103/2019</span>
+          </div>
+          <p class="text-xs text-slate-400">Software Especializado em Planejamento Previdenciário Computadorizado & Atuária</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="abrirModalPrecos()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all">
+          <span>💎</span>
+          <span>Planos & Assinatura</span>
+        </button>
+        <button onclick="abrirModalUpload()" class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-all shadow-sm">
+          <span>📥</span>
+          <span>Analisar Novo CNIS</span>
+        </button>
+        <button onclick="window.print()" class="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-sky-600/30 transition-all">
+          <span>📄</span>
+          <span>Emitir Parecer (PDF)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Card de Perfil do Segurado -->
+    <section class="glass-panel rounded-2xl p-5 border border-slate-700/60 shadow-xl">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2.5">
+            <h2 id="profile-nome" class="text-xl font-bold text-white tracking-wide">HENRIQUE DA SILVA ROSA</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CNIS 100% Auditado
+            </span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Caso Demonstrativo</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-300">
+            <span><strong>CPF:</strong> <span id="profile-cpf" class="font-mono text-slate-200">797.886.107-49</span></span>
+            <span>•</span>
+            <span><strong>Nascimento:</strong> <span id="profile-nasc" class="text-slate-200">06/06/1965 (61 anos)</span></span>
+            <span>•</span>
+            <span><strong>Regime:</strong> RGPS c/ Averbação Marinha (PDV)</span>
+            <span>•</span>
+            <span><strong>Aposentadoria por Idade (65a):</strong> <span id="profile-data-idade" class="font-semibold text-emerald-400">06/06/2030</span></span>
+          </div>
+        </div>
+
+        <!-- Alerta de Diagnóstico Rápido -->
+        <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-900/50 flex items-center gap-3">
+          <div class="text-xl">💡</div>
+          <div class="text-xs">
+            <span class="font-bold text-amber-300 block">Diagnóstico de Inteligência Previdenciária:</span>
+            <span class="text-slate-300">Averbar os 15+ anos da Marinha desbloqueia o <strong>Descarte Inteligente</strong>, elevando sua aposentadoria em quase R$ 1.000/mês sem gastar em complementações!</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de Simulação de Cenários em Tempo Real -->
+    <section class="glass-panel rounded-2xl p-5 border border-sky-900/40 bg-gradient-to-r from-slate-900/90 to-sky-950/20 shadow-lg">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+            <span>⚙️</span> Simulador Atuarial em Tempo Real
+          </h3>
+          <p class="text-xs text-slate-400">Alterne as opções abaixo ou clique nos atalhos rápidos da matriz para ver o recálculo instantâneo.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          <!-- Switch 1: CTC Marinha -->
+          <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer select-none">
+            <input type="checkbox" id="toggle-marinha" checked class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 bg-slate-800 border-slate-700">
+            <span class="text-slate-200">Averbação CTC Marinha (1983-1999)</span>
+          </label>
+
+          <!-- Switch 2: Descarte Inteligente -->
+          <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer select-none">
+            <input type="checkbox" id="toggle-descarte" checked class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 bg-slate-800 border-slate-700">
+            <span class="text-emerald-300 font-bold">Descarte Ativo (Art. 26, §6º)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Atalhos Rápidos dos Marcos da Matriz -->
+      <div class="pt-3 pb-2 flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-slate-400 font-medium">Atalhos da Matriz:</span>
+        <button onclick="aplicarCenarioMatriz(0)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] border border-slate-700">
+          k = 0 (Sem Descarte)
+        </button>
+        <button onclick="aplicarCenarioMatriz(45)" class="px-2.5 py-1 rounded-lg bg-amber-950/40 hover:bg-amber-900/40 text-amber-300 font-mono text-[11px] border border-amber-800/50">
+          k = 45 (Expurgo dos MEIs)
+        </button>
+        <button onclick="aplicarCenarioMatriz(96)" class="px-2.5 py-1 rounded-lg bg-sky-950/40 hover:bg-sky-900/40 text-sky-300 font-mono text-[11px] border border-sky-800/50">
+          k = 96 (MEI + GPS 20% Mínimos)
+        </button>
+        <button onclick="aplicarCenarioMatriz(244)" class="px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-300 font-mono text-[11px] border border-emerald-700 font-bold">
+          k = 244 (Ponto Ótimo Global 👑)
+        </button>
+      </div>
+
+      <!-- Slider de Controle Fino de Descartes -->
+      <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-800/80">
+        <div class="w-full sm:w-2/3">
+          <div class="flex justify-between items-center text-xs mb-1">
+            <span class="text-slate-300 font-medium">Controle de Descartes de Salários:</span>
+            <span id="slider-k-label" class="font-mono text-emerald-400 font-bold">244 salários (Ponto Ótimo)</span>
+          </div>
+          <input type="range" id="slider-descarte" min="0" max="244" value="244" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+          <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+            <span>0 (Sem descarte: 269 salários)</span>
+            <span>45 (Só MEI)</span>
+            <span>244 (Pico Atuarial)</span>
+          </div>
+        </div>
+
+        <div class="text-right sm:border-l sm:border-slate-800 sm:pl-4">
+          <span class="text-[11px] text-slate-400 block">Estratégia Selecionada:</span>
+          <span id="scenario-tag-label" class="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">Ponto Ótimo Global Atuarial 👑</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cards de KPIs (Métricas Principais) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- KPI 1: RMI Otimizada -->
+      <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-slate-900/80 to-emerald-950/20 glass-card-hover">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+          <span class="font-semibold uppercase tracking-wider text-emerald-400">RMI Estimada (Benefício)</span>
+          <span>💰</span>
+        </div>
+        <div id="kpi-rmi" class="text-2xl font-black font-mono text-white tracking-tight">R$ 3.884,13</div>
+        <div id="kpi-ganho" class="text-xs mt-2 flex items-center gap-1.5">
+          <span class="text-emerald-400 font-semibold">+ R$ 977,00/mês</span>
+          <span class="text-[10px] text-slate-400">(vs R$ 2.907 base)</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Média dos Salários -->
+      <div class="glass-panel p-5 rounded-2xl border border-sky-500/30 bg-gradient-to-b from-slate-900/80 to-sky-950/20 glass-card-hover">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+          <span class="font-semibold uppercase tracking-wider text-sky-400">Média Salarial (PBC)</span>
+          <span>📈</span>
+        </div>
+        <div id="kpi-media" class="text-2xl font-black font-mono text-white tracking-tight">R$ 6.473,54</div>
+        <div class="text-xs text-slate-300 mt-2">
+          Coeficiente: <span class="font-bold text-sky-300">60%</span> (Exige 15a de TC)
+        </div>
+      </div>
+
+      <!-- KPI 3: Tempo de Contribuição -->
+      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60 glass-card-hover">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+          <span class="font-semibold uppercase tracking-wider text-slate-300">Tempo de Contribuição</span>
+          <span>⏳</span>
+        </div>
+        <div id="kpi-tempo" class="text-2xl font-black font-mono text-white tracking-tight">35 anos</div>
+        <div class="text-xs text-slate-400 mt-2">
+          Com Marinha (15a 4m) + RGPS (19a)
+        </div>
+      </div>
+
+      <!-- KPI 4: Patrimônio Vitalício Adicional -->
+      <div class="glass-panel p-5 rounded-2xl border border-purple-500/30 bg-gradient-to-b from-slate-900/80 to-purple-950/20 glass-card-hover">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+          <span class="font-semibold uppercase tracking-wider text-purple-400">Ganho Patrimonial (20a)</span>
+          <span>💎</span>
+        </div>
+        <div id="kpi-patrimonio" class="text-2xl font-black font-mono text-purple-300 tracking-tight">+ R$ 234.480,00</div>
+        <div class="text-[11px] text-slate-400 mt-2">
+          Sobrevida projetada pelo IBGE
+        </div>
+      </div>
+    </section>
+
+    <!-- Navegação por Abas do Software -->
+    <nav class="flex overflow-x-auto space-x-2 border-b border-slate-800 pb-2.5 text-xs font-semibold no-print">
+      <button data-tab-target="tab-descarte" class="px-4 py-2 rounded-xl bg-sky-600 text-white border border-sky-500 whitespace-nowrap transition-all shadow-sm">
+        📊 1. Matriz de Combinação de Descartes (EC 103) ⭐ FOCO
+      </button>
+      <button data-tab-target="tab-diagnostico" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        🔍 2. Auditoria com IA do CNIS (IntelPrev)
+      </button>
+      <button data-tab-target="tab-regras" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        ⚖️ 3. Comparador em Lote de Regras (Prev)
+      </button>
+      <button data-tab-target="tab-mei" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        💰 4. Viabilidade Financeira do MEI
+      </button>
+      <button data-tab-target="tab-graficos" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        📈 5. Gráficos & Projeções Atuariais
+      </button>
+      <button data-tab-target="tab-dossie" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        📜 6. Dossiê Jurídico & Petição
+      </button>
+      <button data-tab-target="tab-tabela" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+        📋 7. Tabela Completa de Salários (269 Comps)
+      </button>
+    </nav>
+
+    <!-- CONTEÚDO DAS ABAS -->
+
+    <!-- ABA 1: MATRIZ DE COMBINAÇÃO DE DESCARTES (FOCO TOTAL) -->
+    <div id="tab-descarte" data-tab-content class="space-y-6">
+      
+      <!-- Banner Didático da Balança Atuarial -->
+      <div class="glass-panel p-6 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-sky-950/20">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">⚖️</span>
+              <h3 class="text-lg font-bold text-white tracking-wide">A Balança Atuarial do Artigo 26, § 6º da EC 103/2019</h3>
+              <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">O Segredo do Cálculo</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
+              A exclusão de contribuições gera dois efeitos opostos: <strong>(1) Aumenta a média dos salários restantes</strong> (efeito positivo), mas <strong>(2) Reduz o coeficiente em 2% ao ano que exceder 20 anos</strong> (efeito redutor). A Matriz Computadorizada testa <strong>todas as 245 combinações possíveis</strong> e encontra onde essa balança atinge a maior RMI líquida:
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30 text-center min-w-[200px]">
+            <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Ponto Ótimo Encontrado</span>
+            <span class="text-xl font-mono font-black text-emerald-400 block">k = 244 descartes</span>
+            <span class="text-[11px] text-emerald-300 font-bold block">+ R$ 977,00/mês líquido</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Marcos Estratégicos Comparativos da Matriz -->
+      <div>
+        <h4 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider flex items-center gap-2">
+          <span>🎯</span> Comparativo dos Marcos Estratégicos da Matriz (Clique para Simular):
+        </h4>
+        <div id="matriz-marcos-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          <!-- Renderizado dinamicamente pelo app.js -->
+        </div>
+      </div>
+
+      <!-- Gráfico Dual-Axis da Matriz de Descartes -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <span>📈</span> Curva de Sensibilidade da Matriz Combinatória
+            </h4>
+            <p class="text-xs text-slate-400">Veja a Média subindo em azul, o Coeficiente caindo em âmbar e a RMI final atingindo o pico verde em k = 244:</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> RMI Final</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-400"></span> Média PBC</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-400"></span> Coeficiente %</span>
+          </div>
+        </div>
+
+        <div class="h-80 w-full chart-container">
+          <canvas id="chartDescarte"></canvas>
+        </div>
+      </div>
+
+      <!-- Tabela da Matriz Combinatória Completa -->
+      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h4 class="text-base font-bold text-white flex items-center gap-2">
+              <span>📋</span> Tabela Completa da Matriz de Combinação de Descartes
+            </h4>
+            <span id="matriz-count" class="text-xs text-slate-400">245 combinações testadas</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="text" id="search-matriz" placeholder="Buscar marco ou k..." class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-48">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-96 border border-slate-800 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 sticky top-0 border-b border-slate-700 text-slate-400 font-semibold uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-3">Descartes (k)</th>
+                <th class="py-3 px-3 text-center">Salários Restantes</th>
+                <th class="py-3 px-3">Marco / Estratégia</th>
+                <th class="py-3 px-3 text-right">Média dos Salários</th>
+                <th class="py-3 px-3 text-center">Tempo Restante</th>
+                <th class="py-3 px-3 text-center">Coeficiente</th>
+                <th class="py-3 px-3 text-right">RMI Resultante</th>
+                <th class="py-3 px-3 text-right">Ganho Mensal</th>
+                <th class="py-3 px-3 text-center">Simular</th>
+              </tr>
+            </thead>
+            <tbody id="matriz-tbody" class="divide-y divide-slate-800/40">
+              <!-- Renderizado dinamicamente pelo app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ABA 2: Auditoria com IA do CNIS (IntelPrev) -->
+    <div id="tab-diagnostico" data-tab-content class="hidden space-y-4">
+      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60">
+        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+          <span>🔍</span> Diagnóstico Automático e Auditoria de Indicadores Previdenciários
+        </h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          O sistema escaneou os 16 vínculos do CNIS de Henrique da Silva Rosa e identificou 4 indicadores que exigem ação preventiva pelo advogado antes da concessão:
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-xs">
+          <div class="p-4 rounded-xl bg-rose-950/20 border border-rose-900/40">
+            <span class="font-bold text-rose-400 block mb-1">🚨 PRPPS (Vínculos 1 e 2 - Comando da Marinha)</span>
+            <p class="text-slate-300 leading-relaxed">
+              O INSS desconsiderou mais de 15 anos de tempo de serviço militar e civil (1983 a 1999 com saída via PDV) porque não houve juntada de <strong>Certidão de Tempo de Contribuição (CTC)</strong> expedida pelo Comando da Marinha. Com a emissão e averbação dessa CTC, esse período ingressa integralmente no RGPS.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-amber-950/20 border border-amber-900/40">
+            <span class="font-bold text-amber-400 block mb-1">⚠️ PSC-MEN-SM-EC103 (Seq. 12 - Competência 06/2024)</span>
+            <p class="text-slate-300 leading-relaxed">
+              Recolhimento sobre R$ 1.204,40 (abaixo do mínimo de R$ 1.412,00). Deve ser complementado via DARF/GPS complementar ou agrupado no Meu INSS para não ser perdido para tempo e carência.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-sky-950/20 border border-sky-900/40">
+            <span class="font-bold text-sky-400 block mb-1">ℹ️ IREC-LC123 & IREC-MEI (45 Competências)</span>
+            <p class="text-slate-300 leading-relaxed">
+              Recolhimentos com alíquota reduzida de 5%. Não contam para as regras de transição de tempo sem complementação de 15%, mas <strong>CONTAM SIM para Aposentadoria por Idade (65 anos)</strong> sem necessidade de gastar um único centavo de complementação!
+            </p>
+          </div>
+
+          <div class="p-4 rounded-xl bg-purple-950/20 border border-purple-900/40">
+            <span class="font-bold text-purple-400 block mb-1">💡 Concomitância Cooperativa x MEI (12/2021 a 06/2022)</span>
+            <p class="text-slate-300 leading-relaxed">
+              Nos meses em que houve recolhimento como MEI e como Cooperativa (Seq 11), a remuneração da Cooperativa foi de R$ 6.000 a R$ 6.433 (no teto do RGPS!). O MEI concomitante pode ser totalmente descartado sem qualquer prejuízo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <h4 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Histórico Cronológico dos 16 Vínculos Auditados:</h4>
+        <div id="auditoria-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Gerado dinamicamente pelo app.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 3: Comparador de Regras (Previdenciarista) -->
+    <div id="tab-regras" data-tab-content class="hidden space-y-4">
+      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60">
+        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+          <span>⚖️</span> Simulação em Lote de Todas as Regras da Previdência Social
+        </h3>
+        <p class="text-xs text-slate-300">
+          O motor atuarial rodou o cruzamento entre o histórico de Henrique e todas as opções legais da Emenda Constitucional nº 103/2019 e da Lei 8.213/91:
+        </p>
+      </div>
+
+      <div id="regras-container" class="space-y-4">
+        <!-- Gerado dinamicamente pelo app.js -->
+      </div>
+    </div>
+
+    <!-- ABA 4: Viabilidade Financeira do MEI -->
+    <div id="tab-mei" data-tab-content class="hidden space-y-4">
+      <div id="analise-mei-content">
+        <!-- Gerado dinamicamente pelo app.js -->
+      </div>
+    </div>
+
+    <!-- ABA 5: Gráficos & Projeções Atuariais -->
+    <div id="tab-graficos" data-tab-content class="hidden space-y-6">
+      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
+        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+          <span>📈</span> Evolução Histórica dos Salários de Contribuição (INPC / Plano Real)
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">
+          Comparativo entre salários nominais da época e salários corrigidos mês a mês pelo INPC oficial do BACEN até 2026:
+        </p>
+        <div class="h-72 w-full chart-container">
+          <canvas id="chartSalarios"></canvas>
+        </div>
+      </div>
+
+      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
+        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+          <span>💰</span> Projeção de Fluxo de Caixa Acumulado na Aposentadoria (20 Anos de Sobrevida)
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">
+          Demonstração do patrimônio acumulado pelo segurado no Cenário Otimizado vs Cenário Convencional sem planejamento:
+        </p>
+        <div class="h-72 w-full chart-container">
+          <canvas id="chartPatrimonio"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 6: Dossiê Jurídico & Petição -->
+    <div id="tab-dossie" data-tab-content class="hidden space-y-4">
+      <div id="dossie-juridico-content">
+        <!-- Gerado dinamicamente pelo app.js -->
+      </div>
+    </div>
+
+    <!-- ABA 7: Tabela Completa de Competências Auditadas -->
+    <div id="tab-tabela" data-tab-content class="hidden space-y-4">
+      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <span>📋</span> Auditoria Completa de Salários do PBC (Desde 07/1994)
+            </h3>
+            <span id="salarios-count" class="text-xs text-slate-400">269 competências analisadas</span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <input type="text" id="search-salarios" placeholder="Buscar mês ou vínculo..." class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-44">
+            <select id="filter-salarios" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+              <option value="todas">Todas as Competências</option>
+              <option value="utilizados">Apenas Computadas na Média</option>
+              <option value="descartados">Apenas Descartadas (Art. 26)</option>
+              <option value="mei">Apenas MEI (5%)</option>
+              <option value="clube">Apenas Clube Naval</option>
+              <option value="cooperativa">Apenas Cooperativas</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto max-h-[500px] border border-slate-800 rounded-xl">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900/90 sticky top-0 border-b border-slate-700 text-slate-400 font-semibold uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-3">Competência</th>
+                <th class="py-3 px-3">Origem / Vínculo</th>
+                <th class="py-3 px-3 text-right">Valor Nominal</th>
+                <th class="py-3 px-3 text-right">Fator INPC</th>
+                <th class="py-3 px-3 text-right">Valor Corrigido</th>
+                <th class="py-3 px-3 text-center">Status no Cálculo</th>
+              </tr>
+            </thead>
+            <tbody id="salarios-tbody" class="divide-y divide-slate-800/40">
+              <!-- Gerado dinamicamente pelo app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL DE PLANOS E PREÇOS (SaaS) -->
+  <div id="modal-precos" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 rounded-3xl border border-slate-700 max-w-4xl w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-xl font-extrabold text-white">Planos & Assinatura PreviMaster AI</h3>
+          <p class="text-xs text-slate-400">Escolha o plano ideal para você ou para o seu escritório de advocacia</p>
+        </div>
+        <button onclick="fecharModalPrecos()" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Plano 1: Análise Avulsa -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
+          <div>
+            <h4 class="text-sm font-bold text-slate-200">Parecer Avulso</h4>
+            <p class="text-[11px] text-slate-400 mt-1">Para segurados ou consultas pontuais</p>
+            <div class="my-4">
+              <span class="text-3xl font-black text-white font-mono">R$ 49,90</span>
+              <span class="text-xs text-slate-400">/análise</span>
+            </div>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✓ 1 CNIS Completo Auditado</li>
+              <li>✓ Matriz de Descartes da EC 103</li>
+              <li>✓ Parecer Técnico em PDF</li>
+              <li>✓ Modelo de Petição</li>
+            </ul>
+          </div>
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20uma%20análise%20avulsa%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-semibold text-white transition-all block">
+            Adquirir Análise
+          </a>
+        </div>
+
+        <!-- Plano 2: Escritório (Popular) -->
+        <div class="p-5 rounded-2xl bg-gradient-to-b from-sky-950/40 to-slate-900 border-2 border-sky-500 flex flex-col justify-between relative shadow-lg shadow-sky-500/10">
+          <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500 text-slate-950">
+            Mais Vendido
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-sky-400">Plano Escritório</h4>
+            <p class="text-[11px] text-slate-400 mt-1">Para advogados previdenciaristas</p>
+            <div class="my-4">
+              <span class="text-3xl font-black text-white font-mono">R$ 97,00</span>
+              <span class="text-xs text-slate-400">/mês</span>
+            </div>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✓ <strong>Análises Ilimitadas de CNIS</strong></li>
+              <li>✓ Matriz de Descartes em Lote</li>
+              <li>✓ Exportação de Relatórios com seu Logo</li>
+              <li>✓ Simulador de ROI do MEI</li>
+              <li>✓ Modelos de Petições em Word/PDF</li>
+            </ul>
+          </div>
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
+            Assinar Agora
+          </a>
+        </div>
+
+        <!-- Plano 3: Anual Pro -->
+        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
+          <div>
+            <h4 class="text-sm font-bold text-purple-400">Plano Anual Pro</h4>
+            <p class="text-[11px] text-slate-400 mt-1">Economia de 30% no ano</p>
+            <div class="my-4">
+              <span class="text-3xl font-black text-white font-mono">R$ 69,00</span>
+              <span class="text-xs text-slate-400">/mês (anual)</span>
+            </div>
+            <ul class="space-y-2 text-xs text-slate-300">
+              <li>✓ Tudo do Plano Escritório</li>
+              <li>✓ Suporte Prioritário por Especialista</li>
+              <li>✓ Acesso Antecipado a Novas Regras</li>
+              <li>✓ Integração com IA para Petições</li>
+            </ul>
+          </div>
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Anual%20Pro%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-semibold text-white transition-all block">
+            Economizar 30%
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE UPLOAD DE NOVO CNIS -->
+  <div id="modal-upload" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 rounded-3xl border border-slate-700 max-w-lg w-full shadow-2xl space-y-5">
+      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-white">Carregar Novo Extrato CNIS (PDF)</h3>
+          <p class="text-xs text-slate-400">Arraste ou selecione o PDF oficial emitido pelo Meu INSS</p>
+        </div>
+        <button onclick="fecharModalUpload()" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
+      </div>
+
+      <div class="border-2 border-dashed border-slate-700 hover:border-sky-500 rounded-2xl p-8 text-center space-y-3 cursor-pointer transition-all bg-slate-900/50">
+        <div class="w-12 h-12 rounded-full bg-sky-950/80 text-sky-400 mx-auto flex items-center justify-center text-2xl">
+          📄
+        </div>
+        <div>
+          <span class="text-xs font-semibold text-slate-200 block">Arraste o arquivo CNIS em PDF aqui</span>
+          <span class="text-[11px] text-slate-400">ou clique para selecionar do seu dispositivo</span>
+        </div>
+        <input type="file" id="cnis-file-input" accept=".pdf" class="hidden">
+      </div>
+
+      <div class="text-[11px] text-slate-400 bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1">
+        <span class="text-sky-400 font-semibold block">🔒 Privacidade e LGPD Garantidas:</span>
+        <p>O processamento é realizado de forma segura e confidencial. Os dados são utilizados unicamente para gerar os cálculos da aposentadoria.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Profissional -->
+  <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 max-w-7xl mx-auto px-4 space-y-2">
+    <div class="flex flex-wrap justify-center items-center gap-4 text-xs text-slate-400">
+      <a href="javascript:abrirModalPrecos()" class="hover:text-white">Planos</a>
+      <span>•</span>
+      <a href="javascript:alert('Conforme Art. 26 da EC 103/2019 e IN 128/2022')" class="hover:text-white">Legislação Aplicada</a>
+      <span>•</span>
+      <a href="javascript:alert('Em conformidade com a Lei Geral de Proteção de Dados (LGPD)')" class="hover:text-white">Privacidade & LGPD</a>
+      <span>•</span>
+      <a href="https://wa.me/" target="_blank" class="hover:text-white">Fale com um Especialista</a>
+    </div>
+    <p>PreviMaster AI • Software Computadorizado de Planejamento Previdenciário • Base Legal: EC 103/2019, Lei 8.213/91 e IN 128/2022</p>
+    <p class="text-[11px] text-slate-600">Calculado para Henrique da Silva Rosa • Índices oficiais INPC / IBGE / BACEN série SGS 188</p>
+  </footer>
+
+  <!-- Script Principal da Aplicação -->
+  <script src="app.js"></script>
+  <script>
+    function abrirModalPrecos() {
+      document.getElementById('modal-precos').classList.remove('hidden');
+    }
+    function fecharModalPrecos() {
+      document.getElementById('modal-precos').classList.add('hidden');
+    }
+    function abrirModalUpload() {
+      document.getElementById('modal-upload').classList.remove('hidden');
+    }
+    function fecharModalUpload() {
+      document.getElementById('modal-upload').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

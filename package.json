@@ -1,0 +1,20 @@
+{
+  "name": "previmaster-ai",
+  "version": "1.0.0",
+  "description": "PreviMaster AI - Software Computadorizado de Planejamento Previdenciário & Matriz de Descartes",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "previdenciario",
+    "inss",
+    "cnis",
+    "planejamento-previdenciario",
+    "ec103",
+    "calculo-juridico",
+    "previdenciarista"
+  ],
+  "author": "Henrique da Silva Rosa",
+  "license": "PROPRIETARY"
+}
