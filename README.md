@@ -54,6 +54,6 @@
 ---
 
 ## 💼 Modelo de Monetização (Como Vender)
-- **Plano Avulso:** R$ 49,90 por análise de CNIS.
-- **Plano Escritório:** R$ 97,00/mês para análises ilimitadas.
-- **Plano Pro:** R$ 197,00/mês com inteligência artificial completa e consultoria.
+- **Parecer Avulso:** R$ 69,00 por parecer/análise individual de CNIS.
+- **Plano Escritório:** R$ 149,00/mês para análises ilimitadas, relatórios personalizados com sua marca e matriz de descartes.
+- **Plano Pro Master:** R$ 169,00/mês com inteligência atuarial avançada, IA para redação de petições e suporte VIP.

@@ -11612,6 +11612,8 @@ let chartPatrimonio = null;
 document.addEventListener('DOMContentLoaded', () => {
   try { renderProfileHeader(); } catch (e) { console.error('Erro profile:', e); }
   try { renderKPIs(); } catch (e) { console.error('Erro KPIs:', e); }
+  try { renderBannerBalanca(); } catch (e) { console.error('Erro Banner Balança:', e); }
+  try { renderCardAnaliseAtuarial(); } catch (e) { console.error('Erro Card Atuarial:', e); }
   try { renderAuditoriaCards(); } catch (e) { console.error('Erro Auditoria:', e); }
   try { renderRegrasComparison(); } catch (e) { console.error('Erro Regras:', e); }
   try { renderMatrizDescartes(); } catch (e) { console.error('Erro Matriz:', e); }
@@ -11693,6 +11695,8 @@ function executarLimpezaCNIS() {
 
   renderProfileHeader();
   renderKPIs();
+  renderBannerBalanca();
+  renderCardAnaliseAtuarial();
   renderAuditoriaCards();
   renderRegrasComparison();
   renderMatrizDescartes();
@@ -11715,7 +11719,7 @@ function executarLimpezaCNIS() {
   const bannerLimpo = document.getElementById('banner-tela-limpa');
   if (bannerLimpo) bannerLimpo.classList.remove('hidden');
 
-  alert('Dados do CNIS apagados com sucesso! A tela agora está limpa para analisar um novo cliente ou extrato.');
+  alert('Dados do CNIS apagados com sucesso! A tela agora está 100% limpa para analisar um novo cliente ou extrato.');
 }
 
 function restaurarCasoDemonstrativo() {
@@ -11733,6 +11737,8 @@ function restaurarCasoDemonstrativo() {
 
   renderProfileHeader();
   renderKPIs();
+  renderBannerBalanca();
+  renderCardAnaliseAtuarial();
   renderAuditoriaCards();
   renderRegrasComparison();
   renderMatrizDescartes();
@@ -11831,15 +11837,161 @@ function renderKPIs() {
 // Render Header do Segurado
 function renderProfileHeader() {
   const s = CNIS_DATA.segurado || {};
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+
   const elNome = document.getElementById('profile-nome');
   const elCpf = document.getElementById('profile-cpf');
   const elNasc = document.getElementById('profile-nasc');
   const elDataIdade = document.getElementById('profile-data-idade');
+  const elAlertaDiag = document.getElementById('alerta-diagnostico-perfil');
+  const elBadgeCaso = document.getElementById('profile-caso-badge');
 
   if (elNome) elNome.textContent = s.nome || 'NENHUM SEGURADO CARREGADO';
   if (elCpf) elCpf.textContent = s.cpf || '---.---.--- - --';
   if (elNasc) elNasc.textContent = (s.nascimento && s.nascimento !== '--/--/----') ? `${s.nascimento} (${s.idade_atual} anos)` : '---';
-  if (elDataIdade) elDataIdade.textContent = (s.nome && s.nome.includes('HENRIQUE')) ? '06/06/2030 (65 anos)' : 'Aguardando CNIS';
+  if (elDataIdade) elDataIdade.textContent = hasData ? '06/06/2030 (65 anos)' : 'Aguardando CNIS';
+
+  if (elBadgeCaso) {
+    if (hasData) {
+      elBadgeCaso.classList.remove('hidden');
+    } else {
+      elBadgeCaso.classList.add('hidden');
+    }
+  }
+
+  if (elAlertaDiag) {
+    if (hasData) {
+      elAlertaDiag.innerHTML = `
+        <div class="text-xl">💡</div>
+        <div class="text-xs">
+          <span class="font-bold text-amber-300 block">Diagnóstico de Inteligência Previdenciária:</span>
+          <span class="text-slate-300">Averbar os 15+ anos da Marinha desbloqueia o <strong>Descarte Inteligente</strong>, elevando sua aposentadoria em quase R$ 1.000/mês sem gastar em complementações!</span>
+        </div>
+      `;
+    } else {
+      elAlertaDiag.innerHTML = `
+        <div class="text-xl">✨</div>
+        <div class="text-xs">
+          <span class="font-bold text-sky-300 block">Tela Limpa para Novo CNIS:</span>
+          <span class="text-slate-400">Nenhum extrato carregado no momento. Clique em <strong>"Analisar Novo CNIS"</strong> para importar um PDF ou restaure o caso demonstrativo.</span>
+        </div>
+      `;
+    }
+  }
+}
+
+// Render Banner da Balança Atuarial
+function renderBannerBalanca() {
+  const container = document.getElementById('banner-balanca-atuarial');
+  if (!container) return;
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    container.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  container.classList.remove('hidden');
+
+  const res = CNIS_DATA.resumo_numerico || {};
+  const totalComb = CNIS_DATA.matriz_descarte_completa ? CNIS_DATA.matriz_descarte_completa.length : 0;
+  const bestK = res.descartes_otimos || 0;
+  const ganho = res.ganho_mensal_rmi || 0;
+
+  container.innerHTML = `
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚖️</span>
+          <h3 class="text-lg font-bold text-white tracking-wide">A Balança Atuarial do Artigo 26, § 6º da EC 103/2019</h3>
+          <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">O Segredo do Cálculo</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
+          A exclusão de contribuições gera dois efeitos opostos: <strong>(1) Aumenta a média dos salários restantes</strong> (efeito positivo), mas <strong>(2) Reduz o coeficiente em 2% ao ano que exceder 20 anos</strong> (efeito redutor). A Matriz Computadorizada testa <strong>todas as ${totalComb} combinações possíveis (k = 0 a ${totalComb > 0 ? totalComb - 1 : 0})</strong> e encontra onde essa balança atinge a maior RMI líquida mantendo o piso legal de 15 anos:
+        </p>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30 text-center min-w-[200px]">
+        <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Ponto Ótimo Encontrado</span>
+        <span class="text-xl font-mono font-black text-emerald-400 block">k = ${bestK} descartes</span>
+        <span class="text-[11px] text-emerald-300 font-bold block">+ R$ ${ganho.toLocaleString('pt-BR', {minimumFractionDigits: 2})}/mês líquido</span>
+      </div>
+    </div>
+  `;
+}
+
+// Render Card de Análise Atuarial Vital (Dinâmico para sumir quando limpo!)
+function renderCardAnaliseAtuarial() {
+  const container = document.getElementById('card-analise-atuarial-vital');
+  if (!container) return;
+
+  const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  if (!hasData) {
+    container.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  container.classList.remove('hidden');
+
+  const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
+  const salarios = [...CNIS_DATA.salarios_pbc].sort((a, b) => a.valor_corrigido - b.valor_corrigido);
+  const descartados = salarios.slice(0, k);
+  const melhores = salarios.slice(k);
+
+  const mediaMelhores = melhores.length > 0 ? (melhores.reduce((acc, s) => acc + s.valor_corrigido, 0) / melhores.length) : 0;
+  const mediaDescartados = descartados.length > 0 ? (descartados.reduce((acc, s) => acc + s.valor_corrigido, 0) / descartados.length) : 0;
+
+  const pt = (CNIS_DATA.matriz_descarte_completa && CNIS_DATA.matriz_descarte_completa.length > 0)
+    ? CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)]
+    : { rmi: 0, delta_rmi: 0, coeficiente_perc: 60 };
+
+  const menorMelhor = melhores.length > 0 ? melhores[0].valor_corrigido : 0;
+  const maiorMelhor = melhores.length > 0 ? melhores[melhores.length - 1].valor_corrigido : 0;
+
+  container.innerHTML = `
+    <div class="flex items-center gap-2">
+      <span class="text-xl">💡</span>
+      <h4 class="text-sm font-bold text-sky-300 uppercase tracking-wider">
+        Análise Atuarial Vital: Como a Seleção dos Melhores e Piores Salários Define a Sua RMI
+      </h4>
+    </div>
+    <p class="text-xs text-slate-300 leading-relaxed">
+      Pelo <strong>Artigo 26, § 6º da EC 103/2019</strong>, o critério exclusivo de inclusão ou exclusão é o <strong>Valor Corrigido pelo INPC</strong>. O sistema testou matematicamente todas as combinações e demonstrou que manter salários baixos (como MEI e carnês mínimos) rebaixa severamente a média.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
+      <div class="bg-slate-950/70 p-3 rounded-lg border border-emerald-800/60 space-y-1">
+        <span class="font-bold text-emerald-400 block uppercase tracking-wider text-[11px]">🏆 ${melhores.length} Melhores (Preservados)</span>
+        <p class="text-slate-300">
+          Cooperativas e Clube Naval com adicionais e gratificações. Todos corrigidos superam <strong>R$ ${menorMelhor.toLocaleString('pt-BR', {minimumFractionDigits: 2})} a R$ ${maiorMelhor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong>.
+        </p>
+        <div class="pt-1 border-t border-slate-800 font-mono text-emerald-300 font-bold">
+          Média de Ouro: R$ ${mediaMelhores.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+        </div>
+      </div>
+
+      <div class="bg-slate-950/70 p-3 rounded-lg border border-rose-900/60 space-y-1">
+        <span class="font-bold text-rose-400 block uppercase tracking-wider text-[11px]">🚫 ${descartados.length} Piores (Descartados)</span>
+        <p class="text-slate-300">
+          Expurgados recolhimentos de MEI, carnês GPS de salário mínimo e meses antigos, mantendo os 180 meses (15 anos) exigidos.
+        </p>
+        <div class="pt-1 border-t border-slate-800 font-mono text-rose-300 font-bold">
+          Média Expurgada: ${descartados.length > 0 ? 'R$ ' + mediaDescartados.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : 'Nenhum descarte'}
+        </div>
+      </div>
+
+      <div class="bg-slate-950/70 p-3 rounded-lg border border-sky-800/60 space-y-1">
+        <span class="font-bold text-sky-400 block uppercase tracking-wider text-[11px]">⚖️ RMI Final Otimizada</span>
+        <p class="text-slate-300">
+          Mesmo com coeficiente de ${pt.coeficiente_perc}% (15 anos mantidos), a aplicação sobre a média de ouro gera <strong>R$ ${pt.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong>!
+        </p>
+        <div class="pt-1 border-t border-slate-800 font-mono text-emerald-400 font-bold">
+          Ganho: ${pt.delta_rmi > 0 ? '+ R$ ' + pt.delta_rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '/mês' : 'Cenário Base'}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 // APLICAÇÃO DE CENÁRIO RÁPIDO DA MATRIZ
@@ -11853,6 +12005,7 @@ function aplicarCenarioMatriz(k) {
   if (slider) slider.value = k;
 
   renderKPIs();
+  renderCardAnaliseAtuarial();
   renderMatrizDescartes();
   renderTabelasDescartesEMelhores();
   renderParecerMeuINSS();
@@ -12773,6 +12926,7 @@ function setupEventListeners() {
       const toggle = document.getElementById('toggle-descarte');
       if (toggle) toggle.checked = true;
       renderKPIs();
+      renderCardAnaliseAtuarial();
       renderMatrizDescartes();
       renderTabelasDescartesEMelhores();
       renderParecerMeuINSS();
@@ -12790,6 +12944,7 @@ function setupEventListeners() {
         if (slider) slider.value = currentScenario.descarteCustom;
       }
       renderKPIs();
+      renderCardAnaliseAtuarial();
       renderMatrizDescartes();
       renderTabelasDescartesEMelhores();
       renderParecerMeuINSS();
@@ -12802,6 +12957,7 @@ function setupEventListeners() {
     toggleMarinha.addEventListener('change', (e) => {
       currentScenario.comMarinha = e.target.checked;
       renderKPIs();
+      renderCardAnaliseAtuarial();
     });
   }
 

@@ -289,26 +289,7 @@
     <div id="tab-descarte" data-tab-content class="space-y-6">
       
       <!-- Banner Didático da Balança Atuarial -->
-      <div class="glass-panel p-6 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-sky-950/20">
-        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div class="space-y-1.5">
-            <div class="flex items-center gap-2">
-              <span class="text-2xl">⚖️</span>
-              <h3 class="text-lg font-bold text-white tracking-wide">A Balança Atuarial do Artigo 26, § 6º da EC 103/2019</h3>
-              <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">O Segredo do Cálculo</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed max-w-3xl">
-              A exclusão de contribuições gera dois efeitos opostos: <strong>(1) Aumenta a média dos salários restantes</strong> (efeito positivo), mas <strong>(2) Reduz o coeficiente em 2% ao ano que exceder 20 anos</strong> (efeito redutor). A Matriz Computadorizada testa <strong>todas as 241 combinações possíveis (k = 0 a 240)</strong> e encontra onde essa balança atinge a maior RMI líquida mantendo o piso legal de 15 anos:
-            </p>
-          </div>
-
-          <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30 text-center min-w-[200px]">
-            <span class="text-[11px] text-slate-400 block uppercase tracking-wider font-semibold">Ponto Ótimo Encontrado</span>
-            <span class="text-xl font-mono font-black text-emerald-400 block">k = 240 descartes</span>
-            <span class="text-[11px] text-emerald-300 font-bold block">+ R$ 832,49/mês líquido</span>
-          </div>
-        </div>
-      </div>
+      <div id="banner-balanca-atuarial" class="glass-panel p-6 rounded-2xl border border-emerald-500/40 bg-gradient-to-r from-emerald-950/20 via-slate-900 to-sky-950/20"></div>
 
       <!-- Marcos Estratégicos Comparativos da Matriz -->
       <div>
@@ -382,48 +363,7 @@
       <div class="glass-panel p-6 rounded-2xl border border-sky-900/50 shadow-2xl space-y-4">
         
         <!-- CARD DIDÁTICO E ATUARIAL VITAL -->
-        <div class="p-4 rounded-xl border border-sky-800/60 bg-gradient-to-r from-slate-900 via-sky-950/40 to-slate-900 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">💡</span>
-            <h4 class="text-sm font-bold text-sky-300 uppercase tracking-wider">
-              Análise Atuarial Vital: Como a Seleção dos Melhores e Piores Salários Define a Sua RMI
-            </h4>
-          </div>
-          <p class="text-xs text-slate-300 leading-relaxed">
-            Pelo <strong>Artigo 26, § 6º da EC 103/2019</strong>, o critério exclusivo de inclusão ou exclusão é o <strong>Valor Corrigido pelo INPC</strong>. O sistema testou matematicamente todas as combinações e demonstrou que manter salários baixos (como MEI e carnês mínimos) rebaixa severamente a média.
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
-            <div class="bg-slate-950/70 p-3 rounded-lg border border-emerald-800/60 space-y-1">
-              <span class="font-bold text-emerald-400 block uppercase tracking-wider text-[11px]">🏆 29 Melhores (Preservados)</span>
-              <p class="text-slate-300">
-                Cooperativas (2021-2022 no teto legal) e Clube Naval (2012-2019). Todos corrigidos superam <strong>R$ 5.062 a R$ 8.444</strong>.
-              </p>
-              <div class="pt-1 border-t border-slate-800 font-mono text-emerald-300 font-bold">
-                Média de Ouro: R$ 6.218,65
-              </div>
-            </div>
-
-            <div class="bg-slate-950/70 p-3 rounded-lg border border-rose-900/60 space-y-1">
-              <span class="font-bold text-rose-400 block uppercase tracking-wider text-[11px]">🚫 240 Piores (Descartados)</span>
-              <p class="text-slate-300">
-                Expurgados <strong>todos os 41 meses de MEI</strong>, todos os carnês GPS de salário mínimo e meses antigos, mantendo os 180 meses (15 anos) exigidos.
-              </p>
-              <div class="pt-1 border-t border-slate-800 font-mono text-rose-300 font-bold">
-                Média Expurgada: R$ 2.858,00
-              </div>
-            </div>
-
-            <div class="bg-slate-950/70 p-3 rounded-lg border border-sky-800/60 space-y-1">
-              <span class="font-bold text-sky-400 block uppercase tracking-wider text-[11px]">⚖️ RMI Final Otimizada</span>
-              <p class="text-slate-300">
-                Mesmo com coeficiente de 60% (15 anos mantidos), <strong>60% de R$ 6.218,65</strong> gera <strong>R$ 3.731,19</strong>, superando os R$ 2.898,70 base!
-              </p>
-              <div class="pt-1 border-t border-slate-800 font-mono text-emerald-400 font-bold">
-                Ganho: + R$ 832,49/mês (+ R$ 199.797,60 em 20a)
-              </div>
-            </div>
-          </div>
-        </div>
+        <div id="card-analise-atuarial-vital" class="p-4 rounded-xl border border-sky-800/60 bg-gradient-to-r from-slate-900 via-sky-950/40 to-slate-900 space-y-3"></div>
 
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div>
@@ -716,24 +656,24 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Plano 1: Análise Avulsa -->
+        <!-- Plano 1: Parecer Avulso -->
         <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
           <div>
             <h4 class="text-sm font-bold text-slate-200">Parecer Avulso</h4>
             <p class="text-[11px] text-slate-400 mt-1">Para segurados ou consultas pontuais</p>
             <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 49,90</span>
-              <span class="text-xs text-slate-400">/análise</span>
+              <span class="text-3xl font-black text-white font-mono">R$ 69,00</span>
+              <span class="text-xs text-slate-400">/parecer</span>
             </div>
             <ul class="space-y-2 text-xs text-slate-300">
               <li>✓ 1 CNIS Completo Auditado</li>
               <li>✓ Matriz de Descartes da EC 103</li>
               <li>✓ Parecer Técnico em PDF</li>
-              <li>✓ Modelo de Petição</li>
+              <li>✓ Modelo de Petição Administrativa</li>
             </ul>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20uma%20análise%20avulsa%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-semibold text-white transition-all block">
-            Adquirir Análise
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Parecer%20Avulso%20(R$%2069,00)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block">
+            Adquirir Parecer (R$ 69,00)
           </a>
         </div>
 
@@ -744,42 +684,46 @@
           </div>
           <div>
             <h4 class="text-sm font-bold text-sky-400">Plano Escritório</h4>
-            <p class="text-[11px] text-slate-400 mt-1">Para advogados previdenciaristas</p>
+            <p class="text-[11px] text-slate-400 mt-1">Para advogados e escritórios de advocacia</p>
             <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 97,00</span>
+              <span class="text-3xl font-black text-white font-mono">R$ 149,00</span>
               <span class="text-xs text-slate-400">/mês</span>
             </div>
             <ul class="space-y-2 text-xs text-slate-300">
               <li>✓ <strong>Análises Ilimitadas de CNIS</strong></li>
-              <li>✓ Matriz de Descartes em Lote</li>
+              <li>✓ Matriz de Descartes da EC 103</li>
               <li>✓ Exportação de Relatórios com seu Logo</li>
-              <li>✓ Simulador de ROI do MEI</li>
+              <li>✓ Simulador de Viabilidade e ROI do MEI</li>
               <li>✓ Modelos de Petições em Word/PDF</li>
             </ul>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
-            Assinar Agora
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20(R$%20149,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
+            Assinar Plano Escritório (R$ 149,00)
           </a>
         </div>
 
-        <!-- Plano 3: Anual Pro -->
-        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
+        <!-- Plano 3: Plano Pro Master -->
+        <div class="p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900 border-2 border-purple-500 flex flex-col justify-between relative shadow-lg shadow-purple-500/10">
+          <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500 text-white">
+            Pro Master
+          </div>
           <div>
-            <h4 class="text-sm font-bold text-purple-400">Plano Anual Pro</h4>
-            <p class="text-[11px] text-slate-400 mt-1">Economia de 30% no ano</p>
+            <h4 class="text-sm font-bold text-purple-400">Plano Pro Master</h4>
+            <p class="text-[11px] text-slate-400 mt-1">Inteligência Atuarial Máxima & Suporte VIP</p>
             <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 69,00</span>
-              <span class="text-xs text-slate-400">/mês (anual)</span>
+              <span class="text-3xl font-black text-white font-mono">R$ 169,00</span>
+              <span class="text-xs text-slate-400">/mês</span>
             </div>
             <ul class="space-y-2 text-xs text-slate-300">
-              <li>✓ Tudo do Plano Escritório</li>
-              <li>✓ Suporte Prioritário por Especialista</li>
-              <li>✓ Acesso Antecipado a Novas Regras</li>
-              <li>✓ Integração com IA para Petições</li>
+              <li>✓ <strong>Tudo do Plano Escritório</strong></li>
+              <li>✓ Inteligência Atuarial & IA para Cálculos</li>
+              <li>✓ Suporte Prioritário VIP por Especialista</li>
+              <li>✓ Acesso Antecipado a Novas Regras & Teses</li>
+              <li>✓ Assistente IA para Redação de Petições</li>
             </ul>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Anual%20Pro%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-semibold text-white transition-all block">
-            Economizar 30%
+          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Pro%20Master%20(R$%20169,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-purple-600/30">
+            Assinar Plano Pro Master (R$ 169,00)
           </a>
         </div>
       </div>
