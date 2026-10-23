@@ -1,6 +1,6 @@
 // PrevMaster AI - Software Computadorizado de Planejamento Previdenciário
 // Segurado: Henrique da Silva Rosa | Base Legal: EC 103/2019, Lei 8.213/91, IN 128/2022
-// Foco Principal: Matriz Combinatória de Descartes (Art. 26, § 6º da EC 103/2019)
+// Foco Principal: Matriz Combinatória de Descartes, Melhores Salários e Parecer Técnico para o Meu INSS
 
 const CNIS_DATA = {
   "segurado": {
@@ -10575,7 +10575,7 @@ const CNIS_DATA = {
 let currentScenario = {
   comMarinha: true,
   descarteAtivo: true,
-  descarteCustom: CNIS_DATA.resumo_numerico.descartes_otimos,
+  descarteCustom: CNIS_DATA.resumo_numerico.descartes_otimos, // 244 por padrão
   filtroTabela: 'todas',
   buscaTabela: '',
   buscaMatriz: ''
@@ -10592,6 +10592,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAuditoriaCards();
   renderRegrasComparison();
   renderMatrizDescartes();
+  renderTabelasDescartesEMelhores();
+  renderParecerMeuINSS();
   renderAnaliseMEI();
   renderDossieJuridico();
   renderTabelaSalarios();
@@ -10610,7 +10612,7 @@ function renderKPIs() {
 
   const res = CNIS_DATA.resumo_numerico;
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
-  const pt = CNIS_DATA.descarte_curve[Math.min(k, CNIS_DATA.descarte_curve.length - 1)];
+  const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)];
 
   if (kpiRmi) kpiRmi.textContent = 'R$ ' + pt.rmi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   if (kpiMedia) kpiMedia.textContent = 'R$ ' + pt.media_corrigida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -10633,7 +10635,7 @@ function renderKPIs() {
   }
 
   if (kpiCarencia) {
-    kpiCarencia.innerHTML = `<span class="text-emerald-400 font-bold">260+ meses</span> <span class="text-xs text-slate-400">(Mínimo 180)</span>`;
+    kpiCarencia.innerHTML = `<span class="text-emerald-400 font-bold">${pt.carencia_restante} meses</span> <span class="text-xs text-slate-400">(Mínimo 180)</span>`;
   }
 
   if (kpiPatrimonio) {
@@ -10671,12 +10673,15 @@ function aplicarCenarioMatriz(k) {
   if (slider) slider.value = k;
 
   renderKPIs();
-  renderTabelaSalarios();
   renderMatrizDescartes();
+  renderTabelasDescartesEMelhores();
+  renderParecerMeuINSS();
+  renderTabelaSalarios();
 }
 
-// RENDERIZAÇÃO DA MATRIZ COMBINATÓRIA DE DESCARTES
+// RENDERIZAÇÃO DA TABELA COMPLETA DA MATRIZ COMBINATÓRIA DE DESCARTES
 function renderMatrizDescartes() {
+  // 1. Render dos Cards de Marcos Estratégicos
   const containerMarcos = document.getElementById('matriz-marcos-container');
   if (containerMarcos) {
     const marcos = CNIS_DATA.marcos_estrategicos;
@@ -10715,7 +10720,7 @@ function renderMatrizDescartes() {
     }).join('');
   }
 
-  // Tabela da Matriz Completa
+  // 2. Render da Tabela Completa (Sem cortes arbitrários - lista integral com busca)
   const tbody = document.getElementById('matriz-tbody');
   const countMatriz = document.getElementById('matriz-count');
   if (tbody) {
@@ -10723,42 +10728,252 @@ function renderMatrizDescartes() {
     const currentK = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
     const busca = currentScenario.buscaMatriz.toLowerCase();
 
-    // Filtra pontos da matriz (amostragem para performance, mostrando marcos ou pontos correspondentes à busca)
+    // Filtra pontos da matriz com base na busca do usuário
     const filtered = matriz.filter(m => {
-      if (busca) {
-        return m.descartes.toString().includes(busca) || m.tag.toLowerCase().includes(busca);
-      }
-      // Se não houver busca, exibe os 30 marcos mais representativos + pontos em torno do selecionado
-      return m.descartes % 5 === 0 || Math.abs(m.descartes - currentK) <= 3 || m.descartes === 244 || m.descartes === 45 || m.descartes === 96;
+      if (!busca) return true; // Mostra todos se não houver busca
+      return m.descartes.toString().includes(busca) || 
+             m.tag.toLowerCase().includes(busca) ||
+             m.media_corrigida.toString().includes(busca) ||
+             m.rmi.toString().includes(busca);
     });
 
     if (countMatriz) countMatriz.textContent = `${filtered.length} combinações listadas de ${matriz.length} testadas`;
 
     tbody.innerHTML = filtered.map(m => {
       const isSelected = (currentK === m.descartes);
-      const rowClass = isSelected ? 'bg-emerald-950/30 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/40';
+      const rowClass = isSelected ? 'bg-emerald-950/40 border-l-4 border-emerald-500 font-semibold' : 'hover:bg-slate-800/40';
 
       return `
         <tr class="border-b border-slate-800/60 ${rowClass}">
-          <td class="py-2.5 px-3 font-mono font-bold text-sky-400">k = ${m.descartes}</td>
-          <td class="py-2.5 px-3 text-slate-300 font-mono text-center">${m.salarios_restantes}</td>
-          <td class="py-2.5 px-3 text-slate-300 text-xs">${m.tag}</td>
-          <td class="py-2.5 px-3 font-mono text-right text-slate-300">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td class="py-2.5 px-3 font-mono text-center text-slate-300">${m.tc_anos_resultante}a</td>
-          <td class="py-2.5 px-3 font-mono text-center text-slate-300">${m.coeficiente_perc}%</td>
-          <td class="py-2.5 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${m.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-          <td class="py-2.5 px-3 font-mono text-right ${m.delta_rmi > 0 ? 'text-emerald-300 font-bold' : 'text-slate-400'}">
+          <td class="py-2 px-3 font-mono font-bold text-sky-400">k = ${m.descartes}</td>
+          <td class="py-2 px-3 text-slate-300 font-mono text-center font-bold">${m.salarios_restantes}</td>
+          <td class="py-2 px-3 text-slate-200 text-xs">
+            ${m.tag !== 'Intermediário' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-950 text-purple-300 border border-purple-800">${m.tag}</span>` : `<span class="text-slate-400">${m.tag}</span>`}
+          </td>
+          <td class="py-2 px-3 font-mono text-right text-slate-200 font-semibold">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-2 px-3 font-mono text-center text-slate-300">${m.tc_anos_resultante}a</td>
+          <td class="py-2 px-3 font-mono text-center text-amber-400 font-bold">${m.coeficiente_perc}%</td>
+          <td class="py-2 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${m.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-2 px-3 font-mono text-right ${m.delta_rmi > 0 ? 'text-emerald-300 font-bold' : 'text-slate-400'}">
             ${m.delta_rmi > 0 ? '+ R$ ' + m.delta_rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2}) : 'R$ 0,00'}
           </td>
-          <td class="py-2.5 px-3 text-center">
+          <td class="py-2 px-3 text-center">
             <button onclick="aplicarCenarioMatriz(${m.descartes})" class="px-2.5 py-1 rounded text-xs font-semibold ${isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}">
-              ${isSelected ? 'Ativo' : 'Aplicar'}
+              ${isSelected ? '✓ Ativo' : 'Aplicar'}
             </button>
           </td>
         </tr>
       `;
     }).join('');
   }
+}
+
+// RENDERIZAÇÃO DAS DUAS TABELAS: OS MELHORES SALÁRIOS VS OS DESCARTADOS
+function renderTabelasDescartesEMelhores() {
+  const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
+  const salarios = [...CNIS_DATA.salarios_pbc];
+  
+  // Ordenar salários por valor corrigido
+  salarios.sort((a, b) => a.valor_corrigido - b.valor_corrigido);
+
+  const descartados = salarios.slice(0, k);
+  const melhores = salarios.slice(k);
+
+  // Ordenar os melhores em ordem decrescente de valor para destaque
+  melhores.sort((a, b) => b.valor_corrigido - a.valor_corrigido);
+
+  // 1. Tabela dos Melhores Salários (Os que compõem a Média)
+  const tbodyMelhores = document.getElementById('melhores-tbody');
+  const countMelhores = document.getElementById('melhores-count');
+  if (tbodyMelhores) {
+    if (countMelhores) countMelhores.textContent = `${melhores.length} salários selecionados para o cálculo`;
+
+    tbodyMelhores.innerHTML = melhores.map((s, idx) => `
+      <tr class="border-b border-slate-800/60 hover:bg-slate-800/40">
+        <td class="py-2 px-3 font-mono text-emerald-400 font-bold text-center">#${idx + 1}</td>
+        <td class="py-2 px-3 font-mono font-semibold text-slate-200">${s.comp}</td>
+        <td class="py-2 px-3 text-slate-300 text-xs truncate max-w-xs" title="${s.origem}">${s.origem}</td>
+        <td class="py-2 px-3 font-mono text-slate-400 text-right">R$ ${s.valor_nominal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+        <td class="py-2 px-3 font-mono text-sky-400 text-right">${s.fator_inpc.toFixed(4)}</td>
+        <td class="py-2 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${s.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+      </tr>
+    `).join('');
+  }
+
+  // 2. Tabela dos Salários Descartados (Excluídos da Média)
+  const tbodyDescartados = document.getElementById('descartados-tbody');
+  const countDescartados = document.getElementById('descartados-count');
+  if (tbodyDescartados) {
+    if (countDescartados) countDescartados.textContent = `${descartados.length} salários menores excluídos (Art. 26)`;
+
+    if (descartados.length === 0) {
+      tbodyDescartados.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado neste cenário (Status Quo).</td></tr>`;
+    } else {
+      tbodyDescartados.innerHTML = descartados.map((s, idx) => `
+        <tr class="border-b border-slate-800/60 hover:bg-rose-950/20 text-slate-400">
+          <td class="py-2 px-3 font-mono text-slate-500 text-center">#${idx + 1}</td>
+          <td class="py-2 px-3 font-mono font-semibold text-slate-300 line-through">${s.comp}</td>
+          <td class="py-2 px-3 text-slate-400 text-xs truncate max-w-xs" title="${s.origem}">${s.origem}</td>
+          <td class="py-2 px-3 font-mono text-slate-500 text-right">R$ ${s.valor_nominal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-2 px-3 font-mono text-slate-500 text-right">${s.fator_inpc.toFixed(4)}</td>
+          <td class="py-2 px-3 font-mono text-rose-400 font-semibold text-right">R$ ${s.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+// RENDERIZAÇÃO DO PARECER TÉCNICO OFICIAL PARA O MEU INSS (PDF)
+function renderParecerMeuINSS() {
+  const container = document.getElementById('parecer-meu-inss-content');
+  if (!container) return;
+
+  const s = CNIS_DATA.segurado;
+  const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
+  const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)];
+  const res = CNIS_DATA.resumo_numerico;
+
+  const salarios = [...CNIS_DATA.salarios_pbc].sort((a, b) => a.valor_corrigido - b.valor_corrigido);
+  const descartados = salarios.slice(0, k);
+  const melhores = salarios.slice(k).sort((a, b) => b.valor_corrigido - a.valor_corrigido);
+
+  const listaDescartadosTexto = descartados.map(d => `${d.comp} (R$ ${d.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`).join(', ');
+
+  container.innerHTML = `
+    <div class="bg-white text-slate-900 p-8 sm:p-12 rounded-2xl shadow-2xl border border-slate-300 max-w-4xl mx-auto space-y-6 text-sm font-sans" id="folha-parecer-inss">
+      
+      <!-- Cabeçalho Oficial -->
+      <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
+        <div>
+          <h2 class="text-xl font-extrabold tracking-tight uppercase text-slate-950">PARECER TÉCNICO DE PLANEJAMENTO PREVIDENCIÁRIO</h2>
+          <p class="text-xs text-slate-600 font-medium">REQUERIMENTO DE DESCARTE DE CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º DA EC 103/2019)</p>
+          <p class="text-xs text-slate-500 font-mono mt-0.5">Protocolo Meu INSS / DER Projetada: 06/06/2030</p>
+        </div>
+        <div class="text-right">
+          <span class="px-3 py-1 rounded bg-slate-900 text-white font-mono text-xs font-bold">CÁLCULO ATUARIAL</span>
+        </div>
+      </div>
+
+      <!-- Identificação do Segurado -->
+      <div class="bg-slate-100 p-4 rounded-xl border border-slate-300 text-xs grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div>
+          <span class="text-slate-500 block font-semibold">SEGURADO:</span>
+          <span class="font-bold text-slate-900">${s.nome}</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block font-semibold">CPF:</span>
+          <span class="font-mono font-bold text-slate-900">${s.cpf}</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block font-semibold">DATA DE NASCIMENTO:</span>
+          <span class="font-bold text-slate-900">${s.nascimento} (61 anos)</span>
+        </div>
+        <div>
+          <span class="text-slate-500 block font-semibold">ESPÉCIE REQUERIDA:</span>
+          <span class="font-bold text-slate-900">Aposentadoria por Idade (B41)</span>
+        </div>
+      </div>
+
+      <!-- Fundamentação Jurídica -->
+      <div class="space-y-3 text-xs leading-relaxed text-slate-800 text-justify">
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">1. DA REGULARIDADE CONTRIBUTIVA E AVERBAÇÃO DE TEMPO DA MARINHA</h3>
+        <p>
+          O Segurado conta com histórico contributivo originado no Comando da Marinha (24/01/1983 a 30/11/1983 e 27/03/1985 a 23/09/1999), com desligamento regular mediante o <strong>Programa de Demissão Voluntária (PDV da União)</strong>. Mediante a juntada da competente <strong>Certidão de Tempo de Contribuição (CTC)</strong> expedida pela autoridade militar/federal, resta comprovado o cômputo de <strong>mais de 15 anos de tempo de serviço</strong>, somando-se aos vínculos urbanos vertidos ao RGPS (Cooperativas, Clube Naval e Contribuinte Individual), totalizando <strong>35 anos de tempo de contribuição</strong> e mais de <strong>260 meses de carência</strong>.
+        </p>
+
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1 mt-4">2. DO DIREITO AO DESCARTE DAS CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º DA EC 103/2019)</h3>
+        <p>
+          Dispõe o § 6º do art. 26 da Emenda Constitucional nº 103/2019 c/c o art. 235 da Instrução Normativa PRES/INSS nº 128/2022 que o segurado tem o direito potestativo de excluir da média aritmética as contribuições que resultem em redução do valor do benefício, desde que mantido o tempo mínimo contributivo exigido para a modalidade pretendida.
+        </p>
+        <p>
+          No caso vertente, para a Aposentadoria por Idade Urbana (65 anos homem), o requisito constitucional é de <strong>15 anos de tempo de contribuição (180 meses)</strong>. Contando o Segurado com 35 anos de tempo total, há expressivo excedente de tempo contributivo, autorizando a exclusão das menores contribuições para maximizar a RMI.
+        </p>
+      </div>
+
+      <!-- Tabela Comparativa de Cálculo -->
+      <div class="space-y-2">
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">3. DEMONSTRATIVO COMPARATIVO ATUARIAL DA RMI</h3>
+        <table class="w-full text-xs border border-slate-300 text-left">
+          <thead class="bg-slate-200 text-slate-800 font-bold">
+            <tr>
+              <th class="p-2 border border-slate-300">Item do Cálculo</th>
+              <th class="p-2 border border-slate-300 text-right">Cenário 1: Sem Descarte</th>
+              <th class="p-2 border border-slate-300 text-right bg-emerald-100 text-emerald-950">Cenário 2: Otimizado (Art. 26)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">Competências Consideradas na Média</td>
+              <td class="p-2 border border-slate-300 text-right font-mono">269 competências</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.salarios_restantes} melhores competências</td>
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">Competências Descartadas (Excluídas)</td>
+              <td class="p-2 border border-slate-300 text-right font-mono">0 descartes</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.descartes} competências menores</td>
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">Média Aritmética Simples do PBC</td>
+              <td class="p-2 border border-slate-300 text-right font-mono">R$ ${res.media_sem_descarte.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">R$ ${pt.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">Tempo de Contribuição Restante</td>
+              <td class="p-2 border border-slate-300 text-right font-mono">35 anos</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.tc_anos_resultante} anos (Mínimo 15a)</td>
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">Coeficiente de Benefício Aplicável</td>
+              <td class="p-2 border border-slate-300 text-right font-mono">90,0%</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.coeficiente_perc}%</td>
+            </tr>
+            <tr class="bg-slate-100 font-bold text-sm">
+              <td class="p-2 border border-slate-300 font-bold text-slate-950">Renda Mensal Inicial (RMI) Resultante</td>
+              <td class="p-2 border border-slate-300 text-right font-mono text-slate-700">R$ ${res.rmi_sem_descarte.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td class="p-2 border border-slate-300 text-right font-mono text-emerald-700 bg-emerald-100 text-base">R$ ${pt.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            </tr>
+            <tr class="bg-emerald-50 text-emerald-950 font-semibold text-xs">
+              <td class="p-2 border border-slate-300">Vantagem Financeira Líquida do Descarte</td>
+              <td colspan="2" class="p-2 border border-slate-300 text-right font-mono font-bold">
+                + R$ ${pt.delta_rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})} / mês (+ R$ ${(pt.delta_rmi * 240).toLocaleString('pt-BR', {minimumFractionDigits: 2})} em 20 anos)
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Rol Expresso das Competências a Descartar -->
+      <div class="space-y-1.5 text-xs">
+        <h3 class="text-sm font-bold text-slate-900 uppercase border-b border-slate-300 pb-1">4. ROL DAS COMPETÊNCIAS EXPRESSAMENTE REQUERIDAS PARA EXCLUSÃO</h3>
+        <p class="text-[11px] text-slate-600">
+          Em estrito cumprimento ao dever de peticionar, indica-se a relação das competências contributivas a serem formalmente descartadas pelo sistema do INSS:
+        </p>
+        <div class="p-3 bg-slate-100 rounded-lg border border-slate-300 font-mono text-[10px] text-slate-800 max-h-32 overflow-y-auto leading-relaxed">
+          ${listaDescartadosTexto}
+        </div>
+      </div>
+
+      <!-- Pedido Final e Assinatura -->
+      <div class="pt-4 border-t-2 border-slate-900 space-y-4 text-xs text-slate-800">
+        <p><strong>DOS PEDIDOS:</strong></p>
+        <p>
+          Ante o exposto, REQUER-SE: <strong>(a)</strong> A averbação integral do tempo de serviço comprovado na CTC da Marinha; <strong>(b)</strong> O acolhimento do descarte expresso das competências acima listadas; e <strong>(c)</strong> A concessão do benefício de Aposentadoria por Idade com Renda Mensal Inicial fixada em <strong>R$ ${pt.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong>.
+        </p>
+
+        <div class="flex justify-between items-end pt-8">
+          <div>
+            <p>Rio de Janeiro - RJ, ${new Date().toLocaleDateString('pt-BR')}.</p>
+          </div>
+          <div class="text-center">
+            <div class="w-64 border-b border-slate-800 mb-1"></div>
+            <p class="font-bold text-slate-950">${s.nome}</p>
+            <p class="text-[11px] text-slate-600">Segurado / Requerente</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  `;
 }
 
 // Render Auditoria dos Vínculos e Pendências
@@ -10943,26 +11158,6 @@ function renderDossieJuridico() {
             <p>Ao atingir a data de 65 anos (06/06/2030), formular o pedido de Aposentadoria por Idade Urbana juntando petição técnica com a tabela de salários auditados e requerendo formalmente a <strong>aplicação do Artigo 26, § 6º da EC 103/2019</strong> para exclusão de todas as menores contribuições (MEI).</p>
           </div>
         </div>
-      </div>
-
-      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
-        <div class="flex justify-between items-center mb-3">
-          <h4 class="text-sm font-bold text-slate-100 flex items-center gap-2">
-            <span>⚖️</span> Modelo de Cláusula de Descarte para a Petição Administrativa
-          </h4>
-          <button onclick="copiarPeticao()" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold flex items-center gap-1 transition-all">
-            <span>📋</span> Copiar Texto
-          </button>
-        </div>
-        <pre id="peticao-text" class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-300 overflow-x-auto border border-slate-800 leading-relaxed whitespace-pre-wrap">
-DO DIREITO EXPRESSO AO DESCARTE DAS CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º DA EC 103/2019)
-
-O Segurado HENRIQUE DA SILVA ROSA conta, na presente Data de Entrada do Requerimento (DER), com idade superior a 65 (sessenta e cinco) anos e carência superior aos 180 (cento e oitenta) meses exigidos pelo art. 48 da Lei 8.213/91 c/c art. 18 da Emenda Constitucional nº 103/2019.
-
-Tendo em vista que o Segurado possui expressivo excesso de tempo de contribuição após a regular averbação da Certidão de Tempo de Contribuição (CTC) do período militar/civil perante o Comando da Marinha, REQUER-SE, com fundamento no § 6º do art. 26 da EC nº 103/2019 e no art. 235 da Instrução Normativa PRES/INSS nº 128/2022, o DESCARTE EXPRESSO de todas as competências contributivas correspondentes ao regime do Microempreendedor Individual (MEI / LC 123/2006) e demais salários de contribuição mínimos que reduzem a média aritmética final.
-
-Demonstra-se que, mantidos os 15 (quinze) anos exigidos para a concessão do benefício, o expurgo dos salários prejudiciais eleva a média dos salários de contribuição para patamar compatível com as melhores contribuições vertidas ao RGPS, culminando na fixação da Renda Mensal Inicial (RMI) em conformidade com o cálculo atuarial computadorizado anexo.
-        </pre>
       </div>
     </div>
   `;
@@ -11249,8 +11444,10 @@ function setupEventListeners() {
       currentScenario.descarteAtivo = true;
       document.getElementById('toggle-descarte').checked = true;
       renderKPIs();
-      renderTabelaSalarios();
       renderMatrizDescartes();
+      renderTabelasDescartesEMelhores();
+      renderParecerMeuINSS();
+      renderTabelaSalarios();
     });
   }
 
@@ -11264,8 +11461,10 @@ function setupEventListeners() {
         if (slider) slider.value = currentScenario.descarteCustom;
       }
       renderKPIs();
-      renderTabelaSalarios();
       renderMatrizDescartes();
+      renderTabelasDescartesEMelhores();
+      renderParecerMeuINSS();
+      renderTabelaSalarios();
     });
   }
 
@@ -11319,11 +11518,11 @@ function setupEventListeners() {
   }
 }
 
-function copiarPeticao() {
-  const el = document.getElementById('peticao-text');
-  if (el) {
-    navigator.clipboard.writeText(el.innerText).then(() => {
-      alert('Cláusula de descarte copiada com sucesso para a área de transferência!');
-    });
-  }
+function imprimirParecerMeuINSS() {
+  // Abre a aba do parecer e ativa impressão
+  const btnTab = document.querySelector('[data-tab-target="tab-parecer-inss"]');
+  if (btnTab) btnTab.click();
+  setTimeout(() => {
+    window.print();
+  }, 300);
 }
