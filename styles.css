@@ -336,6 +336,21 @@ body.theme-light .text-amber-400 {
   color: #d97706 !important;
 }
 
+/* Botão Flutuante e Checkout 1-Clique */
+#btn-flutuante-desbloqueio button {
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4), 0 8px 10px -6px rgba(16, 185, 129, 0.4);
+}
+body.theme-light #btn-flutuante-desbloqueio button {
+  background: linear-gradient(to right, #10b981, #059669) !important;
+  color: #ffffff !important;
+  border-color: #047857 !important;
+}
+body.theme-light #toast-sucesso-previmaster {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+  border-color: #10b981 !important;
+}
+
 /* Estilos de Impressão para Emissão de Relatório / Parecer Técnico */
 @media print {
   body {

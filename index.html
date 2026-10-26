@@ -156,13 +156,18 @@
           </div>
         </div>
 
-        <!-- Alerta de Diagnóstico Rápido -->
-        <div id="alerta-diagnostico-perfil" class="p-3 rounded-xl bg-amber-950/30 border border-amber-900/50 flex items-center gap-3">
-          <div class="text-xl">💡</div>
-          <div class="text-xs">
-            <span class="font-bold text-amber-300 block">Diagnóstico de Inteligência Previdenciária:</span>
-            <span class="text-slate-300">Averbar os 15+ anos da Marinha desbloqueia o <strong>Descarte Inteligente</strong>, elevando sua aposentadoria em quase R$ 1.000/mês sem gastar em complementações!</span>
+        <!-- Alerta de Diagnóstico Rápido com Ação Direta -->
+        <div id="alerta-diagnostico-perfil" class="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-amber-950/20 border border-amber-500/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-lg">
+          <div class="flex items-center gap-3">
+            <div class="text-2xl animate-pulse">💡</div>
+            <div class="text-xs">
+              <span class="font-bold text-amber-300 block">Diagnóstico de Inteligência Previdenciária:</span>
+              <span class="text-slate-300">Averbar os 15+ anos da Marinha desbloqueia o <strong>Descarte Inteligente</strong>, elevando sua aposentadoria em quase R$ 1.000/mês sem gastar em complementações!</span>
+            </div>
           </div>
+          <button onclick="abrirCheckout('unitario')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer">
+            <span>🔓</span> Desbloquear Lista Completa por R$ 29,90
+          </button>
         </div>
       </div>
     </section>
@@ -520,9 +525,14 @@
               <h4 class="text-sm sm:text-base font-black text-white mt-0.5">3 Vínculos com Indício de Erro / Extemporaneidade Detectados pela IA PreviMaster</h4>
             </div>
           </div>
-          <button onclick="imprimirParecerMeuINSS()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer">
-            <span>📄</span> Emitir Parecer Técnico com Fundamentação
-          </button>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button onclick="abrirCheckout('unitario')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+              <span>🔓</span> Desbloquear Lista Completa por R$ 29,90
+            </button>
+            <button onclick="imprimirParecerMeuINSS()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+              <span>📄</span> Emitir Parecer Técnico com Fundamentação
+            </button>
+          </div>
         </div>
         <p class="text-xs text-slate-300 leading-relaxed">
           Nossa inteligência artificial identificou que o extrato CNIS possui pendências que <strong>impedirão a concessão imediata</strong> ou <strong>reduzirão a aposentadoria em quase R$ 1.000,00 por mês</strong> se não forem retificadas preventivamente:
@@ -1389,12 +1399,14 @@
     </div>
   </div>
 
-  <!-- Modal de Checkout / Liberação com Pagamento Seguro Mercado Pago -->
+  <!-- Modal de Checkout / Liberação com Pagamento Rápido em 1 Clique (Pix & Mercado Pago) -->
   <div id="modal-checkout" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-sky-500/40 max-w-lg w-full shadow-2xl space-y-5 bg-slate-900/95 max-h-[92vh] overflow-y-auto">
       <div class="flex justify-between items-start pb-3 border-b border-slate-800">
         <div>
-          <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">🔒 Pagamento Seguro • Mercado Pago</span>
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>⚡</span> Check-out em 1 Clique • Pix Instantâneo & Cartão
+          </span>
           <h3 class="text-xl font-black text-white mt-0.5" id="checkout-plano-titulo">Finalizar Contratação</h3>
         </div>
         <button onclick="fecharModalCheckout()" class="text-slate-400 hover:text-white text-xl p-1 cursor-pointer">✕</button>
@@ -1422,25 +1434,48 @@
           <input type="text" id="checkout-input-nome" required placeholder="Ex: Dr. Henrique Rosa" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-email">
-            E-mail para Recebimento do Acesso e Comprovante *
-          </label>
-          <input type="email" id="checkout-input-email" required placeholder="seu-email@escritorio.com.br" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
-          <span class="text-[10px] text-slate-400 mt-1 block">Um e-mail com os detalhes do pedido e link de pagamento será enviado para você e para henrique.rosa@poli.ufrj.br.</span>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-email">
+              E-mail para Acesso *
+            </label>
+            <input type="email" id="checkout-input-email" required placeholder="seu-email@escritorio.com" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-whatsapp">
+              WhatsApp com DDD *
+            </label>
+            <input type="tel" id="checkout-input-whatsapp" required placeholder="(21) 98888-7777" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+          </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-whatsapp">
-            WhatsApp / Celular com DDD *
-          </label>
-          <input type="tel" id="checkout-input-whatsapp" required placeholder="(21) 98888-7777" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+        <span class="text-[10px] text-slate-400 block -mt-1">
+          Os dados do pedido e confirmação são enviados para você e para <strong>henrique.rosa@poli.ufrj.br</strong>.
+        </span>
+
+        <!-- OPÇÃO 1 PRINCIPAL: PIX EM 1 CLIQUE COM APROVAÇÃO INSTANTÂNEA -->
+        <div class="p-4 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/60 space-y-3 shadow-lg shadow-emerald-950/40">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
+              <span>⚡</span> PIX com Aprovação Instantânea (1-Clique)
+            </span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-slate-950">Mais Rápido</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Libere o <strong>Parecer Técnico Oficial em PDF</strong> e a <strong>Lista Completa de Descartes</strong> na hora, <strong>sem recarregar a página</strong>.
+          </p>
+          <button type="button" onclick="executarCheckout1CliquePix()" id="btn-pix-1clique" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+            <span>⚡</span>
+            <span id="btn-pix-1clique-texto">Pagar com PIX & Liberar PDF Instantaneamente</span>
+          </button>
         </div>
 
-        <div class="pt-2">
-          <button type="submit" id="btn-submit-checkout" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer">
+        <!-- OPÇÃO 2: CARTÃO DE CRÉDITO NO MERCADO PAGO -->
+        <div class="pt-1">
+          <button type="submit" id="btn-submit-checkout" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700 flex items-center justify-center gap-2 cursor-pointer">
             <span>💳</span>
-            <span id="btn-submit-checkout-texto">Ir para Pagamento Seguro no Mercado Pago</span>
+            <span id="btn-submit-checkout-texto">Pagar com Cartão no Mercado Pago (Até 12x) ➔</span>
           </button>
         </div>
 
@@ -1451,7 +1486,7 @@
         </div>
 
         <div>
-          <button type="button" onclick="simularPagamentoEfetuado()" id="btn-simular-pagamento" class="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+          <button type="button" onclick="simularPagamentoEfetuado()" id="btn-simular-pagamento" class="w-full py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-emerald-500/30 text-emerald-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
             <span>⚡</span>
             <span>Simular Pagamento Efetuado (Teste Fictício & E-mail)</span>
           </button>
@@ -1592,5 +1627,14 @@
       carregarTutorialNaTelaPrincipal();
     }
   </script>
+
+  <!-- Botão Flutuante de Ação Direta para Desbloqueio (Alta Conversão) -->
+  <div id="btn-flutuante-desbloqueio" class="fixed bottom-6 right-6 z-40 no-print transition-all duration-300">
+    <button onclick="abrirCheckout('unitario')" class="group relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-2xl shadow-emerald-500/50 flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 border border-emerald-300/40 cursor-pointer animate-pulse hover:animate-none">
+      <span class="text-base group-hover:scale-110 transition-transform">🔓</span>
+      <span>Desbloquear Lista Completa por R$ 29,90</span>
+      <span class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-950 text-emerald-300 font-bold ml-0.5">PIX 1-CLIQUE</span>
+    </button>
+  </div>
 </body>
 </html>
