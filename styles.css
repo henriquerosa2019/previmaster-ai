@@ -5,6 +5,7 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: #0f172a;
   color: #f8fafc;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .font-mono-numbers {
@@ -74,6 +75,248 @@ body {
   background-color: rgba(168, 85, 247, 0.15);
   color: #c084fc;
   border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* ==========================================================================
+   TEMA CLARO (LIGHT MODE) - Executivo, Limpo & Alta Legibilidade
+   ========================================================================== */
+html.theme-light,
+body.theme-light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+body.theme-light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+body.theme-light header h1 {
+  color: #0f172a !important;
+}
+
+body.theme-light .glass-panel {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -2px rgba(15, 23, 42, 0.03) !important;
+  color: #1e293b !important;
+}
+
+body.theme-light .glass-card-hover:hover {
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.12) !important;
+  border-color: #0284c7 !important;
+}
+
+/* Tipografia e Contraste no Modo Claro */
+body.theme-light .text-white {
+  color: #0f172a !important;
+}
+body.theme-light .text-slate-100 {
+  color: #0f172a !important;
+}
+body.theme-light .text-slate-200 {
+  color: #1e293b !important;
+}
+body.theme-light .text-slate-300 {
+  color: #334155 !important;
+}
+body.theme-light .text-slate-400 {
+  color: #64748b !important;
+}
+body.theme-light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Cores de Fundo do Modo Claro */
+body.theme-light .bg-slate-900,
+body.theme-light .bg-slate-950 {
+  background-color: #ffffff !important;
+}
+body.theme-light .bg-slate-900\/95,
+body.theme-light .bg-slate-900\/90,
+body.theme-light .bg-slate-900\/80,
+body.theme-light .bg-slate-900\/60,
+body.theme-light .bg-slate-900\/40,
+body.theme-light .bg-slate-950\/90,
+body.theme-light .bg-slate-950\/80,
+body.theme-light .bg-slate-950\/70,
+body.theme-light .bg-slate-950\/60 {
+  background-color: #ffffff !important;
+}
+
+body.theme-light .bg-slate-800,
+body.theme-light .bg-slate-800\/80,
+body.theme-light .bg-slate-800\/60,
+body.theme-light .bg-slate-800\/40 {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+body.theme-light .border-slate-800,
+body.theme-light .border-slate-700,
+body.theme-light .border-slate-800\/80,
+body.theme-light .border-slate-800\/60,
+body.theme-light .border-slate-700\/60,
+body.theme-light .border-slate-700\/40 {
+  border-color: #e2e8f0 !important;
+}
+
+body.theme-light .hover\:bg-slate-700:hover,
+body.theme-light .hover\:bg-slate-800:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+body.theme-light .hover\:bg-slate-800\/40:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Badges e Pílulas em Modo Claro */
+body.theme-light .badge-ok {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+body.theme-light .badge-prpps {
+  background-color: #fee2e2 !important;
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+}
+body.theme-light .badge-mei {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
+}
+body.theme-light .badge-descartado {
+  background-color: #f1f5f9 !important;
+  color: #94a3b8 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Barra de Abas */
+body.theme-light nav[aria-label="Tabs"] {
+  background-color: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+body.theme-light nav[aria-label="Tabs"] button.text-slate-400 {
+  color: #475569 !important;
+}
+body.theme-light nav[aria-label="Tabs"] button.text-slate-400:hover {
+  color: #0f172a !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+body.theme-light nav[aria-label="Tabs"] button.bg-sky-600 {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+/* Simulador Atuarial em Tempo Real */
+body.theme-light #section-simulador-controles {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Alertas de Diagnóstico */
+body.theme-light #alerta-diagnostico-perfil {
+  background-color: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+body.theme-light #alerta-diagnostico-perfil .text-amber-300 {
+  color: #92400e !important;
+}
+body.theme-light #alerta-diagnostico-perfil .text-slate-300 {
+  color: #78350f !important;
+}
+
+body.theme-light #alerta-inconsistencias-ia {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffffff 50%, #fffbeb 100%) !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Scrollbar Claro */
+body.theme-light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+body.theme-light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+body.theme-light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Tabelas no Modo Claro */
+body.theme-light table thead {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-color: #e2e8f0 !important;
+}
+body.theme-light table thead th {
+  color: #475569 !important;
+}
+body.theme-light table tbody tr {
+  border-color: #f1f5f9 !important;
+}
+body.theme-light table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Inputs, Selects e Sliders */
+body.theme-light input[type="text"],
+body.theme-light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+body.theme-light input[type="range"] {
+  background-color: #cbd5e1 !important;
+}
+
+/* Rodapé */
+body.theme-light footer {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #64748b !important;
+}
+body.theme-light #footer-segurado-info {
+  color: #94a3b8 !important;
+}
+
+/* Modais no Modo Claro */
+body.theme-light #modal-precos,
+body.theme-light #modal-upload,
+body.theme-light #modal-confirmar-limpar {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+}
+body.theme-light #modal-precos > div,
+body.theme-light #modal-upload > div,
+body.theme-light #modal-confirmar-limpar > div {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+body.theme-light #modal-precos .bg-slate-900,
+body.theme-light #modal-precos .bg-slate-900\/80,
+body.theme-light #modal-precos .bg-slate-900\/90 {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Badges da legenda do gráfico no Modo Claro */
+body.theme-light #grafico-matriz-box span.bg-emerald-950\/60 {
+  background-color: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+body.theme-light #grafico-matriz-box span.bg-sky-950\/60 {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+  border-color: #7dd3fc !important;
+}
+body.theme-light #grafico-matriz-box span.bg-amber-950\/60 {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
 }
 
 /* Estilos de Impressão para Emissão de Relatório / Parecer Técnico */

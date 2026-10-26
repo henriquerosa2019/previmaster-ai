@@ -11626,8 +11626,57 @@ let chartSalarios = null;
 let chartDescarte = null;
 let chartPatrimonio = null;
 
+// CONTROLE DO TEMA (CLARO / ESCURO)
+function getTemaAtual() {
+  return localStorage.getItem('previmaster_theme') || 'dark';
+}
+
+function aplicarTema(tema) {
+  const isLight = tema === 'light';
+  if (isLight) {
+    document.body.classList.add('theme-light');
+    document.documentElement.classList.add('theme-light');
+  } else {
+    document.body.classList.remove('theme-light');
+    document.documentElement.classList.remove('theme-light');
+  }
+  localStorage.setItem('previmaster_theme', tema);
+
+  const btnTheme = document.getElementById('btn-theme-toggle');
+  const iconTheme = document.getElementById('theme-icon');
+  const textTheme = document.getElementById('theme-text');
+
+  if (iconTheme && textTheme) {
+    if (isLight) {
+      iconTheme.textContent = '🌙';
+      textTheme.textContent = 'Modo Escuro';
+      if (btnTheme) {
+        btnTheme.className = "px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 border border-slate-300 transition-all shadow-sm cursor-pointer";
+      }
+    } else {
+      iconTheme.textContent = '☀️';
+      textTheme.textContent = 'Modo Claro';
+      if (btnTheme) {
+        btnTheme.className = "px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-all shadow-sm cursor-pointer";
+      }
+    }
+  }
+
+  // Atualiza os gráficos se inicializados para recalcular as cores
+  if (typeof initCharts === 'function' && CNIS_DATA && CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0) {
+    initCharts();
+  }
+}
+
+function alternarTema() {
+  const atual = getTemaAtual();
+  const proximo = atual === 'light' ? 'dark' : 'light';
+  aplicarTema(proximo);
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
+  try { aplicarTema(getTemaAtual()); } catch (e) { console.error('Erro tema:', e); }
   try { renderProfileHeader(); } catch (e) { console.error('Erro profile:', e); }
   try { renderKPIs(); } catch (e) { console.error('Erro KPIs:', e); }
   try { renderBannerBalanca(); } catch (e) { console.error('Erro Banner Balança:', e); }
@@ -12877,6 +12926,12 @@ function initCharts() {
 
   if (!hasData) return;
 
+  const isLight = document.body.classList.contains('theme-light');
+  const gridColor = isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.05)';
+  const tickColor = isLight ? '#64748b' : '#94a3b8';
+  const titleColor = isLight ? '#334155' : '#94a3b8';
+  const legendColor = isLight ? '#334155' : '#cbd5e1';
+
   // Gráfico 1: Evolução Histórica dos Salários (Nominal vs INPC Corrigido)
   const ctxSalarios = document.getElementById('chartSalarios');
   if (ctxSalarios) {
@@ -12901,20 +12956,24 @@ function initCharts() {
           {
             label: 'Salário Médio Corrigido (INPC)',
             data: mediaCorr,
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            borderColor: isLight ? '#0284c7' : '#38bdf8',
+            backgroundColor: isLight ? 'rgba(2, 132, 199, 0.08)' : 'rgba(56, 189, 248, 0.1)',
             fill: true,
             tension: 0.35,
-            borderWidth: 2.5
+            borderWidth: 2.5,
+            pointRadius: 0,
+            pointHoverRadius: 5
           },
           {
             label: 'Salário Médio Nominal',
             data: mediaNom,
-            borderColor: '#94a3b8',
+            borderColor: isLight ? '#64748b' : '#94a3b8',
             borderDash: [5, 5],
             fill: false,
             tension: 0.35,
-            borderWidth: 1.5
+            borderWidth: 1.8,
+            pointRadius: 0,
+            pointHoverRadius: 5
           }
         ]
       },
@@ -12922,21 +12981,26 @@ function initCharts() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: '#cbd5e1', font: { family: 'Inter', size: 12 } } },
+          legend: { labels: { color: legendColor, font: { family: 'Inter', size: 12 } } },
           tooltip: {
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.95)',
+            titleColor: isLight ? '#0f172a' : '#f8fafc',
+            bodyColor: isLight ? '#334155' : '#cbd5e1',
+            borderColor: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
             callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+              label: (ctx) => ` ${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
             }
           }
         },
         scales: {
-          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          x: { ticks: { color: tickColor }, grid: { color: gridColor } },
           y: { 
             ticks: { 
-              color: '#94a3b8', 
+              color: tickColor, 
               callback: v => 'R$ ' + v.toLocaleString('pt-BR') 
             }, 
-            grid: { color: 'rgba(255,255,255,0.05)' } 
+            grid: { color: gridColor } 
           }
         }
       }
@@ -12952,6 +13016,17 @@ function initCharts() {
     const medias = curve.map(c => c.media_corrigida);
     const coefs = curve.map(c => c.coeficiente_perc);
 
+    // Gradiente suave profissional sob a curva de RMI
+    const ctx2d = ctxDescarte.getContext('2d');
+    const gradRmi = ctx2d.createLinearGradient(0, 0, 0, 320);
+    if (isLight) {
+      gradRmi.addColorStop(0, 'rgba(5, 150, 105, 0.22)');
+      gradRmi.addColorStop(1, 'rgba(5, 150, 105, 0.00)');
+    } else {
+      gradRmi.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+      gradRmi.addColorStop(1, 'rgba(16, 185, 129, 0.00)');
+    }
+
     chartDescarte = new Chart(ctxDescarte, {
       type: 'line',
       data: {
@@ -12960,31 +13035,44 @@ function initCharts() {
           {
             label: 'RMI Resultante (R$)',
             data: rmis,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.18)',
+            borderColor: isLight ? '#059669' : '#10b981',
+            backgroundColor: gradRmi,
             fill: true,
-            borderWidth: 3.5,
-            tension: 0.2,
+            borderWidth: 3,
+            tension: 0.12,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: isLight ? '#059669' : '#10b981',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
             yAxisID: 'y'
           },
           {
             label: 'Média Salarial dos Restantes (R$)',
             data: medias,
-            borderColor: '#38bdf8',
-            borderDash: [4, 4],
+            borderColor: isLight ? '#0284c7' : '#38bdf8',
             fill: false,
-            borderWidth: 2,
-            tension: 0.2,
+            borderWidth: 2.5,
+            tension: 0.25,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: isLight ? '#0284c7' : '#38bdf8',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
             yAxisID: 'y'
           },
           {
             label: 'Coeficiente de Benefício (%)',
             data: coefs,
-            borderColor: '#f59e0b',
-            borderDash: [2, 2],
+            borderColor: isLight ? '#d97706' : '#f59e0b',
+            stepped: 'after',
             fill: false,
-            borderWidth: 1.5,
-            tension: 0.1,
+            borderWidth: 2.2,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: isLight ? '#d97706' : '#f59e0b',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 2,
             yAxisID: 'y1'
           }
         ]
@@ -12997,39 +13085,48 @@ function initCharts() {
           intersect: false
         },
         plugins: {
-          legend: { labels: { color: '#cbd5e1' } },
+          legend: { display: false },
           tooltip: {
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.95)',
+            titleColor: isLight ? '#0f172a' : '#f8fafc',
+            bodyColor: isLight ? '#334155' : '#cbd5e1',
+            borderColor: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
+            padding: 10,
+            boxPadding: 4,
+            usePointStyle: true,
+            cornerRadius: 8,
             callbacks: {
               title: (ctx) => `Combinação: k = ${ctx[0].label} descartes`,
               label: (ctx) => {
-                if (ctx.dataset.yAxisID === 'y1') return `${ctx.dataset.label}: ${ctx.parsed.y}%`;
-                return `${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                if (ctx.dataset.yAxisID === 'y1') return ` ${ctx.dataset.label}: ${ctx.parsed.y}%`;
+                return ` ${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
               }
             }
           }
         },
         scales: {
           x: { 
-            title: { display: true, text: 'Quantidade de Salários Menores Descartados (k)', color: '#94a3b8' }, 
-            ticks: { color: '#94a3b8' }, 
-            grid: { color: 'rgba(255,255,255,0.05)' } 
+            title: { display: true, text: 'Quantidade de Salários Menores Descartados (k)', color: titleColor, font: { family: 'Inter', size: 11, weight: '600' } }, 
+            ticks: { color: tickColor, maxTicksLimit: 22, font: { family: 'Inter', size: 10 } }, 
+            grid: { color: gridColor, drawBorder: false } 
           },
           y: { 
             type: 'linear',
             display: true,
             position: 'left',
-            title: { display: true, text: 'Valores em R$ (RMI e Média)', color: '#94a3b8' },
-            ticks: { color: '#94a3b8', callback: v => 'R$ ' + v.toLocaleString('pt-BR') }, 
-            grid: { color: 'rgba(255,255,255,0.05)' } 
+            title: { display: true, text: 'Valores em R$ (RMI e Média)', color: titleColor, font: { family: 'Inter', size: 11, weight: '600' } },
+            ticks: { color: tickColor, callback: v => 'R$ ' + v.toLocaleString('pt-BR'), font: { family: 'Inter', size: 10 } }, 
+            grid: { color: gridColor, drawBorder: false } 
           },
           y1: {
             type: 'linear',
             display: true,
             position: 'right',
-            title: { display: true, text: 'Coeficiente (%)', color: '#f59e0b' },
+            title: { display: true, text: 'Coeficiente (%)', color: isLight ? '#d97706' : '#f59e0b', font: { family: 'Inter', size: 11, weight: '600' } },
             min: 50,
             max: 100,
-            ticks: { color: '#f59e0b', callback: v => v + '%' },
+            ticks: { color: isLight ? '#d97706' : '#f59e0b', callback: v => v + '%', font: { family: 'Inter', size: 10 } },
             grid: { drawOnChartArea: false }
           }
         }
@@ -13055,24 +13152,35 @@ function initCharts() {
           {
             label: 'Cenário Otimizado (CTC Marinha + Descarte MEI)',
             data: acumuladoOtimizado,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderColor: isLight ? '#059669' : '#10b981',
+            backgroundColor: isLight ? 'rgba(5, 150, 105, 0.1)' : 'rgba(16, 185, 129, 0.1)',
             borderWidth: 3,
-            fill: true
+            fill: true,
+            tension: 0.2,
+            pointRadius: 0,
+            pointHoverRadius: 5
           },
           {
             label: 'Cenário Convencional (Sem Descarte)',
             data: acumuladoSemDescarte,
-            borderColor: '#94a3b8',
+            borderColor: isLight ? '#64748b' : '#94a3b8',
             borderWidth: 2,
-            borderDash: [5, 5]
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.2,
+            pointRadius: 0,
+            pointHoverRadius: 5
           },
           {
             label: 'Cenário Complementando MEI (- R$ 11.250 em DARFs)',
             data: acumuladoMEIComp,
-            borderColor: '#f43f5e',
+            borderColor: isLight ? '#e11d48' : '#f43f5e',
             borderWidth: 2,
-            borderDash: [3, 3]
+            borderDash: [3, 3],
+            fill: false,
+            tension: 0.2,
+            pointRadius: 0,
+            pointHoverRadius: 5
           }
         ]
       },
@@ -13080,16 +13188,27 @@ function initCharts() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: '#cbd5e1' } },
+          legend: { labels: { color: legendColor, font: { family: 'Inter', size: 12 } } },
           tooltip: {
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.95)',
+            titleColor: isLight ? '#0f172a' : '#f8fafc',
+            bodyColor: isLight ? '#334155' : '#cbd5e1',
+            borderColor: isLight ? '#cbd5e1' : 'rgba(255, 255, 255, 0.1)',
+            borderWidth: 1,
             callbacks: {
-              label: (ctx) => `${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
+              label: (ctx) => ` ${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`
             }
           }
         },
         scales: {
-          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-          y: { ticks: { color: '#94a3b8', callback: v => 'R$ ' + (v / 1000).toLocaleString('pt-BR') + 'k' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          x: { ticks: { color: tickColor }, grid: { color: gridColor } },
+          y: { 
+            ticks: { 
+              color: tickColor, 
+              callback: v => 'R$ ' + (v / 1000).toLocaleString('pt-BR') + 'k' 
+            }, 
+            grid: { color: gridColor } 
+          }
         }
       }
     });
