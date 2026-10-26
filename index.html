@@ -108,7 +108,7 @@
             <span id="profile-status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CNIS 100% Auditado
             </span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Caso Demonstrativo</span>
+            <span id="profile-caso-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Caso Demonstrativo</span>
             
             <button id="btn-restaurar-demo" onclick="restaurarCasoDemonstrativo()" class="hidden px-2.5 py-0.5 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 hover:text-white border border-sky-700 text-xs font-bold transition-all shadow-sm flex items-center gap-1">
               <span>🔄</span> Restaurar Demonstração
@@ -122,14 +122,14 @@
             <span>•</span>
             <span><strong>Nascimento:</strong> <span id="profile-nasc" class="text-slate-200">06/06/1965 (61 anos)</span></span>
             <span>•</span>
-            <span><strong>Regime:</strong> RGPS c/ Averbação Marinha (PDV)</span>
+            <span><strong>Regime:</strong> <span id="profile-regime">RGPS c/ Averbação Marinha (PDV)</span></span>
             <span>•</span>
             <span><strong>Aposentadoria por Idade (65a):</strong> <span id="profile-data-idade" class="font-semibold text-emerald-400">06/06/2030</span></span>
           </div>
         </div>
 
         <!-- Alerta de Diagnóstico Rápido -->
-        <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-900/50 flex items-center gap-3">
+        <div id="alerta-diagnostico-perfil" class="p-3 rounded-xl bg-amber-950/30 border border-amber-900/50 flex items-center gap-3">
           <div class="text-xl">💡</div>
           <div class="text-xs">
             <span class="font-bold text-amber-300 block">Diagnóstico de Inteligência Previdenciária:</span>
@@ -165,7 +165,7 @@
       </div>
 
       <!-- Atalhos Rápidos dos Marcos da Matriz -->
-      <div class="pt-3 pb-2 flex flex-wrap items-center gap-2 text-xs">
+      <div id="atalhos-matriz-box" class="pt-3 pb-2 flex flex-wrap items-center gap-2 text-xs">
         <span class="text-slate-400 font-medium">Atalhos da Matriz:</span>
         <button onclick="aplicarCenarioMatriz(0)" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-[11px] border border-slate-700">
           k = 0 (Sem Descarte)
@@ -182,7 +182,7 @@
       </div>
 
       <!-- Slider de Controle Fino de Descartes -->
-      <div class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-800/80">
+      <div id="slider-descarte-box" class="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-800/80">
         <div class="w-full sm:w-2/3">
           <div class="flex justify-between items-center text-xs mb-1">
             <span class="text-slate-300 font-medium">Controle de Descartes de Salários:</span>
@@ -225,7 +225,7 @@
           <span>📈</span>
         </div>
         <div id="kpi-media" class="text-2xl font-black font-mono text-white tracking-tight">R$ 6.473,54</div>
-        <div class="text-xs text-slate-300 mt-2">
+        <div id="kpi-media-sub" class="text-xs text-slate-300 mt-2">
           Coeficiente: <span class="font-bold text-sky-300">60%</span> (Exige 15a de TC)
         </div>
       </div>
@@ -237,7 +237,7 @@
           <span>⏳</span>
         </div>
         <div id="kpi-tempo" class="text-2xl font-black font-mono text-white tracking-tight">35 anos</div>
-        <div class="text-xs text-slate-400 mt-2">
+        <div id="kpi-tempo-sub" class="text-xs text-slate-400 mt-2">
           Com Marinha (15a 4m) + RGPS (19a)
         </div>
       </div>
@@ -249,7 +249,7 @@
           <span>💎</span>
         </div>
         <div id="kpi-patrimonio" class="text-2xl font-black font-mono text-purple-300 tracking-tight">+ R$ 234.480,00</div>
-        <div class="text-[11px] text-slate-400 mt-2">
+        <div id="kpi-patrimonio-sub" class="text-[11px] text-slate-400 mt-2">
           Sobrevida projetada pelo IBGE
         </div>
       </div>
@@ -275,7 +275,7 @@
       <button data-tab-target="tab-dossie" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
         📜 6. Dossiê Jurídico & Petição
       </button>
-      <button data-tab-target="tab-tabela" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
+      <button id="tab-btn-salarios" data-tab-target="tab-tabela" class="px-4 py-2 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 whitespace-nowrap transition-all">
         📋 7. Tabela Completa de Salários (269 Comps)
       </button>
       <button data-tab-target="tab-parecer-inss" class="px-4 py-2 rounded-xl text-amber-300 hover:text-white bg-amber-950/40 hover:bg-amber-900/40 border border-amber-700/60 whitespace-nowrap transition-all">
@@ -302,7 +302,7 @@
       </div>
 
       <!-- Gráfico Dual-Axis da Matriz de Descartes -->
-      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl">
+      <div id="grafico-matriz-box" class="glass-panel p-6 rounded-2xl border border-slate-700/60 shadow-xl">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div>
             <h4 class="text-base font-bold text-white flex items-center gap-2">
@@ -472,7 +472,7 @@
 
     <!-- ABA 2: Auditoria com IA do CNIS (IntelPrev) -->
     <div id="tab-diagnostico" data-tab-content class="hidden space-y-4">
-      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60">
+      <div id="diagnostico-resumo-box" class="glass-panel p-5 rounded-2xl border border-slate-700/60">
         <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
           <span>🔍</span> Diagnóstico Automático e Auditoria de Indicadores Previdenciários
         </h3>
@@ -511,8 +511,12 @@
         </div>
       </div>
 
+      <div id="diagnostico-empty-box" class="hidden glass-panel p-8 text-center text-slate-400 text-xs italic rounded-2xl border border-slate-800">
+        Nenhum indicador ou pendência no momento. Tela limpa aguardando novo extrato CNIS em PDF.
+      </div>
+
       <div class="mt-6">
-        <h4 class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Histórico Cronológico dos 16 Vínculos Auditados:</h4>
+        <h4 id="auditoria-vinculos-title" class="text-sm font-bold text-slate-200 mb-3 uppercase tracking-wider">Histórico Cronológico dos 16 Vínculos Auditados:</h4>
         <div id="auditoria-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Gerado dinamicamente pelo app.js -->
         </div>
@@ -521,12 +525,12 @@
 
     <!-- ABA 3: Comparador de Regras (Previdenciarista) -->
     <div id="tab-regras" data-tab-content class="hidden space-y-4">
-      <div class="glass-panel p-5 rounded-2xl border border-slate-700/60">
+      <div id="regras-header-box" class="glass-panel p-5 rounded-2xl border border-slate-700/60">
         <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
           <span>⚖️</span> Simulação em Lote de Todas as Regras da Previdência Social
         </h3>
         <p class="text-xs text-slate-300">
-          O motor atuarial rodou o cruzamento entre o histórico de Henrique e todas as opções legais da Emenda Constitucional nº 103/2019 e da Lei 8.213/91:
+          O motor atuarial rodou o cruzamento entre o histórico previdenciário e todas as opções legais da Emenda Constitucional nº 103/2019 e da Lei 8.213/91:
         </p>
       </div>
 
@@ -544,27 +548,32 @@
 
     <!-- ABA 5: Gráficos & Projeções Atuariais -->
     <div id="tab-graficos" data-tab-content class="hidden space-y-6">
-      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
-        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-          <span>📈</span> Evolução Histórica dos Salários de Contribuição (INPC / Plano Real)
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">
-          Comparativo entre salários nominais da época e salários corrigidos mês a mês pelo INPC oficial do BACEN até 2026:
-        </p>
-        <div class="h-72 w-full chart-container">
-          <canvas id="chartSalarios"></canvas>
-        </div>
+      <div id="graficos-empty-box" class="hidden glass-panel p-8 text-center text-slate-400 text-xs italic rounded-2xl border border-slate-800">
+        Nenhum dado gráfico no momento. Tela limpa aguardando novo extrato CNIS em PDF.
       </div>
+      <div id="graficos-charts-container" class="space-y-6">
+        <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span>📈</span> Evolução Histórica dos Salários de Contribuição (INPC / Plano Real)
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">
+            Comparativo entre salários nominais da época e salários corrigidos mês a mês pelo INPC oficial do BACEN até 2026:
+          </p>
+          <div class="h-72 w-full chart-container">
+            <canvas id="chartSalarios"></canvas>
+          </div>
+        </div>
 
-      <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
-        <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
-          <span>💰</span> Projeção de Fluxo de Caixa Acumulado na Aposentadoria (20 Anos de Sobrevida)
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">
-          Demonstração do patrimônio acumulado pelo segurado no Cenário Otimizado vs Cenário Convencional sem planejamento:
-        </p>
-        <div class="h-72 w-full chart-container">
-          <canvas id="chartPatrimonio"></canvas>
+        <div class="glass-panel p-6 rounded-2xl border border-slate-700/60">
+          <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
+            <span>💰</span> Projeção de Fluxo de Caixa Acumulado na Aposentadoria (20 Anos de Sobrevida)
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">
+            Demonstração do patrimônio acumulado pelo segurado no Cenário Otimizado vs Cenário Convencional sem planejamento:
+          </p>
+          <div class="h-72 w-full chart-container">
+            <canvas id="chartPatrimonio"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -869,7 +878,7 @@
       <a href="https://wa.me/" target="_blank" class="hover:text-white">Fale com um Especialista</a>
     </div>
     <p>PreviMaster AI • Software Computadorizado de Planejamento Previdenciário • Base Legal: EC 103/2019, Lei 8.213/91 e IN 128/2022</p>
-    <p class="text-[11px] text-slate-600">Calculado para Henrique da Silva Rosa • Índices oficiais INPC / IBGE / BACEN série SGS 188</p>
+    <p id="footer-segurado-info" class="text-[11px] text-slate-600">Calculado para Henrique da Silva Rosa • Índices oficiais INPC / IBGE / BACEN série SGS 188</p>
     <div class="pt-2">
       <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-sky-950/90 text-sky-300 border border-sky-800/80 shadow-md">
         💻 Desenvolvedor : Henrique Rosa - Antigravity @2026

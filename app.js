@@ -11773,14 +11773,25 @@ function renderKPIs() {
   const kpiPatrimonio = document.getElementById('kpi-patrimonio');
   const kpiMedia = document.getElementById('kpi-media');
 
+  const kpiMediaSub = document.getElementById('kpi-media-sub');
+  const kpiTempoSub = document.getElementById('kpi-tempo-sub');
+  const kpiPatrimonioSub = document.getElementById('kpi-patrimonio-sub');
+  const atalhosBox = document.getElementById('atalhos-matriz-box');
+  const sliderBox = document.getElementById('slider-descarte-box');
+
   const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
   if (!hasData) {
     if (kpiRmi) kpiRmi.textContent = 'R$ 0,00';
     if (kpiMedia) kpiMedia.textContent = 'R$ 0,00';
-    if (kpiGanho) kpiGanho.innerHTML = '<span class="text-slate-500">Tela Limpa</span>';
+    if (kpiGanho) kpiGanho.innerHTML = '<span class="text-slate-500 font-medium">Tela Limpa</span>';
+    if (kpiMediaSub) kpiMediaSub.innerHTML = '<span class="text-slate-500">Coeficiente: 0%</span>';
     if (kpiTempo) kpiTempo.innerHTML = '<span class="text-slate-500 font-bold">0 anos</span>';
+    if (kpiTempoSub) kpiTempoSub.innerHTML = '<span class="text-slate-500">Carência: 0 meses</span>';
     if (kpiCarencia) kpiCarencia.innerHTML = '<span class="text-slate-500 font-bold">0 meses</span>';
     if (kpiPatrimonio) kpiPatrimonio.textContent = 'R$ 0,00';
+    if (kpiPatrimonioSub) kpiPatrimonioSub.innerHTML = '<span class="text-slate-500">Sem cálculo ativo</span>';
+    if (atalhosBox) atalhosBox.classList.add('opacity-40', 'pointer-events-none');
+    if (sliderBox) sliderBox.classList.add('opacity-40', 'pointer-events-none');
     const sliderLabel = document.getElementById('slider-k-label');
     if (sliderLabel) sliderLabel.textContent = '0 salários excluídos';
     const tagLabel = document.getElementById('scenario-tag-label');
@@ -11788,16 +11799,20 @@ function renderKPIs() {
     return;
   }
 
+  if (atalhosBox) atalhosBox.classList.remove('opacity-40', 'pointer-events-none');
+  if (sliderBox) sliderBox.classList.remove('opacity-40', 'pointer-events-none');
+
   const res = CNIS_DATA.resumo_numerico;
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
-  const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)] || {
-    rmi: 0, media_corrigida: 0, tc_anos_resultante: 0, carencia_restante: 0, tag: 'Cenário', salarios_restantes: 0, descartes: 0, delta_rmi: 0
-  };
+  const pt = (CNIS_DATA.matriz_descarte_completa && CNIS_DATA.matriz_descarte_completa.length > 0)
+    ? (CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)] || {})
+    : { rmi: 0, media_corrigida: 0, tc_anos_resultante: 0, carencia_restante: 0, tag: 'Cenário', salarios_restantes: 0, descartes: 0, delta_rmi: 0, coeficiente_perc: 60 };
 
-  if (kpiRmi) kpiRmi.textContent = 'R$ ' + pt.rmi.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  if (kpiMedia) kpiMedia.textContent = 'R$ ' + pt.media_corrigida.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (kpiRmi) kpiRmi.textContent = 'R$ ' + (pt.rmi || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (kpiMedia) kpiMedia.textContent = 'R$ ' + (pt.media_corrigida || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (kpiMediaSub) kpiMediaSub.innerHTML = `Coeficiente: <span class="font-bold text-sky-300">${pt.coeficiente_perc || 60}%</span> (Exige ${pt.tc_anos_resultante || 15}a de TC)`;
   
-  const diff = pt.rmi - res.rmi_sem_descarte;
+  const diff = (pt.rmi || 0) - (res.rmi_sem_descarte || 0);
   if (kpiGanho) {
     if (diff > 0) {
       kpiGanho.innerHTML = `<span class="text-emerald-400 font-semibold">+ R$ ${diff.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mês</span> <span class="text-xs text-slate-400">(Otimizado)</span>`;
@@ -11808,24 +11823,30 @@ function renderKPIs() {
 
   if (kpiTempo) {
     if (currentScenario.comMarinha) {
-      kpiTempo.innerHTML = `<span class="text-sky-400 font-bold">${pt.tc_anos_resultante} anos</span> <span class="text-xs text-slate-400">(35a - descartes)</span>`;
+      kpiTempo.innerHTML = `<span class="text-sky-400 font-bold">${pt.tc_anos_resultante || 0} anos</span> <span class="text-xs text-slate-400">(35a - descartes)</span>`;
     } else {
       kpiTempo.innerHTML = `<span class="text-amber-400 font-bold">18.5 anos</span> <span class="text-xs text-rose-400">(Sem Marinha)</span>`;
     }
   }
+  if (kpiTempoSub) {
+    kpiTempoSub.innerHTML = currentScenario.comMarinha ? 'Com Marinha (15a 4m) + RGPS' : 'Tempo exclusivo do RGPS';
+  }
 
   if (kpiCarencia) {
-    kpiCarencia.innerHTML = `<span class="text-emerald-400 font-bold">${pt.carencia_restante} meses</span> <span class="text-xs text-slate-400">(Mínimo 180)</span>`;
+    kpiCarencia.innerHTML = `<span class="text-emerald-400 font-bold">${pt.carencia_restante || 0} meses</span> <span class="text-xs text-slate-400">(Mínimo 180)</span>`;
   }
 
   if (kpiPatrimonio) {
     const totalVitalicio = Math.max(0, diff) * 240;
     kpiPatrimonio.textContent = '+ R$ ' + totalVitalicio.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
+  if (kpiPatrimonioSub) {
+    kpiPatrimonioSub.innerHTML = 'Sobrevida projetada pelo IBGE';
+  }
 
   const sliderLabel = document.getElementById('slider-k-label');
   if (sliderLabel) {
-    sliderLabel.textContent = `${k} salários menores excluídos (Restam ${pt.salarios_restantes} melhores salários)`;
+    sliderLabel.textContent = `${k} salários menores excluídos (Restam ${pt.salarios_restantes || 0} melhores salários)`;
   }
 
   const tagLabel = document.getElementById('scenario-tag-label');
@@ -11843,13 +11864,21 @@ function renderProfileHeader() {
   const elCpf = document.getElementById('profile-cpf');
   const elNasc = document.getElementById('profile-nasc');
   const elDataIdade = document.getElementById('profile-data-idade');
+  const elRegime = document.getElementById('profile-regime');
   const elAlertaDiag = document.getElementById('alerta-diagnostico-perfil');
   const elBadgeCaso = document.getElementById('profile-caso-badge');
+  const elFooter = document.getElementById('footer-segurado-info');
 
   if (elNome) elNome.textContent = s.nome || 'NENHUM SEGURADO CARREGADO';
   if (elCpf) elCpf.textContent = s.cpf || '---.---.--- - --';
   if (elNasc) elNasc.textContent = (s.nascimento && s.nascimento !== '--/--/----') ? `${s.nascimento} (${s.idade_atual} anos)` : '---';
   if (elDataIdade) elDataIdade.textContent = hasData ? '06/06/2030 (65 anos)' : 'Aguardando CNIS';
+  if (elRegime) elRegime.textContent = hasData ? 'RGPS c/ Averbação Marinha (PDV)' : 'Aguardando CNIS';
+  if (elFooter) {
+    elFooter.textContent = hasData 
+      ? `Calculado para ${s.nome || 'Segurado'} • Índices oficiais INPC / IBGE / BACEN série SGS 188` 
+      : 'PreviMaster AI • Software Especializado em Planejamento Previdenciário • Base Legal: EC 103/2019, Lei 8.213/91';
+  }
 
   if (elBadgeCaso) {
     if (hasData) {
@@ -12424,13 +12453,23 @@ function renderParecerMeuINSS() {
 // Render Auditoria dos Vínculos e Pendências
 function renderAuditoriaCards() {
   const container = document.getElementById('auditoria-cards-container');
-  if (!container) return;
+  const resBox = document.getElementById('diagnostico-resumo-box');
+  const emptyBox = document.getElementById('diagnostico-empty-box');
+  const titleVinculos = document.getElementById('auditoria-vinculos-title');
 
   const vinculos = CNIS_DATA.vinculos || [];
   if (vinculos.length === 0) {
-    container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhum vínculo carregado na tela. Carregue um novo extrato CNIS para auditar os vínculos e indicadores.</div>';
+    if (resBox) resBox.classList.add('hidden');
+    if (emptyBox) emptyBox.classList.remove('hidden');
+    if (titleVinculos) titleVinculos.classList.add('hidden');
+    if (container) container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhum vínculo carregado na tela. Carregue um novo extrato CNIS para auditar os vínculos e indicadores.</div>';
     return;
   }
+
+  if (resBox) resBox.classList.remove('hidden');
+  if (emptyBox) emptyBox.classList.add('hidden');
+  if (titleVinculos) titleVinculos.classList.remove('hidden');
+  if (!container) return;
 
   container.innerHTML = vinculos.map(v => {
     let badgeHtml = '';
@@ -12473,13 +12512,17 @@ function renderAuditoriaCards() {
 // Render Comparador de Regras
 function renderRegrasComparison() {
   const container = document.getElementById('regras-container');
+  const headerBox = document.getElementById('regras-header-box');
   if (!container) return;
 
   const regras = CNIS_DATA.regras || [];
   if (regras.length === 0) {
-    container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhuma regra processada. Tela limpa aguardando CNIS.</div>';
+    if (headerBox) headerBox.classList.add('hidden');
+    container.innerHTML = '<div class="glass-panel p-8 text-center text-slate-400 text-xs italic rounded-2xl border border-slate-800">Aguardando importação de CNIS para simular as regras de aposentadoria (Idade Urbana e Transições da EC 103).</div>';
     return;
   }
+
+  if (headerBox) headerBox.classList.remove('hidden');
 
   container.innerHTML = regras.map(r => {
     const isElegivel = r.elegivel;
@@ -12637,6 +12680,13 @@ function renderTabelaSalarios() {
   if (!tbody) return;
 
   const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  const btnTabSalarios = document.getElementById('tab-btn-salarios');
+  if (btnTabSalarios) {
+    btnTabSalarios.innerHTML = hasData
+      ? `📋 7. Tabela Completa de Salários (${CNIS_DATA.salarios_pbc.length} Comps)`
+      : '📋 7. Tabela de Salários (0 Comps)';
+  }
+
   if (!hasData) {
     if (countEl) countEl.textContent = '0 competências (Tela Limpa)';
     tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs italic">Nenhum salário de contribuição na base de cálculo. Tela limpa.</td></tr>';
@@ -12693,6 +12743,23 @@ function initCharts() {
   if (chartPatrimonio) { chartPatrimonio.destroy(); chartPatrimonio = null; }
 
   const hasData = CNIS_DATA.salarios_pbc && CNIS_DATA.salarios_pbc.length > 0;
+  const boxMatrizChart = document.getElementById('grafico-matriz-box');
+  const boxGraficosCharts = document.getElementById('graficos-charts-container');
+  const emptyGraficos = document.getElementById('graficos-empty-box');
+
+  if (boxMatrizChart) {
+    if (!hasData) boxMatrizChart.classList.add('hidden');
+    else boxMatrizChart.classList.remove('hidden');
+  }
+  if (boxGraficosCharts) {
+    if (!hasData) boxGraficosCharts.classList.add('hidden');
+    else boxGraficosCharts.classList.remove('hidden');
+  }
+  if (emptyGraficos) {
+    if (!hasData) emptyGraficos.classList.remove('hidden');
+    else emptyGraficos.classList.add('hidden');
+  }
+
   if (!hasData) return;
 
   // Gráfico 1: Evolução Histórica dos Salários (Nominal vs INPC Corrigido)
