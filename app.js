@@ -12155,7 +12155,7 @@ function renderMatrizDescartes() {
           <div class="space-y-1 text-xs">
             <div class="flex justify-between">
               <span class="text-slate-400">Média Salarial:</span>
-              <span class="font-mono text-slate-200">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              <span class="font-mono font-bold text-sky-400">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-400">RMI Estimada:</span>
@@ -12201,7 +12201,7 @@ function renderMatrizDescartes() {
           <td class="py-2 px-3 text-slate-200 text-xs">
             ${m.tag !== 'Intermediário' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-purple-950 text-purple-300 border border-purple-800">${m.tag}</span>` : `<span class="text-slate-400">${m.tag}</span>`}
           </td>
-          <td class="py-2 px-3 font-mono text-right text-slate-200 font-semibold">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-2 px-3 font-mono text-right text-sky-400 font-bold">R$ ${m.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
           <td class="py-2 px-3 font-mono text-center text-slate-300">${m.tc_anos_resultante}a</td>
           <td class="py-2 px-3 font-mono text-center text-amber-400 font-bold">${m.coeficiente_perc}%</td>
           <td class="py-2 px-3 font-mono font-bold text-emerald-400 text-right text-sm">R$ ${m.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
@@ -13042,7 +13042,7 @@ function initCharts() {
             tension: 0.12,
             pointRadius: 0,
             pointHoverRadius: 6,
-            pointHoverBackgroundColor: isLight ? '#059669' : '#10b981',
+            pointHoverBackgroundColor: '#10b981',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2,
             yAxisID: 'y'
@@ -13055,8 +13055,8 @@ function initCharts() {
             borderWidth: 2.5,
             tension: 0.25,
             pointRadius: 0,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: isLight ? '#0284c7' : '#38bdf8',
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#0ea5e9',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2,
             yAxisID: 'y'
@@ -13069,8 +13069,8 @@ function initCharts() {
             fill: false,
             borderWidth: 2.2,
             pointRadius: 0,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: isLight ? '#d97706' : '#f59e0b',
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#facc15',
             pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2,
             yAxisID: 'y1'
@@ -13101,7 +13101,38 @@ function initCharts() {
               label: (ctx) => {
                 if (ctx.dataset.yAxisID === 'y1') return ` ${ctx.dataset.label}: ${ctx.parsed.y}%`;
                 return ` ${ctx.dataset.label}: R$ ${ctx.parsed.y.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-              }
+              },
+              labelColor: (ctx) => {
+                if (ctx.datasetIndex === 0) {
+                  // Verde forte bem vivo para RMI
+                  return {
+                    borderColor: '#059669',
+                    backgroundColor: '#10b981',
+                    borderWidth: 2,
+                    borderRadius: 6
+                  };
+                } else if (ctx.datasetIndex === 1) {
+                  // Azul forte bem vivo para Média Salarial
+                  return {
+                    borderColor: '#0284c7',
+                    backgroundColor: '#0ea5e9',
+                    borderWidth: 2,
+                    borderRadius: 6
+                  };
+                } else {
+                  // Amarelo forte bem vivo para Coeficiente
+                  return {
+                    borderColor: '#ca8a04',
+                    backgroundColor: '#facc15',
+                    borderWidth: 2,
+                    borderRadius: 6
+                  };
+                }
+              },
+              labelPointStyle: () => ({
+                pointStyle: 'circle',
+                rotation: 0
+              })
             }
           }
         },

@@ -319,6 +319,17 @@ body.theme-light #grafico-matriz-box span.bg-amber-950\/60 {
   border-color: #fcd34d !important;
 }
 
+/* Cores Vivas das Métricas nas Tabelas e Textos no Modo Claro (Média em Azul, RMI em Verde, Coef em Amarelo) */
+body.theme-light .text-sky-400 {
+  color: #0284c7 !important;
+}
+body.theme-light .text-emerald-400 {
+  color: #059669 !important;
+}
+body.theme-light .text-amber-400 {
+  color: #d97706 !important;
+}
+
 /* Estilos de Impressão para Emissão de Relatório / Parecer Técnico */
 @media print {
   body {
