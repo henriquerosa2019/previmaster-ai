@@ -13096,3 +13096,12 @@ function imprimirParecerMeuINSS() {
     window.print();
   }, 300);
 }
+
+function ativarAbaTutorialCNIS() {
+  const btnTab = document.querySelector('[data-tab-target="tab-tutorial-cnis"]');
+  if (btnTab) {
+    btnTab.click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
