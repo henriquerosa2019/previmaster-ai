@@ -12345,7 +12345,7 @@ function renderTabelasDescartesEMelhores() {
                 </p>
               </div>
               <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
-                <button onclick="abrirModalPrecos()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer">
+                <button onclick="abrirCheckout('unitario')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer">
                   <span>⚡</span> Desbloquear por R$ 29,90 (1 CNIS)
                 </button>
                 <button onclick="abrirModalPrecos()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer">
@@ -13729,5 +13729,315 @@ function ativarAbaTutorialCNIS() {
   carregarTutorialNaTelaPrincipal();
 }
 
+// =========================================================================
+// MÓDULO DE PAGAMENTO E CHECKOUT MERCADO PAGO COM NOTIFICAÇÃO POR E-MAIL
+// =========================================================================
 
+const PLANOS_MERCADO_PAGO = {
+  unitario: {
+    id: 'unitario',
+    nome: 'Pacote Unitário (1 CNIS)',
+    valor: 'R$ 29,90',
+    tipo: '1 CNIS Completo + Parecer Técnico em PDF',
+    link: 'https://mpago.la/1BDNyDP'
+  },
+  pacote5: {
+    id: 'pacote5',
+    nome: 'Pacote 5 CNIS',
+    valor: 'R$ 119,90',
+    tipo: '5 Créditos de CNIS + 5 Pareceres em PDF',
+    link: 'https://mpago.la/1cpReJo'
+  },
+  individual: {
+    id: 'individual',
+    nome: 'Plano Individual',
+    valor: 'R$ 97,00/mês',
+    tipo: 'Assinatura Mensal Recorrente (Até 15 CNIS/mês)',
+    link: 'https://mpago.la/1fXW3vA'
+  },
+  escritorio: {
+    id: 'escritorio',
+    nome: 'Plano Escritório Ilimitado',
+    valor: 'R$ 247,00/mês',
+    tipo: 'Assinatura Mensal Ilimitada VIP White-Label',
+    link: 'https://mpago.la/2a7PV7c'
+  }
+};
 
+let planoCheckoutAtual = PLANOS_MERCADO_PAGO.unitario;
+
+function abrirCheckout(planoId) {
+  const plano = PLANOS_MERCADO_PAGO[planoId] || PLANOS_MERCADO_PAGO.unitario;
+  planoCheckoutAtual = plano;
+
+  // Fecha o modal de preços se estiver aberto
+  const modalPrecos = document.getElementById('modal-precos');
+  if (modalPrecos) modalPrecos.classList.add('hidden');
+
+  // Atualiza os dados no modal de checkout
+  const elTitulo = document.getElementById('checkout-plano-titulo');
+  const elNome = document.getElementById('checkout-plano-nome');
+  const elTipo = document.getElementById('checkout-plano-tipo');
+  const elValor = document.getElementById('checkout-plano-valor');
+  const btnTexto = document.getElementById('btn-submit-checkout-texto');
+  const formBox = document.getElementById('form-checkout-cliente');
+  const sucessoBox = document.getElementById('checkout-sucesso-box');
+
+  if (elTitulo) elTitulo.textContent = `Contratar ${plano.nome}`;
+  if (elNome) elNome.textContent = plano.nome;
+  if (elTipo) elTipo.textContent = plano.tipo;
+  if (elValor) elValor.textContent = plano.valor;
+  if (btnTexto) btnTexto.textContent = `Pagar com Mercado Pago (${plano.valor})`;
+
+  if (formBox) formBox.classList.remove('hidden');
+  if (sucessoBox) sucessoBox.classList.add('hidden');
+
+  // Preenche dados se já existirem no localStorage
+  const savedNome = localStorage.getItem('previmaster_user_name') || '';
+  const savedEmail = localStorage.getItem('previmaster_user_email') || '';
+  const savedWzap = localStorage.getItem('previmaster_user_whatsapp') || '';
+
+  const inputNome = document.getElementById('checkout-input-nome');
+  const inputEmail = document.getElementById('checkout-input-email');
+  const inputWzap = document.getElementById('checkout-input-whatsapp');
+
+  if (inputNome && savedNome) inputNome.value = savedNome;
+  if (inputEmail && savedEmail) inputEmail.value = savedEmail;
+  if (inputWzap && savedWzap) inputWzap.value = savedWzap;
+
+  // Abre o modal de checkout
+  const modal = document.getElementById('modal-checkout');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function fecharModalCheckout() {
+  const modal = document.getElementById('modal-checkout');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function processarCheckoutMercadoPago(event) {
+  if (event) event.preventDefault();
+
+  const plano = planoCheckoutAtual || PLANOS_MERCADO_PAGO.unitario;
+  const inputNome = document.getElementById('checkout-input-nome');
+  const inputEmail = document.getElementById('checkout-input-email');
+  const inputWzap = document.getElementById('checkout-input-whatsapp');
+
+  const nome = (inputNome ? inputNome.value : '').trim();
+  const email = (inputEmail ? inputEmail.value : '').trim();
+  const whatsapp = (inputWzap ? inputWzap.value : '').trim();
+
+  if (!nome || !email || !whatsapp) {
+    alert('Por favor, preencha seu Nome, E-mail e WhatsApp para continuar.');
+    return;
+  }
+
+  // 1. Salva os dados no localStorage para próximas compras
+  localStorage.setItem('previmaster_user_name', nome);
+  localStorage.setItem('previmaster_user_email', email);
+  localStorage.setItem('previmaster_user_whatsapp', whatsapp);
+
+  const btnSubmit = document.getElementById('btn-submit-checkout');
+  const btnTexto = document.getElementById('btn-submit-checkout-texto');
+  if (btnSubmit) btnSubmit.disabled = true;
+  if (btnTexto) btnTexto.textContent = 'Processando e enviando e-mail...';
+
+  // 2. Prepara o payload do e-mail
+  const dataHora = new Date().toLocaleString('pt-BR');
+  const payloadEmail = {
+    _subject: `[PreviMaster AI] Novo Pedido: ${plano.nome} (${plano.valor}) - ${nome}`,
+    _replyto: email,
+    _cc: email, // Envia cópia simultânea para o e-mail do usuário cadastrado!
+    "Nome do Cliente": nome,
+    "E-mail do Cliente": email,
+    "WhatsApp": whatsapp,
+    "Plano Contratado": plano.nome,
+    "Valor": plano.valor,
+    "Tipo de Plano": plano.tipo,
+    "Link Direto de Pagamento (Mercado Pago)": plano.link,
+    "Data e Hora": dataHora,
+    "Notificação": "E-mail enviado simultaneamente para henrique.rosa@poli.ufrj.br e para o cliente"
+  };
+
+  // 3. Dispara o envio de e-mail via FormSubmit para henrique.rosa@poli.ufrj.br com CC para o cliente
+  try {
+    fetch('https://formsubmit.co/ajax/henrique.rosa@poli.ufrj.br', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payloadEmail)
+    }).catch(err => console.warn('Disparo FormSubmit:', err));
+  } catch (e) {
+    console.warn('Erro ao disparar FormSubmit:', e);
+  }
+
+  // Também registra na API interna se disponível
+  try {
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, whatsapp, plano: plano.nome, valor: plano.valor, link: plano.link })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // 4. Configura tela de sucesso com link manual e redireciona para o Mercado Pago
+  const linkDireto = document.getElementById('checkout-link-direto');
+  if (linkDireto) {
+    linkDireto.href = plano.link;
+    linkDireto.textContent = `Acessar Mercado Pago (${plano.valor}) ➔`;
+  }
+
+  const formBox = document.getElementById('form-checkout-cliente');
+  const sucessoBox = document.getElementById('checkout-sucesso-box');
+  if (formBox) formBox.classList.add('hidden');
+  if (sucessoBox) sucessoBox.classList.remove('hidden');
+
+  if (btnSubmit) btnSubmit.disabled = false;
+  if (btnTexto) btnTexto.textContent = `Pagar com Mercado Pago (${plano.valor})`;
+
+  // Abre a página de pagamento oficial do Mercado Pago em nova aba
+  window.open(plano.link, '_blank');
+}
+
+// Simulação de Pagamento Efetuado com envio de e-mail de confirmação
+async function simularPagamentoEfetuado() {
+  const plano = planoCheckoutAtual || PLANOS_MERCADO_PAGO.unitario;
+  const inputNome = document.getElementById('checkout-input-nome');
+  const inputEmail = document.getElementById('checkout-input-email');
+  const inputWzap = document.getElementById('checkout-input-whatsapp');
+
+  let nome = (inputNome ? inputNome.value : '').trim();
+  let email = (inputEmail ? inputEmail.value : '').trim();
+  let whatsapp = (inputWzap ? inputWzap.value : '').trim();
+
+  // Valores padrão para teste rápido se não preenchido
+  if (!nome) nome = 'Dr. Henrique Rosa (Ambiente de Teste)';
+  if (!email) email = 'henrique.rosa@poli.ufrj.br';
+  if (!whatsapp) whatsapp = '(21) 98888-7777';
+
+  if (inputNome) inputNome.value = nome;
+  if (inputEmail) inputEmail.value = email;
+  if (inputWzap) inputWzap.value = whatsapp;
+
+  localStorage.setItem('previmaster_user_name', nome);
+  localStorage.setItem('previmaster_user_email', email);
+  localStorage.setItem('previmaster_user_whatsapp', whatsapp);
+
+  const btnSimular = document.getElementById('btn-simular-pagamento');
+  if (btnSimular) {
+    btnSimular.disabled = true;
+    btnSimular.textContent = 'Enviando comprovante de pagamento...';
+  }
+
+  const txId = 'MP-TEST-' + Math.floor(100000 + Math.random() * 900000) + '-OK';
+  const dataHora = new Date().toLocaleString('pt-BR');
+
+  // Payload completo com texto de "Pagamento Efetuado com Sucesso"
+  const payloadEmail = {
+    _subject: `[PreviMaster AI] PAGAMENTO EFETUADO COM SUCESSO: ${plano.nome} (${plano.valor}) - ${nome}`,
+    _replyto: email,
+    _cc: email,
+    "Status": "PAGAMENTO EFETUADO COM SUCESSO (TESTE FICTÍCIO)",
+    "Cliente": nome,
+    "E-mail do Cliente": email,
+    "WhatsApp": whatsapp,
+    "Plano Adquirido": plano.nome,
+    "Valor Compensado": plano.valor,
+    "Tipo de Plano": plano.tipo,
+    "Link Mercado Pago": plano.link,
+    "ID da Transação": txId,
+    "Data e Hora": dataHora,
+    "Acesso Liberado": "SIM - Acesso total aos relatórios, matriz de descartes da EC 103 e emissão de parecer técnico em PDF liberado com sucesso.",
+    "Notificação": "Texto de confirmação de pagamento enviado para henrique.rosa@poli.ufrj.br e para o cliente"
+  };
+
+  // Disparo para henrique.rosa@poli.ufrj.br com cópia para o e-mail informado
+  try {
+    fetch('https://formsubmit.co/ajax/henrique.rosa@poli.ufrj.br', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payloadEmail)
+    }).catch(err => console.warn('Disparo FormSubmit:', err));
+  } catch (e) {
+    console.warn('Erro ao disparar FormSubmit:', e);
+  }
+
+  try {
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'PAGAMENTO_EFETUADO',
+        nome,
+        email,
+        whatsapp,
+        plano: plano.nome,
+        valor: plano.valor,
+        transacaoId: txId
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // Libera flag de acesso no app
+  sessionStorage.setItem('previmaster_acesso_liberado', 'true');
+  window.usuarioPagou = true;
+
+  const formBox = document.getElementById('form-checkout-cliente');
+  const sucessoBox = document.getElementById('checkout-sucesso-box');
+  if (formBox) formBox.classList.add('hidden');
+  if (sucessoBox) {
+    sucessoBox.innerHTML = `
+      <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+        <span>✅</span>
+        <span>Pagamento Efetuado com Sucesso! (Teste Fictício)</span>
+      </div>
+      <p class="text-xs text-slate-200">
+        O texto com a confirmação de <strong>pagamento efetuado com sucesso</strong> foi enviado para <strong>henrique.rosa@poli.ufrj.br</strong> e cópia para <strong>${email}</strong>.
+      </p>
+      <div class="p-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-[11px] text-emerald-400 space-y-1">
+        <div><strong>Plano:</strong> ${plano.nome} (${plano.valor})</div>
+        <div><strong>Status:</strong> APROVADO & COMPENSADO</div>
+        <div><strong>ID da Transação:</strong> ${txId}</div>
+        <div><strong>Acesso:</strong> 🔓 100% Desbloqueado no PreviMaster AI</div>
+      </div>
+      <button onclick="fecharModalCheckout()" class="block w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-center text-xs transition-all cursor-pointer">
+        Acessar Relatório Completo Agora ➔
+      </button>
+    `;
+    sucessoBox.classList.remove('hidden');
+  }
+
+  if (btnSimular) {
+    btnSimular.disabled = false;
+    btnSimular.textContent = '⚡ Simular Pagamento Efetuado (Teste Fictício & E-mail)';
+  }
+}
+
+// Máscara dinâmica de telefone/WhatsApp
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'checkout-input-whatsapp') {
+    let v = e.target.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.substring(0, 11);
+    if (v.length > 10) {
+      e.target.value = `(${v.substring(0, 2)}) ${v.substring(2, 7)}-${v.substring(7)}`;
+    } else if (v.length > 6) {
+      e.target.value = `(${v.substring(0, 2)}) ${v.substring(2, 6)}-${v.substring(6)}`;
+    } else if (v.length > 2) {
+      e.target.value = `(${v.substring(0, 2)}) ${v.substring(2)}`;
+    } else if (v.length > 0) {
+      e.target.value = `(${v}`;
+    }
+  }
+});
+
+// Exporta para escopo global
+window.PLANOS_MERCADO_PAGO = PLANOS_MERCADO_PAGO;
+window.abrirCheckout = abrirCheckout;
+window.fecharModalCheckout = fecharModalCheckout;
+window.processarCheckoutMercadoPago = processarCheckoutMercadoPago;
+window.simularPagamentoEfetuado = simularPagamentoEfetuado;

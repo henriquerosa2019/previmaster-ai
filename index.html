@@ -55,8 +55,8 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-lg font-extrabold tracking-tight text-white">PreviMaster <span class="text-yellow-400 font-mono font-black drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">AI</span></h1>
-            <span class="px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-yellow-950/60 text-yellow-400 border border-yellow-500/80 shadow-md shadow-yellow-500/20">SaaS Previdenciário</span>
+            <h1 class="text-lg font-extrabold tracking-tight text-white"><span class="text-yellow-400 font-mono font-black drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]">AI DE PREVIMASTER</span></h1>
+            <span class="px-2.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-yellow-950/60 text-yellow-400 border border-yellow-500/80 shadow-md shadow-yellow-500/20">SAAS Previdenciário</span>
             <span class="hidden sm:inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-950 text-purple-300 border border-purple-800/80">Matriz EC 103/2019</span>
           </div>
           <p class="text-xs text-slate-400">Software Especializado em Planejamento Previdenciário Computadorizado & Atuária</p>
@@ -1060,12 +1060,12 @@
                 <li class="flex items-center gap-2">✓ <strong>Detecção de Inconsistências</strong> & Vínculos pela IA</li>
               </ul>
             </div>
-            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Pacote%20Unitário%20(R$%2029,90)%20do%20PreviMaster%20AI%20para%201%20CNIS" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700 shadow-sm">
+            <button onclick="abrirCheckout('unitario')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700 shadow-sm cursor-pointer">
               Adquirir 1 Análise (R$ 29,90)
-            </a>
+            </button>
           </div>
 
-          <!-- Pacote 5 CNIS: R$ 119,00 -->
+          <!-- Pacote 5 CNIS: R$ 119,90 -->
           <div class="p-5 rounded-2xl bg-gradient-to-b from-sky-950/40 via-slate-900 to-slate-900 border-2 border-sky-500/80 flex flex-col justify-between relative shadow-lg shadow-sky-500/10">
             <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 shadow-sm">
               Economia de 20%
@@ -1074,23 +1074,23 @@
               <div class="flex justify-between items-start">
                 <div>
                   <h5 class="text-base font-black text-white">Pacote 5 CNIS</h5>
-                  <p class="text-[11px] text-emerald-400 font-semibold mt-0.5">Apenas R$ 23,80 por análise</p>
+                  <p class="text-[11px] text-emerald-400 font-semibold mt-0.5">Apenas R$ 23,98 por análise</p>
                 </div>
               </div>
               <div class="my-4">
-                <span class="text-3xl font-black text-white font-mono">R$ 119,00</span>
+                <span class="text-3xl font-black text-white font-mono">R$ 119,90</span>
                 <span class="text-xs text-slate-400">/lote (5 créditos)</span>
               </div>
               <ul class="space-y-2 text-xs text-slate-300">
                 <li class="flex items-center gap-2">✓ <strong>5 Análises Completas de CNIS</strong></li>
                 <li class="flex items-center gap-2">✓ <strong>Relação Nominal de Descartes</strong> liberada</li>
                 <li class="flex items-center gap-2">✓ <strong>5 Pareceres Técnicos em PDF</strong> prontos para juntar</li>
-                <li class="flex items-center gap-2">✓ <strong>Economia imediata de R$ 30,50</strong> no pacote</li>
+                <li class="flex items-center gap-2">✓ <strong>Economia imediata de R$ 29,60</strong> no pacote</li>
               </ul>
             </div>
-            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Pacote%205%20CNIS%20(R$%20119,00)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
-              Adquirir Pacote 5 CNIS (R$ 119,00)
-            </a>
+            <button onclick="abrirCheckout('pacote5')" class="mt-5 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30 cursor-pointer">
+              Adquirir Pacote 5 CNIS (R$ 119,90)
+            </button>
           </div>
         </div>
       </div>
@@ -1130,9 +1130,9 @@
                 <li class="flex items-center gap-2">✓ Suporte técnico prioritário por e-mail/WhatsApp</li>
               </ul>
             </div>
-            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Individual%20(R$%2097,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700">
+            <button onclick="abrirCheckout('individual')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700 cursor-pointer">
               Assinar Plano Individual (R$ 97,00/mês)
-            </a>
+            </button>
           </div>
 
           <!-- Plano Escritório / Ilimitado: R$ 247/mês -->
@@ -1160,9 +1160,9 @@
                 <li class="flex items-center gap-2">✓ Suporte VIP Prioritário Direto com Especialista Atuarial</li>
               </ul>
             </div>
-            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20Ilimitado%20(R$%20247,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-purple-600/30">
+            <button onclick="abrirCheckout('escritorio')" class="mt-5 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-purple-600/30 cursor-pointer">
               Assinar Plano Escritório (R$ 247,00/mês)
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -1385,6 +1385,98 @@
           <span>🗑️</span>
           <span>Sim, Apagar Dados</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Checkout / Liberação com Pagamento Seguro Mercado Pago -->
+  <div id="modal-checkout" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-sky-500/40 max-w-lg w-full shadow-2xl space-y-5 bg-slate-900/95 max-h-[92vh] overflow-y-auto">
+      <div class="flex justify-between items-start pb-3 border-b border-slate-800">
+        <div>
+          <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">🔒 Pagamento Seguro • Mercado Pago</span>
+          <h3 class="text-xl font-black text-white mt-0.5" id="checkout-plano-titulo">Finalizar Contratação</h3>
+        </div>
+        <button onclick="fecharModalCheckout()" class="text-slate-400 hover:text-white text-xl p-1 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Resumo do Plano Selecionado -->
+      <div class="p-4 rounded-2xl bg-gradient-to-r from-sky-950/60 to-slate-900 border border-sky-800/60 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] text-slate-400 uppercase font-semibold">Plano Selecionado:</span>
+          <h4 class="text-base font-black text-white" id="checkout-plano-nome">Pacote Unitário (1 CNIS)</h4>
+          <span class="text-xs text-sky-300" id="checkout-plano-tipo">1 CNIS completo + Parecer em PDF</span>
+        </div>
+        <div class="text-right">
+          <span class="text-2xl font-black text-white font-mono" id="checkout-plano-valor">R$ 29,90</span>
+          <span class="text-[10px] text-emerald-400 block font-semibold">Liberação Imediata</span>
+        </div>
+      </div>
+
+      <!-- Formulário de Identificação do Usuário -->
+      <form id="form-checkout-cliente" onsubmit="processarCheckoutMercadoPago(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-nome">
+            Nome Completo do Comprador / Advogado *
+          </label>
+          <input type="text" id="checkout-input-nome" required placeholder="Ex: Dr. Henrique Rosa" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-email">
+            E-mail para Recebimento do Acesso e Comprovante *
+          </label>
+          <input type="email" id="checkout-input-email" required placeholder="seu-email@escritorio.com.br" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+          <span class="text-[10px] text-slate-400 mt-1 block">Um e-mail com os detalhes do pedido e link de pagamento será enviado para você e para henrique.rosa@poli.ufrj.br.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1" for="checkout-input-whatsapp">
+            WhatsApp / Celular com DDD *
+          </label>
+          <input type="tel" id="checkout-input-whatsapp" required placeholder="(21) 98888-7777" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm text-white focus:outline-none focus:border-sky-500 transition-all">
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="btn-submit-checkout" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer">
+            <span>💳</span>
+            <span id="btn-submit-checkout-texto">Ir para Pagamento Seguro no Mercado Pago</span>
+          </button>
+        </div>
+
+        <div class="pt-1 flex items-center gap-2">
+          <div class="h-px bg-slate-800 flex-1"></div>
+          <span class="text-[10px] uppercase font-bold text-slate-500">Ou para Validação / Teste</span>
+          <div class="h-px bg-slate-800 flex-1"></div>
+        </div>
+
+        <div>
+          <button type="button" onclick="simularPagamentoEfetuado()" id="btn-simular-pagamento" class="w-full py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+            <span>⚡</span>
+            <span>Simular Pagamento Efetuado (Teste Fictício & E-mail)</span>
+          </button>
+        </div>
+
+        <div class="text-center pt-1">
+          <p class="text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+            <span>🔒</span>
+            <span>Ambiente 100% Criptografado e Seguro do Mercado Pago</span>
+          </p>
+        </div>
+      </form>
+
+      <!-- Feedback de Sucesso e Link Manual -->
+      <div id="checkout-sucesso-box" class="hidden p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/60 space-y-3">
+        <div class="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+          <span>✓</span>
+          <span>Pedido Registrado e E-mail Enviado!</span>
+        </div>
+        <p class="text-xs text-slate-200">
+          Você está sendo redirecionado para a página de pagamento seguro do Mercado Pago.
+        </p>
+        <a id="checkout-link-direto" href="#" target="_blank" class="block w-full py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-bold text-center text-xs hover:bg-emerald-400 transition-all">
+          Clique aqui caso a página do Mercado Pago não tenha aberto
+        </a>
       </div>
     </div>
   </div>
