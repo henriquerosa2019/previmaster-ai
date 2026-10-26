@@ -12401,6 +12401,51 @@ function alternarVisualizacaoAuditoria(modo) {
   }
 }
 
+// CÁLCULO DE IDADE ATUAL E PREVISÃO DA APOSENTADORIA
+function calcularPrevisaoAposentadoria(segurado) {
+  const s = segurado || {};
+  let idade = s.idade_atual || 61;
+  const dataNasc = s.nascimento || "06/06/1965";
+
+  if (dataNasc && dataNasc.includes('/')) {
+    const parts = dataNasc.split('/');
+    if (parts.length === 3) {
+      const dia = parseInt(parts[0], 10);
+      const mes = parseInt(parts[1], 10) - 1;
+      const ano = parseInt(parts[2], 10);
+      const hoje = new Date();
+      let calcIdade = hoje.getFullYear() - ano;
+      const m = hoje.getMonth() - mes;
+      if (m < 0 || (m === 0 && hoje.getDate() < dia)) {
+        calcIdade--;
+      }
+      if (calcIdade > 0 && calcIdade < 120) {
+        idade = calcIdade;
+      }
+    }
+  }
+
+  const isMulher = (s.nome && (s.nome.includes('MARIA') || s.nome.includes('ANA ') || s.nome.includes('LUCIA')));
+  const idadeAposentadoria = isMulher ? 62 : 65;
+  const anosFaltantes = Math.max(0, idadeAposentadoria - idade);
+
+  let dataAposentadoria = "06/06/2030";
+  if (dataNasc && dataNasc.includes('/')) {
+    const parts = dataNasc.split('/');
+    if (parts.length === 3) {
+      const anoNasc = parseInt(parts[2], 10);
+      dataAposentadoria = `${parts[0]}/${parts[1]}/${anoNasc + idadeAposentadoria}`;
+    }
+  }
+
+  return {
+    idadeAtual: idade,
+    idadeAposentadoria,
+    anosFaltantes,
+    dataAposentadoria
+  };
+}
+
 // RENDERIZAÇÃO DO PARECER TÉCNICO OFICIAL PARA O MEU INSS (PDF)
 function renderParecerMeuINSS() {
   const container = document.getElementById('parecer-meu-inss-content');
@@ -12435,6 +12480,7 @@ function renderParecerMeuINSS() {
   }
 
   const s = CNIS_DATA.segurado;
+  const prev = calcularPrevisaoAposentadoria(s);
   const k = currentScenario.descarteAtivo ? currentScenario.descarteCustom : 0;
   const pt = CNIS_DATA.matriz_descarte_completa[Math.min(k, CNIS_DATA.matriz_descarte_completa.length - 1)];
   const res = CNIS_DATA.resumo_numerico;
@@ -12471,7 +12517,7 @@ function renderParecerMeuINSS() {
         <div>
           <h2 class="text-xl font-extrabold tracking-tight uppercase text-slate-950">PARECER TÉCNICO DE PLANEJAMENTO PREVIDENCIÁRIO</h2>
           <p class="text-xs text-slate-600 font-medium">REQUERIMENTO DE DESCARTE DE CONTRIBUIÇÕES PREJUDICIAIS (ART. 26, § 6º DA EC 103/2019)</p>
-          <p class="text-xs text-slate-500 font-mono mt-0.5">Protocolo Meu INSS / DER Projetada: 06/06/2030</p>
+          <p class="text-xs text-slate-500 font-mono mt-0.5">Protocolo Meu INSS / DER Projetada: ${prev.dataAposentadoria}</p>
         </div>
         <div class="text-right">
           <span class="px-3 py-1 rounded bg-slate-900 text-white font-mono text-xs font-bold">CÁLCULO ATUARIAL</span>
@@ -12490,11 +12536,11 @@ function renderParecerMeuINSS() {
         </div>
         <div>
           <span class="text-slate-500 block font-semibold">DATA DE NASCIMENTO:</span>
-          <span class="font-bold text-slate-900">${s.nascimento} (61 anos)</span>
+          <span class="font-bold text-slate-900">${s.nascimento} (${prev.idadeAtual} anos)</span>
         </div>
         <div>
           <span class="text-slate-500 block font-semibold">BENEFÍCIO REQUERIDO:</span>
-          <span class="font-bold text-emerald-800">Aposentadoria por Idade (65a)</span>
+          <span class="font-bold text-emerald-800">Aposentadoria por Idade (${prev.idadeAposentadoria}a - Previsão: ${prev.dataAposentadoria})</span>
         </div>
       </div>
 
@@ -12519,7 +12565,7 @@ function renderParecerMeuINSS() {
           "Poderão ser excluídas da média as contribuições que resultem em redução do valor do benefício, desde que mantido o tempo mínimo de contribuição exigido, vedada a utilização do tempo excluído para qualquer finalidade..."
         </blockquote>
         <p>
-          No caso vertente, para a Aposentadoria por Idade Urbana (65 anos homem), o requisito constitucional é de <strong>15 anos de tempo de contribuição (180 meses)</strong>. Contando o Segurado com 35 anos de tempo total, há expressivo excedente de tempo contributivo, autorizando a exclusão das menores contribuições para maximizar a RMI.
+          No caso vertente, para a Aposentadoria por Idade Urbana (${prev.idadeAposentadoria} anos homem), o requisito constitucional é de <strong>15 anos de tempo de contribuição (180 meses)</strong>. Contando o Segurado com 35 anos de tempo total apurado e <strong>idade atual de ${prev.idadeAtual} anos</strong>, a concessão dar-se-á aos <strong>${prev.idadeAposentadoria} anos em ${prev.dataAposentadoria}</strong> (faltando apenas ${prev.anosFaltantes} anos de idade, sem necessidade de novas contribuições, pois o tempo mínimo e carência já estão 100% cumpridos). Há expressivo excedente de tempo contributivo (20 anos a mais que o piso), autorizando a exclusão das menores contribuições para maximizar a RMI vitalícia.
         </p>
       </div>
 
@@ -12551,9 +12597,26 @@ function renderParecerMeuINSS() {
               <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">R$ ${pt.media_corrigida.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
             </tr>
             <tr>
-              <td class="p-2 border border-slate-300 font-medium">Tempo de Contribuição Restante</td>
-              <td class="p-2 border border-slate-300 text-right font-mono">35 anos</td>
-              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.tc_anos_resultante} anos (Mínimo 15a)</td>
+              <td class="p-2 border border-slate-300 font-medium">
+                <div>Tempo de Contribuição Computado</div>
+                <div class="text-[10px] text-slate-500 font-normal">Requisito mínimo de 15 anos já cumprido (tempo adicional a contribuir: 0 anos)</div>
+              </td>
+              <td class="p-2 border border-slate-300 text-right font-mono">35 anos (Total Apurado)</td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">${pt.tc_anos_resultante} anos (Piso de 15a preservado)</td>
+            </tr>
+            <tr>
+              <td class="p-2 border border-slate-300 font-medium">
+                <div>Idade para se Aposentar (Idade Atual: ${prev.idadeAtual} anos)</div>
+                <div class="text-[10px] text-slate-500 font-normal">Aposentadoria por Idade Urbana (Art. 18 / 19 da EC 103/2019)</div>
+              </td>
+              <td class="p-2 border border-slate-300 text-right font-mono text-slate-700">
+                Aos ${prev.idadeAposentadoria} anos (${prev.anosFaltantes > 0 ? 'Faltam ' + prev.anosFaltantes + ' anos' : 'Idade já atingida'})
+                <div class="text-[10px] text-slate-500 font-normal">Previsão: ${prev.dataAposentadoria}</div>
+              </td>
+              <td class="p-2 border border-slate-300 text-right font-mono font-bold bg-emerald-50 text-emerald-900">
+                Aos ${prev.idadeAposentadoria} anos (${prev.anosFaltantes > 0 ? 'Faltam ' + prev.anosFaltantes + ' anos' : 'Idade já atingida'})
+                <div class="text-[10px] text-emerald-700 font-semibold">Previsão: ${prev.dataAposentadoria} (Sem necessidade de recolher novos carnês)</div>
+              </td>
             </tr>
             <tr>
               <td class="p-2 border border-slate-300 font-medium">Coeficiente de Benefício Aplicável</td>
@@ -12590,7 +12653,7 @@ function renderParecerMeuINSS() {
       <div class="pt-4 border-t-2 border-slate-900 space-y-4 text-xs text-slate-800">
         <p><strong>DOS PEDIDOS:</strong></p>
         <p>
-          Ante o exposto, REQUER-SE: <strong>(a)</strong> A averbação integral do tempo de serviço comprovado na CTC da Marinha; <strong>(b)</strong> O acolhimento do descarte expresso das competências acima listadas; e <strong>(c)</strong> A concessão do benefício de Aposentadoria por Idade com Renda Mensal Inicial fixada em <strong>R$ ${pt.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong>.
+          Ante o exposto, REQUER-SE: <strong>(a)</strong> A averbação integral do tempo de serviço comprovado na CTC da Marinha; <strong>(b)</strong> O acolhimento do descarte expresso das competências acima listadas; e <strong>(c)</strong> A concessão do benefício de Aposentadoria por Idade Urbana ao completar ${prev.idadeAposentadoria} anos (Previsão: ${prev.dataAposentadoria}), com Renda Mensal Inicial fixada em <strong>R$ ${pt.rmi.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong>.
         </p>
 
         <div class="flex justify-between items-end pt-8">
