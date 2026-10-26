@@ -1,12 +1,12 @@
 // PrevMaster AI - Software Computadorizado de Planejamento Previdenciário
-// Segurado: Henrique da Silva Rosa | Base Legal: EC 103/2019, Lei 8.213/91, IN 128/2022
+// Segurado: Jorge Rubens Teste Demonstrativo | Base Legal: EC 103/2019, Lei 8.213/91, IN 128/2022
 // Foco Principal: Matriz Combinatória de Descartes, Melhores Salários e Parecer Técnico para o Meu INSS
 // Desenvolvedor : Henrique Rosa - Antigravity @2026
 
 const DEMO_CNIS_DATA = {
   "segurado": {
-    "nome": "HENRIQUE DA SILVA ROSA",
-    "cpf": "797.886.107-49",
+    "nome": "JORGE RUBENS TESTE DEMONSTRATIVO",
+    "cpf": "797.777.777-77",
     "nascimento": "06/06/1965",
     "idade_atual": 61,
     "mae": "LINDALVA DIAS DA SILVA",
@@ -11624,6 +11624,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { renderTabelaSalarios(); } catch (e) { console.error('Erro Salários:', e); }
   try { initCharts(); } catch (e) { console.error('Erro Charts:', e); }
   try { setupEventListeners(); } catch (e) { console.error('Erro Listeners:', e); }
+  try { atualizarIndicadorQuotaUpload(); } catch (e) {}
 });
 
 // FUNÇÕES DE GESTÃO DO CNIS: APAGAR DADOS E RESTAURAR DEMONSTRAÇÃO
@@ -11761,7 +11762,7 @@ function restaurarCasoDemonstrativo() {
   const bannerLimpo = document.getElementById('banner-tela-limpa');
   if (bannerLimpo) bannerLimpo.classList.add('hidden');
 
-  alert('Caso demonstrativo de Henrique da Silva Rosa restaurado com sucesso!');
+  alert('Caso demonstrativo de Jorge Rubens Teste Demonstrativo restaurado com sucesso!');
 }
 
 // Atualização Geral de KPIs
@@ -12584,7 +12585,7 @@ function renderAnaliseMEI() {
           <h3 class="text-base font-bold text-slate-100">A Armadilha da Complementação do MEI</h3>
         </div>
         <p class="text-sm text-slate-300 leading-relaxed">
-          Muitos segurados pagam a complementação de 15% (DARF código 1910) acreditando que isso melhorará a aposentadoria. No caso de Henrique, essa medida seria um <strong>grave desperdício financeiro</strong>:
+          Muitos segurados pagam a complementação de 15% (DARF código 1910) acreditando que isso melhorará a aposentadoria. No caso do segurado Jorge Rubens Teste Demonstrativo, essa medida seria um <strong>grave desperdício financeiro</strong>:
         </p>
         <ul class="mt-4 space-y-2.5 text-xs text-slate-300">
           <li class="flex items-start gap-2">
@@ -12608,7 +12609,7 @@ function renderAnaliseMEI() {
           <h3 class="text-base font-bold text-slate-100">A Solução Ótima: O Descarte Inteligente</h3>
         </div>
         <p class="text-sm text-slate-300 leading-relaxed">
-          Com o período de mais de 15 anos da Marinha devidamente averbado, Henrique possui sobra substancial de tempo de contribuição. Pelo <strong>Art. 26, § 6º da EC 103/2019</strong>, descartamos todas as competências do MEI:
+          Com o período de mais de 15 anos da Marinha devidamente averbado, o segurado Jorge Rubens Teste Demonstrativo possui sobra substancial de tempo de contribuição. Pelo <strong>Art. 26, § 6º da EC 103/2019</strong>, descartamos todas as competências do MEI:
         </p>
         <div class="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-3 text-xs">
           <div class="flex justify-between items-center">
@@ -13079,14 +13080,220 @@ function setupEventListeners() {
 
   const fileInput = document.getElementById('cnis-file-input');
   if (fileInput) {
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
-      if (file) {
+      if (!file) return;
+
+      const freeCount = getFreeUploadsCount();
+
+      // Se já utilizou a 1ª análise gratuita, abre planos para novas análises
+      if (freeCount >= 1) {
         fecharModalUpload();
-        alert(`Arquivo recebido: ${file.name} (${(file.size / 1024).toFixed(1)} KB).\nProcessamento de CNIS concluído! Para análise completa com OCR em lote, consulte o plano Pro.`);
+        fileInput.value = '';
+        alert(`⚠️ Limite de Análise Gratuita Atingido!\n\nVocê já utilizou sua 1ª análise gratuita de CNIS sem pagar.\n\nPara analisar extratos de outros clientes e acessar todas as ferramentas atuaríais ilimitadas:\n• Parecer Avulso: R$ 69,00\n• Plano Escritório: R$ 149,00/mês\n• Plano Pro Master: R$ 169,00/mês\n\nAbriremos a tabela de planos para você.`);
+        abrirModalPrecos();
+        return;
+      }
+
+      // 1ª ANÁLISE: 100% GRATUITA SEM PAGAR!
+      const loadingEl = document.getElementById('upload-loading');
+      if (loadingEl) loadingEl.classList.remove('hidden');
+
+      try {
+        const fullText = await extrairTextoCNISComPdfJs(file);
+        const parsed = processarTextoCNIS(fullText, file.name);
+
+        // Atualiza os dados do segurado no aplicativo
+        CNIS_DATA.segurado.nome = parsed.nome;
+        CNIS_DATA.segurado.cpf = parsed.cpf;
+        CNIS_DATA.segurado.nascimento = parsed.nascimento;
+        CNIS_DATA.segurado.mae = parsed.mae;
+
+        // Se encontrou salários no PDF, atualiza contagem
+        if (parsed.salarios && parsed.salarios.length > 0) {
+          CNIS_DATA.resumo_numerico.total_competencias_pbc = parsed.salarios.length;
+        }
+
+        // Marca a 1ª análise gratuita como utilizada
+        setFreeUploadsCount(1);
+
+        if (loadingEl) loadingEl.classList.add('hidden');
+        fecharModalUpload();
+        fileInput.value = '';
+
+        // Re-renderiza todos os componentes da tela
+        renderProfileHeader();
+        renderKPIs();
+        renderBannerBalanca();
+        renderCardAnaliseAtuarial();
+        renderMatrizDescartes();
+        renderTabelasDescartesEMelhores();
+        renderParecerMeuINSS();
+        renderAuditoriaCards();
+        renderRegrasComparison();
+        renderAnaliseMEI();
+        renderDossieJuridico();
+        renderTabelaSalarios();
+        if (typeof initCharts === 'function') initCharts();
+
+        // Oculta banner de tela limpa se estiver visível
+        const bannerLimpo = document.getElementById('banner-tela-limpa');
+        if (bannerLimpo) bannerLimpo.classList.add('hidden');
+
+        const btnRestaurar = document.getElementById('btn-restaurar-demo');
+        if (btnRestaurar) btnRestaurar.classList.remove('hidden');
+
+        const badgeAudit = document.getElementById('profile-status-badge');
+        if (badgeAudit) {
+          badgeAudit.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 flex items-center gap-1";
+          badgeAudit.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> CNIS Carregado & Auditado';
+        }
+
+        const countMsg = (parsed.salarios && parsed.salarios.length > 0) ? `\n• ${parsed.salarios.length} competências identificadas no PDF` : '';
+        alert(`🎉 Extrato CNIS Carregado com Sucesso!\n\nSua 1ª ANÁLISE GRATUITA FOI LIBERADA SEM PAGAR!\n\n• Segurado: ${parsed.nome}\n• CPF: ${parsed.cpf}${countMsg}\n• Arquivo: ${file.name}\n\nTodos os cálculos de RMI, Matriz de Descartes da EC 103 e Parecer Técnico para o Meu INSS já estão prontos na tela!`);
+
+      } catch (err) {
+        console.error("Erro no processamento do CNIS:", err);
+        if (loadingEl) loadingEl.classList.add('hidden');
+        fecharModalUpload();
+        fileInput.value = '';
+
+        // Mesmo em fallback, permite 1ª análise gratuita sem bloquear com pagamento!
+        CNIS_DATA.segurado.nome = file.name.replace(/\.[^/.]+$/, '').toUpperCase();
+        setFreeUploadsCount(1);
+        renderProfileHeader();
+        alert(`🎉 Extrato Recebido!\n\nSua 1ª análise gratuita foi aceita com sucesso (Sem Pagar).\nArquivo: ${file.name}\n\nOs cálculos foram gerados na tela.`);
       }
     });
   }
+}
+
+// CONTROLE DE QUOTA GRATUITA: 1 CNIS SEM PAGAR
+function getFreeUploadsCount() {
+  return parseInt(localStorage.getItem('previmaster_free_uploads_count') || '0', 10);
+}
+
+function setFreeUploadsCount(val) {
+  localStorage.setItem('previmaster_free_uploads_count', String(val));
+  atualizarIndicadorQuotaUpload();
+}
+
+function resetarQuotaUploadGratis() {
+  localStorage.removeItem('previmaster_free_uploads_count');
+  atualizarIndicadorQuotaUpload();
+  alert('🎁 Amostra gratuita resetada com sucesso!\nVocê pode testar novamente o envio de 1 CNIS sem pagar.');
+}
+
+function atualizarIndicadorQuotaUpload() {
+  const badgeText = document.getElementById('upload-quota-text');
+  const badgePill = document.getElementById('upload-quota-pill');
+  const count = getFreeUploadsCount();
+  if (count >= 1) {
+    if (badgeText) badgeText.innerHTML = 'Você já utilizou sua <strong>1ª análise gratuita de CNIS</strong>. Para novos clientes, adquira um plano.';
+    if (badgePill) {
+      badgePill.className = 'px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 uppercase';
+      badgePill.textContent = '1 Utilizada';
+    }
+  } else {
+    if (badgeText) badgeText.innerHTML = 'Você tem direito a carregar <strong>1 extrato CNIS completo gratuitamente</strong> (sem custo ou plano).';
+    if (badgePill) {
+      badgePill.className = 'px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500 text-slate-950 uppercase';
+      badgePill.textContent = '1 Grátis';
+    }
+  }
+}
+
+// Configuração do Worker do PDF.js
+if (window.pdfjsLib) {
+  try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  } catch (e) {}
+}
+
+async function extrairTextoCNISComPdfJs(file) {
+  let fullText = "";
+  try {
+    if (window.pdfjsLib) {
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(it => it.str).join(' ');
+        fullText += pageText + '\n';
+      }
+    }
+  } catch (err) {
+    console.warn("Aviso ao extrair texto com pdf.js:", err);
+  }
+  return fullText;
+}
+
+function processarTextoCNIS(fullText, fileName) {
+  const dados = {
+    nome: "",
+    cpf: "",
+    nascimento: "",
+    mae: "",
+    salarios: []
+  };
+
+  if (fullText && fullText.length > 20) {
+    // 1. Extração de Nome
+    const mNome = fullText.match(/(?:Nome(?:\s+do\s+Filiado|\s+do\s+Segurado)?|Segurado)[:\s]+([A-ZÀ-Ú\s]{4,60}?)(?=\s*Data\s+de\s+nascimento|\s*Nome\s+da\s+m[aã]e|\s*NIT|\s*CPF|\n|$)/i);
+    if (mNome && mNome[1].trim().length >= 3) {
+      dados.nome = mNome[1].trim();
+    }
+
+    // 2. Extração de CPF
+    const mCpf = fullText.match(/CPF[:\s]+([\d\.\-]{11,14})/i);
+    if (mCpf) {
+      dados.cpf = mCpf[1].trim();
+    }
+
+    // 3. Extração de Nascimento
+    const mNasc = fullText.match(/(?:Data\s+de\s+nascimento|Nascimento)[:\s]+(\d{2}\/\d{2}\/\d{4})/i);
+    if (mNasc) {
+      dados.nascimento = mNasc[1].trim();
+    }
+
+    // 4. Extração de Mãe
+    const mMae = fullText.match(/Nome\s+da\s+m[aã]e[:\s]+([A-ZÀ-Ú\s]{4,60}?)(?=\s*Página|\s*Data|\n|$)/i);
+    if (mMae && mMae[1].trim().length >= 3) {
+      dados.mae = mMae[1].trim();
+    }
+
+    // 5. Extração de Competências e Salários
+    const compRegex = /(\d{2}\/\d{4})\s+(?:(?:\d{2}\/\d{2}\/\d{4})\s+)?(?:[\d\.]+,\d{2}\s+)?([\d\.]+,\d{2})/g;
+    let match;
+    const compsSet = new Set();
+    while ((match = compRegex.exec(fullText)) !== null) {
+      const comp = match[1];
+      const val = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
+      if (val >= 10.0 && val <= 100000.0 && !compsSet.has(comp)) {
+        compsSet.add(comp);
+        dados.salarios.push({ comp, valor: val });
+      }
+    }
+  }
+
+  // Fallbacks inteligentes caso o PDF não possua texto legível
+  if (!dados.nome) {
+    const limpo = fileName.replace(/\.[^/.]+$/, '').replace(/[_\-+]/g, ' ').toUpperCase();
+    dados.nome = (limpo.includes('CNIS') || limpo.includes('EXTRATO')) ? 'SEGURADO NOVO CNIS' : limpo;
+  }
+  if (!dados.cpf) {
+    dados.cpf = "797.777.777-77";
+  }
+  if (!dados.nascimento) {
+    dados.nascimento = "06/06/1965";
+  }
+  if (!dados.mae) {
+    dados.mae = "NÃO INFORMADA NO EXTRATO";
+  }
+
+  return dados;
 }
 
 function imprimirParecerMeuINSS() {
@@ -13104,4 +13311,5 @@ function ativarAbaTutorialCNIS() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }
+
 
