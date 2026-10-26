@@ -13033,6 +13033,21 @@ function setupEventListeners() {
   tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-tab-target');
+      if (targetId === 'tab-tutorial-cnis') {
+        carregarTutorialNaTelaPrincipal();
+        return;
+      }
+
+      // Se navegou para qualquer outra aba de cálculo, restaura as seções do topo
+      const elPerfil = document.getElementById('section-perfil-segurado');
+      const elSimulador = document.getElementById('section-simulador-controles');
+      const elKpis = document.getElementById('section-kpis-metricas');
+      if (elPerfil) elPerfil.classList.remove('hidden');
+      if (elSimulador) elSimulador.classList.remove('hidden');
+      if (elKpis) elKpis.classList.remove('hidden');
+      const topBarTutorial = document.getElementById('tutorial-voltar-bar');
+      if (topBarTutorial) topBarTutorial.classList.add('hidden');
+
       document.querySelectorAll('[data-tab-content]').forEach(c => c.classList.add('hidden'));
       document.querySelectorAll('[data-tab-target]').forEach(b => {
         b.classList.remove('bg-sky-600', 'text-white', 'border-sky-500');
@@ -13304,12 +13319,72 @@ function imprimirParecerMeuINSS() {
   }, 300);
 }
 
-function ativarAbaTutorialCNIS() {
-  const btnTab = document.querySelector('[data-tab-target="tab-tutorial-cnis"]');
-  if (btnTab) {
-    btnTab.click();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function carregarTutorialNaTelaPrincipal() {
+  // Oculta seções do topo da tela de cálculos ("limpando o que está lá antes")
+  const elPerfil = document.getElementById('section-perfil-segurado');
+  const elSimulador = document.getElementById('section-simulador-controles');
+  const elKpis = document.getElementById('section-kpis-metricas');
+  const elBannerLimpo = document.getElementById('banner-tela-limpa');
+
+  if (elPerfil) elPerfil.classList.add('hidden');
+  if (elSimulador) elSimulador.classList.add('hidden');
+  if (elKpis) elKpis.classList.add('hidden');
+  if (elBannerLimpo) elBannerLimpo.classList.add('hidden');
+
+  // Oculta todas as outras abas
+  document.querySelectorAll('[data-tab-content]').forEach(c => c.classList.add('hidden'));
+
+  // Destaca o botão da aba na navegação
+  document.querySelectorAll('[data-tab-target]').forEach(b => {
+    b.classList.remove('bg-sky-600', 'text-white', 'border-sky-500');
+    b.classList.add('text-slate-400', 'hover:text-slate-200');
+  });
+  const btnNav = document.querySelector('[data-tab-target="tab-tutorial-cnis"]');
+  if (btnNav) {
+    btnNav.classList.add('bg-sky-600', 'text-white', 'border-sky-500');
+    btnNav.classList.remove('text-slate-400');
   }
+
+  // Exibe a aba do tutorial
+  const tabTutorial = document.getElementById('tab-tutorial-cnis');
+  if (tabTutorial) {
+    tabTutorial.classList.remove('hidden');
+  }
+
+  // Exibe a barra de retorno no topo do tutorial
+  const topBarTutorial = document.getElementById('tutorial-voltar-bar');
+  if (topBarTutorial) {
+    topBarTutorial.classList.remove('hidden');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function voltarParaCalculosTelaPrincipal() {
+  const elPerfil = document.getElementById('section-perfil-segurado');
+  const elSimulador = document.getElementById('section-simulador-controles');
+  const elKpis = document.getElementById('section-kpis-metricas');
+
+  if (elPerfil) elPerfil.classList.remove('hidden');
+  if (elSimulador) elSimulador.classList.remove('hidden');
+  if (elKpis) elKpis.classList.remove('hidden');
+
+  const topBarTutorial = document.getElementById('tutorial-voltar-bar');
+  if (topBarTutorial) {
+    topBarTutorial.classList.add('hidden');
+  }
+
+  // Ativa a primeira aba (Matriz de Descartes)
+  const btnDescarte = document.querySelector('[data-tab-target="tab-descarte"]');
+  if (btnDescarte) {
+    btnDescarte.click();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function ativarAbaTutorialCNIS() {
+  carregarTutorialNaTelaPrincipal();
+}
+
 
 

@@ -54,7 +54,11 @@
         </div>
       </div>
 
-      <div class="flex items-center gap-2.5">
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="carregarTutorialNaTelaPrincipal()" class="px-3.5 py-1.5 rounded-lg bg-sky-950/80 hover:bg-sky-900 text-sky-300 hover:text-white text-xs font-bold flex items-center gap-1.5 border border-sky-600/70 transition-all shadow-md shadow-sky-950/50 cursor-pointer" title="Ver tutorial passo a passo de como baixar o CNIS">
+          <span>💡</span>
+          <span>Passo a Passo</span>
+        </button>
         <button onclick="abrirModalPrecos()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all">
           <span>💎</span>
           <span>Planos & Assinatura</span>
@@ -90,6 +94,10 @@
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
+        <button onclick="carregarTutorialNaTelaPrincipal()" class="px-3.5 py-1.5 rounded-xl bg-sky-950/80 hover:bg-sky-900 text-sky-300 hover:text-white border border-sky-700/60 text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer">
+          <span>💡</span>
+          <span>Passo a Passo</span>
+        </button>
         <button onclick="abrirModalUpload()" class="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold transition-all shadow-md flex items-center gap-1.5">
           <span>📥</span>
           <span>Analisar Novo CNIS (PDF)</span>
@@ -102,7 +110,7 @@
     </div>
 
     <!-- Card de Perfil do Segurado -->
-    <section class="glass-panel rounded-2xl p-5 border border-slate-700/60 shadow-xl">
+    <section id="section-perfil-segurado" class="glass-panel rounded-2xl p-5 border border-slate-700/60 shadow-xl">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div class="space-y-1">
           <div class="flex flex-wrap items-center gap-2.5">
@@ -142,7 +150,7 @@
     </section>
 
     <!-- Barra de Simulação de Cenários em Tempo Real -->
-    <section class="glass-panel rounded-2xl p-5 border border-sky-900/40 bg-gradient-to-r from-slate-900/90 to-sky-950/20 shadow-lg">
+    <section id="section-simulador-controles" class="glass-panel rounded-2xl p-5 border border-sky-900/40 bg-gradient-to-r from-slate-900/90 to-sky-950/20 shadow-lg">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
           <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
@@ -206,7 +214,7 @@
     </section>
 
     <!-- Cards de KPIs (Métricas Principais) -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <section id="section-kpis-metricas" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <!-- KPI 1: RMI Otimizada -->
       <div class="glass-panel p-5 rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-slate-900/80 to-emerald-950/20 glass-card-hover">
         <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
@@ -659,6 +667,23 @@
     <!-- ABA 9: COMO BAIXAR CNIS (PASSO A PASSO ILUSTRADO COM TELAS REAIS) -->
     <div id="tab-tutorial-cnis" data-tab-content class="hidden space-y-6">
       
+      <!-- BARRA SUPERIOR DE RETORNO (QUANDO CARREGADO NA TELA PRINCIPAL LIMPA) -->
+      <div id="tutorial-voltar-bar" class="hidden flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-sky-950/40 to-slate-900 border-2 border-sky-500/80 shadow-2xl">
+        <div class="flex items-center gap-3">
+          <button onclick="voltarParaCalculosTelaPrincipal()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-sky-600/30 transition-all cursor-pointer">
+            <span>🔙</span> Voltar para a Tela de Cálculos & RMI
+          </button>
+          <span class="text-xs text-sky-200 font-semibold hidden md:inline">
+            ✨ Modo Tutorial Ativo: Tela limpa para visualização passo a passo
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="abrirModalUpload()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all cursor-pointer">
+            <span>🚀</span> Carregar PDF do CNIS Agora (1 Grátis)
+          </button>
+        </div>
+      </div>
+
       <!-- Cabeçalho Principal com Links Oficiais Rápidos -->
       <div class="glass-panel p-6 rounded-3xl border border-sky-800/60 bg-gradient-to-r from-sky-950/60 via-slate-900 to-slate-900/80 shadow-2xl space-y-4">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1213,12 +1238,71 @@
     function fecharModalLimpar() {
       document.getElementById('modal-confirmar-limpar').classList.add('hidden');
     }
-    function ativarAbaTutorialCNIS() {
-      const btn = document.querySelector('[data-tab-target="tab-tutorial-cnis"]');
-      if (btn) {
-        btn.click();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    function carregarTutorialNaTelaPrincipal() {
+      // Oculta seções do topo da tela de cálculos ("limpando o que está lá antes")
+      const elPerfil = document.getElementById('section-perfil-segurado');
+      const elSimulador = document.getElementById('section-simulador-controles');
+      const elKpis = document.getElementById('section-kpis-metricas');
+      const elBannerLimpo = document.getElementById('banner-tela-limpa');
+
+      if (elPerfil) elPerfil.classList.add('hidden');
+      if (elSimulador) elSimulador.classList.add('hidden');
+      if (elKpis) elKpis.classList.add('hidden');
+      if (elBannerLimpo) elBannerLimpo.classList.add('hidden');
+
+      // Oculta todas as outras abas
+      document.querySelectorAll('[data-tab-content]').forEach(c => c.classList.add('hidden'));
+
+      // Destaca o botão da aba na navegação
+      document.querySelectorAll('[data-tab-target]').forEach(b => {
+        b.classList.remove('bg-sky-600', 'text-white', 'border-sky-500');
+        b.classList.add('text-slate-400', 'hover:text-slate-200');
+      });
+      const btnNav = document.querySelector('[data-tab-target="tab-tutorial-cnis"]');
+      if (btnNav) {
+        btnNav.classList.add('bg-sky-600', 'text-white', 'border-sky-500');
+        btnNav.classList.remove('text-slate-400');
       }
+
+      // Exibe a aba do tutorial
+      const tabTutorial = document.getElementById('tab-tutorial-cnis');
+      if (tabTutorial) {
+        tabTutorial.classList.remove('hidden');
+      }
+
+      // Exibe a barra de retorno no topo do tutorial
+      const topBarTutorial = document.getElementById('tutorial-voltar-bar');
+      if (topBarTutorial) {
+        topBarTutorial.classList.remove('hidden');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function voltarParaCalculosTelaPrincipal() {
+      const elPerfil = document.getElementById('section-perfil-segurado');
+      const elSimulador = document.getElementById('section-simulador-controles');
+      const elKpis = document.getElementById('section-kpis-metricas');
+
+      if (elPerfil) elPerfil.classList.remove('hidden');
+      if (elSimulador) elSimulador.classList.remove('hidden');
+      if (elKpis) elKpis.classList.remove('hidden');
+
+      const topBarTutorial = document.getElementById('tutorial-voltar-bar');
+      if (topBarTutorial) {
+        topBarTutorial.classList.add('hidden');
+      }
+
+      // Ativa a primeira aba (Matriz de Descartes)
+      const btnDescarte = document.querySelector('[data-tab-target="tab-descarte"]');
+      if (btnDescarte) {
+        btnDescarte.click();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function ativarAbaTutorialCNIS() {
+      carregarTutorialNaTelaPrincipal();
     }
   </script>
 </body>
