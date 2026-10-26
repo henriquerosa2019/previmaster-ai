@@ -119,6 +119,11 @@
             </span>
             <span id="profile-caso-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Caso Demonstrativo</span>
             
+            <button id="btn-toggle-freemium" onclick="toggleModoFreemium()" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm bg-amber-500/10 text-amber-300 border border-amber-500/40 hover:bg-amber-500/20" title="Clique para alternar entre o Modo Freemium (Demonstração) e o Modo Pro">
+              <span>🔒</span> <span>Amostra Grátis (1º CNIS)</span>
+              <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">Simular Pro</span>
+            </button>
+
             <button id="btn-restaurar-demo" onclick="restaurarCasoDemonstrativo()" class="hidden px-2.5 py-0.5 rounded-lg bg-sky-950 hover:bg-sky-900 text-sky-300 hover:text-white border border-sky-700 text-xs font-bold transition-all shadow-sm flex items-center gap-1">
               <span>🔄</span> Restaurar Demonstração
             </button>
@@ -484,6 +489,52 @@
 
     <!-- ABA 2: Auditoria com IA do CNIS (IntelPrev) -->
     <div id="tab-diagnostico" data-tab-content class="hidden space-y-4">
+
+      <!-- Gancho de Conversão por IA: Alertas de Inconsistências Críticas -->
+      <div id="alerta-inconsistencias-ia" class="p-5 rounded-2xl bg-gradient-to-r from-rose-950/80 via-slate-900 to-amber-950/60 border-2 border-rose-500/70 shadow-xl space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl animate-bounce">🚨</span>
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-sm">Alerta de Inconsistências</span>
+              <h4 class="text-sm sm:text-base font-black text-white mt-0.5">3 Vínculos com Indício de Erro / Extemporaneidade Detectados pela IA PreviMaster</h4>
+            </div>
+          </div>
+          <button onclick="imprimirParecerMeuINSS()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer">
+            <span>📄</span> Emitir Parecer Técnico com Fundamentação
+          </button>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Nossa inteligência artificial identificou que o extrato CNIS possui pendências que <strong>impedirão a concessão imediata</strong> ou <strong>reduzirão a aposentadoria em quase R$ 1.000,00 por mês</strong> se não forem retificadas preventivamente:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-rose-800/60 space-y-1">
+            <div class="font-bold text-rose-300 flex items-center gap-1.5">
+              <span>⚠️</span> 1. CTC Marinha Não Averbada
+            </div>
+            <p class="text-[11px] text-slate-400">15 anos e 4 meses desconsiderados pelo INSS por ausência de CTC formal. Risco de perda de carência.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-amber-800/60 space-y-1">
+            <div class="font-bold text-amber-300 flex items-center gap-1.5">
+              <span>⚠️</span> 2. Salário Inferior ao Mínimo
+            </div>
+            <p class="text-[11px] text-slate-400">Competência com recolhimento abaixo do piso (PSC-MEN-SM). Exige complementação ou agrupamento legal.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-purple-800/60 space-y-1">
+            <div class="font-bold text-purple-300 flex items-center gap-1.5">
+              <span>⚠️</span> 3. Concomitância MEI x Cooperativa
+            </div>
+            <p class="text-[11px] text-slate-400">Recolhimento duplo no mesmo mês. Descarte legal do MEI preserva o teto da Cooperativa sem custos.</p>
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
+          <span class="text-slate-400">O Parecer em PDF gera as justificativas jurídicas prontas para protocolar no Meu INSS.</span>
+          <button onclick="abrirModalPrecos()" class="text-amber-400 hover:text-amber-300 font-bold underline flex items-center gap-1 cursor-pointer">
+            Ver opções de emissão avulsa (R$ 29,90) ou plano de escritório →
+          </button>
+        </div>
+      </div>
+
       <div id="diagnostico-resumo-box" class="glass-panel p-5 rounded-2xl border border-slate-700/60">
         <h3 class="text-base font-bold text-white mb-2 flex items-center gap-2">
           <span>🔍</span> Diagnóstico Automático e Auditoria de Indicadores Previdenciários
@@ -940,85 +991,210 @@
 
   <!-- MODAL DE PLANOS E PREÇOS (SaaS) -->
   <div id="modal-precos" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="glass-panel p-6 rounded-3xl border border-slate-700 max-w-4xl w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-slate-700 max-w-5xl w-full shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-4 border-b border-slate-800">
         <div>
-          <h3 class="text-xl font-extrabold text-white">Planos & Assinatura PreviMaster AI</h3>
-          <p class="text-xs text-slate-400">Escolha o plano ideal para você ou para o seu escritório de advocacia</p>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">
+              💎 Monetização Flexível
+            </span>
+            <span class="text-xs text-slate-400">PreviMaster AI</span>
+          </div>
+          <h3 class="text-xl sm:text-2xl font-black text-white mt-1">Planos, Créditos & Assinaturas</h3>
+          <p class="text-xs text-slate-300">Escolha entre Créditos Pay-Per-Use (por CNIS) ou Assinatura Recorrente para o seu Escritório</p>
         </div>
-        <button onclick="fecharModalPrecos()" class="text-slate-400 hover:text-white text-lg font-bold p-1">✕</button>
+        <button onclick="fecharModalPrecos()" class="text-slate-400 hover:text-white text-xl font-bold p-2 cursor-pointer">✕</button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Plano 1: Parecer Avulso -->
-        <div class="p-5 rounded-2xl bg-slate-900/70 border border-slate-800 flex flex-col justify-between">
-          <div>
-            <h4 class="text-sm font-bold text-slate-200">Parecer Avulso</h4>
-            <p class="text-[11px] text-slate-400 mt-1">Para segurados ou consultas pontuais</p>
-            <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 69,00</span>
-              <span class="text-xs text-slate-400">/parecer</span>
-            </div>
-            <ul class="space-y-2 text-xs text-slate-300">
-              <li>✓ 1 CNIS Completo Auditado</li>
-              <li>✓ Matriz de Descartes da EC 103</li>
-              <li>✓ Parecer Técnico em PDF</li>
-              <li>✓ Modelo de Petição Administrativa</li>
-            </ul>
+      <!-- SEÇÃO 1: PAY-PER-USE / CRÉDITOS AVULSOS (PARA ADVOGADOS AUTÔNOMOS) -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">⚡</span>
+            <h4 class="text-sm font-extrabold text-sky-400 uppercase tracking-wide">
+              1. Pay-Per-Use / Créditos Avulsos (Sem Mensalidade Fixa)
+            </h4>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Parecer%20Avulso%20(R$%2069,00)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block">
-            Adquirir Parecer (R$ 69,00)
-          </a>
+          <span class="text-[11px] text-slate-400">Pague apenas pelo que usar • Créditos sem validade</span>
         </div>
 
-        <!-- Plano 2: Escritório (Popular) -->
-        <div class="p-5 rounded-2xl bg-gradient-to-b from-sky-950/40 to-slate-900 border-2 border-sky-500 flex flex-col justify-between relative shadow-lg shadow-sky-500/10">
-          <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500 text-slate-950">
-            Mais Vendido
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-sky-400">Plano Escritório</h4>
-            <p class="text-[11px] text-slate-400 mt-1">Para advogados e escritórios de advocacia</p>
-            <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 149,00</span>
-              <span class="text-xs text-slate-400">/mês</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Pacote Unitário: R$ 29,90 -->
+          <div class="p-5 rounded-2xl bg-slate-900/80 border border-sky-800/60 flex flex-col justify-between hover:border-sky-500 transition-all shadow-lg">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h5 class="text-base font-black text-white">Pacote Unitário (1 CNIS)</h5>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Ideal para consultas pontuais ou clientes avulsos</p>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-800">Avulso</span>
+              </div>
+              <div class="my-4">
+                <span class="text-3xl font-black text-white font-mono">R$ 29,90</span>
+                <span class="text-xs text-slate-400">/análise completa</span>
+              </div>
+              <ul class="space-y-2 text-xs text-slate-300">
+                <li class="flex items-center gap-2">✓ <strong>1 CNIS Completo Auditado</strong></li>
+                <li class="flex items-center gap-2">✓ <strong>Matriz de Descartes da EC 103</strong> desbloqueada</li>
+                <li class="flex items-center gap-2">✓ <strong>Parecer Técnico Oficial</strong> para o Meu INSS em PDF</li>
+                <li class="flex items-center gap-2">✓ <strong>Detecção de Inconsistências</strong> & Vínculos pela IA</li>
+              </ul>
             </div>
-            <ul class="space-y-2 text-xs text-slate-300">
-              <li>✓ <strong>Análises Ilimitadas de CNIS</strong></li>
-              <li>✓ Matriz de Descartes da EC 103</li>
-              <li>✓ Exportação de Relatórios com seu Logo</li>
-              <li>✓ Simulador de Viabilidade e ROI do MEI</li>
-              <li>✓ Modelos de Petições em Word/PDF</li>
-            </ul>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Pacote%20Unitário%20(R$%2029,90)%20do%20PreviMaster%20AI%20para%201%20CNIS" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700 shadow-sm">
+              Adquirir 1 Análise (R$ 29,90)
+            </a>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20(R$%20149,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
-            Assinar Plano Escritório (R$ 149,00)
-          </a>
+
+          <!-- Pacote 5 CNIS: R$ 119,00 -->
+          <div class="p-5 rounded-2xl bg-gradient-to-b from-sky-950/40 via-slate-900 to-slate-900 border-2 border-sky-500/80 flex flex-col justify-between relative shadow-lg shadow-sky-500/10">
+            <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500 text-slate-950 shadow-sm">
+              Economia de 20%
+            </div>
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h5 class="text-base font-black text-white">Pacote 5 CNIS</h5>
+                  <p class="text-[11px] text-emerald-400 font-semibold mt-0.5">Apenas R$ 23,80 por análise</p>
+                </div>
+              </div>
+              <div class="my-4">
+                <span class="text-3xl font-black text-white font-mono">R$ 119,00</span>
+                <span class="text-xs text-slate-400">/lote (5 créditos)</span>
+              </div>
+              <ul class="space-y-2 text-xs text-slate-300">
+                <li class="flex items-center gap-2">✓ <strong>5 Análises Completas de CNIS</strong></li>
+                <li class="flex items-center gap-2">✓ <strong>Relação Nominal de Descartes</strong> liberada</li>
+                <li class="flex items-center gap-2">✓ <strong>5 Pareceres Técnicos em PDF</strong> prontos para juntar</li>
+                <li class="flex items-center gap-2">✓ <strong>Economia imediata de R$ 30,50</strong> no pacote</li>
+              </ul>
+            </div>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20o%20Pacote%205%20CNIS%20(R$%20119,00)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-sky-600/30">
+              Adquirir Pacote 5 CNIS (R$ 119,00)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 2: ASSINATURA RECORRENTE (SAAS PRO PARA ESCRITÓRIOS) -->
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">💼</span>
+            <h4 class="text-sm font-extrabold text-amber-400 uppercase tracking-wide">
+              2. Assinatura Recorrente (SaaS Pro para Escritórios)
+            </h4>
+          </div>
+          <span class="text-[11px] text-slate-400">Previsibilidade, volume e autoridade com marca própria</span>
         </div>
 
-        <!-- Plano 3: Plano Pro Master -->
-        <div class="p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 to-slate-900 border-2 border-purple-500 flex flex-col justify-between relative shadow-lg shadow-purple-500/10">
-          <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500 text-white">
-            Pro Master
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-purple-400">Plano Pro Master</h4>
-            <p class="text-[11px] text-slate-400 mt-1">Inteligência Atuarial Máxima & Suporte VIP</p>
-            <div class="my-4">
-              <span class="text-3xl font-black text-white font-mono">R$ 169,00</span>
-              <span class="text-xs text-slate-400">/mês</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Plano Individual: R$ 97/mês -->
+          <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between hover:border-amber-500/60 transition-all shadow-lg">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h5 class="text-base font-black text-white">Plano Individual</h5>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Para advogados autônomos e previdenciaristas</p>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/60 text-amber-300 border border-amber-800">Recorrente</span>
+              </div>
+              <div class="my-4">
+                <span class="text-3xl font-black text-white font-mono">R$ 97,00</span>
+                <span class="text-xs text-slate-400">/mês</span>
+              </div>
+              <ul class="space-y-2 text-xs text-slate-300">
+                <li class="flex items-center gap-2">✓ <strong>Até 15 Análises de CNIS por mês</strong></li>
+                <li class="flex items-center gap-2">✓ <strong>Auditoria de Descartes da EC 103</strong> completa</li>
+                <li class="flex items-center gap-2">✓ <strong>Gerador de Petição Básica</strong> Administrativa</li>
+                <li class="flex items-center gap-2">✓ <strong>Pareceres Técnicos em PDF</strong> inclusos</li>
+                <li class="flex items-center gap-2">✓ Suporte técnico prioritário por e-mail/WhatsApp</li>
+              </ul>
             </div>
-            <ul class="space-y-2 text-xs text-slate-300">
-              <li>✓ <strong>Tudo do Plano Escritório</strong></li>
-              <li>✓ Inteligência Atuarial & IA para Cálculos</li>
-              <li>✓ Suporte Prioritário VIP por Especialista</li>
-              <li>✓ Acesso Antecipado a Novas Regras & Teses</li>
-              <li>✓ Assistente IA para Redação de Petições</li>
-            </ul>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Individual%20(R$%2097,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700">
+              Assinar Plano Individual (R$ 97,00/mês)
+            </a>
           </div>
-          <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Pro%20Master%20(R$%20169,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-6 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-purple-600/30">
-            Assinar Plano Pro Master (R$ 169,00)
-          </a>
+
+          <!-- Plano Escritório / Ilimitado: R$ 247/mês -->
+          <div class="p-5 rounded-2xl bg-gradient-to-b from-purple-950/40 via-slate-900 to-slate-900 border-2 border-purple-500 flex flex-col justify-between relative shadow-xl shadow-purple-500/10">
+            <div class="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500 text-white shadow-md">
+              👑 Mais Vendido • Ilimitado
+            </div>
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h5 class="text-base font-black text-white">Plano Escritório Ilimitado</h5>
+                  <p class="text-[11px] text-purple-300 font-semibold mt-0.5">Produtividade máxima e autoridade jurídica</p>
+                </div>
+              </div>
+              <div class="my-4">
+                <span class="text-3xl font-black text-white font-mono">R$ 247,00</span>
+                <span class="text-xs text-slate-400">/mês</span>
+              </div>
+              <ul class="space-y-2 text-xs text-slate-300">
+                <li class="flex items-center gap-2">✓ <strong>Análises Ilimitadas de CNIS</strong> (sem travas ou franquias)</li>
+                <li class="flex items-center gap-2">✓ <strong>Personalização White-Label:</strong> Pareceres com o logo do seu escritório</li>
+                <li class="flex items-center gap-2">✓ <strong>Auditoria Avançada por IA (IntelPrev):</strong> Erros e extemporaneidades</li>
+                <li class="flex items-center gap-2">✓ <strong>Módulo MEI / Carnês:</strong> ROI de complementação vs descarte</li>
+                <li class="flex items-center gap-2">✓ Modelos de Petições em Word/PDF editáveis</li>
+                <li class="flex items-center gap-2">✓ Suporte VIP Prioritário Direto com Especialista Atuarial</li>
+              </ul>
+            </div>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20assinar%20o%20Plano%20Escritório%20Ilimitado%20(R$%20247,00/mês)%20do%20PreviMaster%20AI" target="_blank" class="mt-5 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-center text-xs font-bold text-white transition-all block shadow-md shadow-purple-600/30">
+              Assinar Plano Escritório (R$ 247,00/mês)
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 3: UPSELLS ESTRATÉGICOS (MONETIZAÇÃO ADICIONAL) -->
+      <div class="space-y-3 pt-2">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🚀</span>
+            <h4 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wide">
+              3. Upsells Estratégicos (Monetização Adicional por Caso)
+            </h4>
+          </div>
+          <span class="text-[11px] text-slate-400">Poupe tempo de redação e fortaleça a marca do seu escritório</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Upsell 1: Petição Pronta em 1-Clique (R$ 19,90) -->
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/50 flex flex-col justify-between space-y-3">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-white flex items-center gap-1.5">
+                  <span>⚖️</span> Petição Pronta em 1-Clique
+                </span>
+                <span class="text-sm font-mono font-black text-emerald-400">R$ 19,90 <span class="text-[10px] text-slate-400 font-normal">/caso</span></span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-relaxed">
+                Gera a peça jurídica e dossiê completo fundamentado na EC 103/2019 e IN 128/2022 pronto para juntada no processo administrativo ou judicial. <strong>Economize até 4 horas de redação por cliente!</strong>
+              </p>
+            </div>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20adquirir%20a%20Petição%20Pronta%20em%201-Clique%20(R$%2019,90)%20para%20o%20meu%20caso" target="_blank" class="w-full py-2 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-600/70 text-center text-xs font-bold text-emerald-300 transition-all block">
+              Contratar Petição Pronta (R$ 19,90)
+            </a>
+          </div>
+
+          <!-- Upsell 2: White-Label / Marca do Escritório -->
+          <div class="p-4 rounded-2xl bg-slate-900/90 border border-purple-500/50 flex flex-col justify-between space-y-3">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-white flex items-center gap-1.5">
+                  <span>🏷️</span> White-Label / Selo de Marca do Escritório
+                </span>
+                <span class="text-xs font-mono font-bold text-purple-300">Incluso no Escritório ou Avulso</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-relaxed">
+                Exporte pareceres, relatórios e petições 100% personalizados com o timbre, logotipo e dados do seu escritório, sem qualquer menção externa, transmitindo <strong>máxima autoridade</strong> ao cliente.
+              </p>
+            </div>
+            <a href="https://wa.me/?text=Olá!%20Gostaria%20de%20ativar%20a%20Personalização%20White-Label%20com%20o%20timbre%20do%20meu%20escritório" target="_blank" class="w-full py-2 rounded-xl bg-purple-950/70 hover:bg-purple-900 border border-purple-600/70 text-center text-xs font-bold text-purple-300 transition-all block">
+              Ativar Selo White-Label
+            </a>
+          </div>
         </div>
       </div>
 

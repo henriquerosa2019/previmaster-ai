@@ -11604,6 +11604,24 @@ let currentScenario = {
   modoAuditoria: 'ambos'
 };
 
+// Controle de Monetização & Modo Freemium Inteligente
+let modoFreemiumAtivo = localStorage.getItem('previmaster_usuario_pro') === 'true' ? false : true;
+
+function toggleModoFreemium() {
+  modoFreemiumAtivo = !modoFreemiumAtivo;
+  localStorage.setItem('previmaster_usuario_pro', (!modoFreemiumAtivo).toString());
+  renderProfileHeader();
+  renderTabelasDescartesEMelhores();
+  renderAuditoriaCards();
+  renderParecerMeuINSS();
+
+  if (modoFreemiumAtivo) {
+    alert("🔒 Modo Freemium (Demonstração Gratuita) Ativado!\n\nAs competências descartadas além da 3ª foram ocultadas/borradas para simular a visão do usuário não pagante, com alertas e ganchos de conversão para emissão do parecer oficial em PDF.");
+  } else {
+    alert("👑 Modo Pro Ativado!\n\nTodas as competências nominais descartadas, relatórios e parecer oficial para o Meu INSS estão 100% desbloqueados sem qualquer limitação.");
+  }
+}
+
 let chartSalarios = null;
 let chartDescarte = null;
 let chartPatrimonio = null;
@@ -11886,6 +11904,19 @@ function renderProfileHeader() {
       elBadgeCaso.classList.remove('hidden');
     } else {
       elBadgeCaso.classList.add('hidden');
+    }
+  }
+
+  const btnFreemium = document.getElementById('btn-toggle-freemium');
+  if (btnFreemium) {
+    if (modoFreemiumAtivo) {
+      btnFreemium.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm bg-amber-500/10 text-amber-300 border border-amber-500/40 hover:bg-amber-500/20";
+      btnFreemium.innerHTML = '<span>🔒</span> <span>Amostra Grátis (1º CNIS)</span> <span class="text-[9px] bg-amber-400 text-slate-950 font-black px-1.5 py-0.2 rounded">Simular Pro</span>';
+      btnFreemium.title = "Visualizando versão de demonstração (Freemium). Clique para alternar para o Modo Pro.";
+    } else {
+      btnFreemium.className = "px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm bg-emerald-500/10 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/20";
+      btnFreemium.innerHTML = '<span>👑</span> <span>Plano Pro Ativo</span> <span class="text-[9px] bg-emerald-400 text-slate-950 font-black px-1.5 py-0.2 rounded">Ilimitado</span>';
+      btnFreemium.title = "Modo Pro Ativo com acesso total. Clique para testar o Modo Freemium.";
     }
   }
 
@@ -12214,9 +12245,70 @@ function renderTabelasDescartesEMelhores() {
   }
 
   if (tbodyDescartados) {
-    if (countDescartados) countDescartados.textContent = `${descartados.length} salários menores excluídos (Art. 26)`;
+    if (countDescartados) {
+      countDescartados.textContent = (modoFreemiumAtivo && descartados.length > 3)
+        ? `${descartados.length} descartes identificados (🔒 3 visíveis na demo)`
+        : `${descartados.length} salários menores excluídos (Art. 26)`;
+    }
     if (descartados.length === 0) {
       tbodyDescartados.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-500 text-xs italic">Nenhum salário descartado neste cenário ou busca.</td></tr>`;
+    } else if (modoFreemiumAtivo && descartados.length > 3) {
+      // 1. Primeiras 3 competências descartadas nítidas (prova da exatidão matemática do algoritmo)
+      const visiveis = descartados.slice(0, 3);
+      const amostraBorrados = descartados.slice(3, 6);
+      const totalOcultos = descartados.length - 3;
+
+      const htmlVisiveis = visiveis.map((s, idx) => `
+        <tr class="border-b border-slate-800/60 hover:bg-rose-950/20 text-slate-400">
+          <td class="py-1.5 px-2 font-mono text-slate-500 text-center text-xs">#${idx + 1}</td>
+          <td class="py-1.5 px-2 font-mono font-semibold text-slate-300 line-through text-xs">${s.comp}</td>
+          <td class="py-1.5 px-2 text-center whitespace-nowrap">${getBadgeOrigem(s)}</td>
+          <td class="py-1.5 px-2 font-mono text-slate-500 text-right text-xs whitespace-nowrap">R$ ${s.valor_nominal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+          <td class="py-1.5 px-2 font-mono text-slate-500 text-center text-[11px]">${s.fator_inpc.toFixed(4)}</td>
+          <td class="py-1.5 px-2 font-mono font-semibold text-rose-400 text-right text-xs whitespace-nowrap">R$ ${s.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+        </tr>
+      `).join('');
+
+      // 2. Linhas com efeito frosted glass / blur simulando o restante do extrato
+      const htmlBorrados = amostraBorrados.map((s, idx) => `
+        <tr class="border-b border-slate-800/30 select-none filter blur-[3.5px] opacity-25 pointer-events-none">
+          <td class="py-1.5 px-2 font-mono text-slate-600 text-center text-xs">#${idx + 4}</td>
+          <td class="py-1.5 px-2 font-mono font-semibold text-slate-400 text-xs">??/????</td>
+          <td class="py-1.5 px-2 text-center whitespace-nowrap"><span class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-500">Bloqueado</span></td>
+          <td class="py-1.5 px-2 font-mono text-slate-600 text-right text-xs whitespace-nowrap">R$ 1.250,00</td>
+          <td class="py-1.5 px-2 font-mono text-slate-600 text-center text-[11px]">1.2345</td>
+          <td class="py-1.5 px-2 font-mono font-semibold text-rose-500 text-right text-xs whitespace-nowrap">R$ 1.543,00</td>
+        </tr>
+      `).join('');
+
+      // 3. Card de Conversão para Upgrade (Unitário R$ 29,90 ou SaaS Pro)
+      const ctaRow = `
+        <tr class="bg-gradient-to-b from-slate-950/90 via-slate-900 to-slate-950 border-t-2 border-amber-500/80">
+          <td colspan="6" class="p-5 text-center">
+            <div class="max-w-md mx-auto space-y-3">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-black uppercase tracking-wider">
+                <span>🔒</span> Diagnóstico Preliminar Gratuito
+              </div>
+              <div>
+                <h6 class="text-sm font-black text-white">+ ${totalOcultos} Competências Descartadas Ocultas</h6>
+                <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                  A IA encontrou o ponto ótimo com <strong>${descartados.length} descartes</strong>, elevando a aposentadoria para <strong>R$ 3.884/mês</strong> (+ R$ 977/mês vitalício). Para liberar a relação nominal completa e o Parecer Técnico Oficial para o Meu INSS:
+                </p>
+              </div>
+              <div class="flex flex-wrap justify-center items-center gap-2 pt-1">
+                <button onclick="abrirModalPrecos()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-1.5 cursor-pointer">
+                  <span>⚡</span> Desbloquear por R$ 29,90 (1 CNIS)
+                </button>
+                <button onclick="abrirModalPrecos()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-all cursor-pointer">
+                  <span>👑</span> Assinar Plano Pro
+                </button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      tbodyDescartados.innerHTML = htmlVisiveis + htmlBorrados + ctaRow;
     } else {
       tbodyDescartados.innerHTML = descartados.map((s, idx) => `
         <tr class="border-b border-slate-800/60 hover:bg-rose-950/20 text-slate-400">
@@ -12302,11 +12394,29 @@ function renderParecerMeuINSS() {
   const descartados = salarios.slice(0, k);
   const melhores = salarios.slice(k).sort((a, b) => b.valor_corrigido - a.valor_corrigido);
 
-  const listaDescartadosTexto = descartados.map(d => `${d.comp} (R$ ${d.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`).join(', ');
+  const listaDescartadosTexto = (modoFreemiumAtivo && descartados.length > 3)
+    ? descartados.slice(0, 3).map(d => `${d.comp} (R$ ${d.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`).join(', ') +
+      ` ... [🔒 + ${descartados.length - 3} COMPETÊNCIAS IDENTIFICADAS PARA DESCARTE OCULTAS NA VERSÃO DE DEMONSTRAÇÃO. Desbloqueie o Parecer Oficial por R$ 29,90 ou ative o Plano Pro Escritório para exportar sem tarjas]`
+    : descartados.map(d => `${d.comp} (R$ ${d.valor_corrigido.toLocaleString('pt-BR', {minimumFractionDigits: 2})})`).join(', ');
 
   container.innerHTML = `
     <div class="bg-white text-slate-900 p-8 sm:p-12 rounded-2xl shadow-2xl border border-slate-300 max-w-4xl mx-auto space-y-6 text-sm font-sans" id="folha-parecer-inss">
       
+      ${modoFreemiumAtivo ? `
+      <!-- Alerta de Diagnóstico Freemium -->
+      <div class="p-3.5 rounded-xl bg-amber-50 border-2 border-amber-400 text-amber-950 text-xs space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="font-black flex items-center gap-1.5 uppercase text-[11px] text-amber-900">
+            <span>🔒</span> Relatório de Diagnóstico Preliminar (Demonstração Gratuita)
+          </span>
+          <span class="font-bold text-[10px] bg-amber-200 px-2 py-0.5 rounded text-amber-900">1º CNIS Gratuito</span>
+        </div>
+        <p class="text-[11px] text-amber-900 leading-relaxed">
+          Este parecer técnico foi gerado na versão de demonstração diagnóstica. Para emitir o Parecer Técnico Oficial definitivo sem tarjas e com a relação integral de todas as ${descartados.length} competências pronta para juntar no Meu INSS ou ação judicial, adquira o Pacote Unitário (R$ 29,90) ou assine o Plano Pro Escritório.
+        </p>
+      </div>
+      ` : ''}
+
       <!-- Cabeçalho Oficial -->
       <div class="border-b-2 border-slate-900 pb-4 flex justify-between items-start">
         <div>
@@ -12459,10 +12569,13 @@ function renderAuditoriaCards() {
   const titleVinculos = document.getElementById('auditoria-vinculos-title');
 
   const vinculos = CNIS_DATA.vinculos || [];
+  const alertaIa = document.getElementById('alerta-inconsistencias-ia');
+
   if (vinculos.length === 0) {
     if (resBox) resBox.classList.add('hidden');
     if (emptyBox) emptyBox.classList.remove('hidden');
     if (titleVinculos) titleVinculos.classList.add('hidden');
+    if (alertaIa) alertaIa.classList.add('hidden');
     if (container) container.innerHTML = '<div class="col-span-full py-8 text-center text-slate-500 text-xs italic">Nenhum vínculo carregado na tela. Carregue um novo extrato CNIS para auditar os vínculos e indicadores.</div>';
     return;
   }
@@ -12470,6 +12583,7 @@ function renderAuditoriaCards() {
   if (resBox) resBox.classList.remove('hidden');
   if (emptyBox) emptyBox.classList.add('hidden');
   if (titleVinculos) titleVinculos.classList.remove('hidden');
+  if (alertaIa) alertaIa.classList.remove('hidden');
   if (!container) return;
 
   container.innerHTML = vinculos.map(v => {
@@ -13105,7 +13219,7 @@ function setupEventListeners() {
       if (freeCount >= 1) {
         fecharModalUpload();
         fileInput.value = '';
-        alert(`⚠️ Limite de Análise Gratuita Atingido!\n\nVocê já utilizou sua 1ª análise gratuita de CNIS sem pagar.\n\nPara analisar extratos de outros clientes e acessar todas as ferramentas atuaríais ilimitadas:\n• Parecer Avulso: R$ 69,00\n• Plano Escritório: R$ 149,00/mês\n• Plano Pro Master: R$ 169,00/mês\n\nAbriremos a tabela de planos para você.`);
+        alert(`⚠️ Limite de Análise Gratuita Atingido!\n\nVocê já utilizou sua 1ª análise gratuita de CNIS sem pagar.\n\nPara analisar novos extratos e emitir pareceres oficiais em PDF:\n• Pacote Unitário (1 CNIS + Parecer PDF): R$ 29,90\n• Pacote 5 CNIS: R$ 119,00 (R$ 23,80/análise)\n• Plano Individual: R$ 97,00/mês\n• Plano Escritório Ilimitado: R$ 247,00/mês\n\nAbriremos a tabela de planos para você.`);
         abrirModalPrecos();
         return;
       }
@@ -13314,6 +13428,22 @@ function processarTextoCNIS(fullText, fileName) {
 function imprimirParecerMeuINSS() {
   const btnTab = document.querySelector('[data-tab-target="tab-parecer-inss"]');
   if (btnTab) btnTab.click();
+
+  if (modoFreemiumAtivo) {
+    const querUpgrade = confirm(
+      "📄 EMITIR PARECER TÉCNICO OFICIAL EM PDF\n\n" +
+      "Você está visualizando a versão de Demonstração Gratuita (Freemium).\n" +
+      "O documento em tela possui a tarja de diagnóstico preliminar e a relação de competências com limites.\n\n" +
+      "Deseja adquirir o PARECER OFICIAL COMPLETO (sem tarjas, com todas as 244 competências e pronto para protocolar no Meu INSS) por apenas R$ 29,90 ou assinar o Plano Pro?\n\n" +
+      "• Clique em OK para ver a tabela de Planos & Créditos Avulsos.\n" +
+      "• Clique em CANCELAR para imprimir a versão preliminar de demonstração mesmo assim."
+    );
+    if (querUpgrade) {
+      abrirModalPrecos();
+      return;
+    }
+  }
+
   setTimeout(() => {
     window.print();
   }, 300);
