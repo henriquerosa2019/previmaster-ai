@@ -14170,7 +14170,7 @@ async function executarCheckout1CliquePix() {
 // PAGAMENTO REAL VIA PIX (R$ 1,00 - AMBIENTE DE PRODUÇÃO E TESTE REAL)
 // =========================================================================
 
-const PIX_COPIA_E_COLA_1_REAL = '00020126480014br.gov.bcb.pix0126henrique.rosa@poli.ufrj.br52040000530398654041.005802BR5913HENRIQUE ROSA6014RIO DE JANEIRO62150511PREVIMASTER6304738A';
+const PIX_COPIA_E_COLA_1_REAL = '00020126360014br.gov.bcb.pix0114+552199379374652040000530398654041.005802BR5913HENRIQUE ROSA6014RIO DE JANEIRO62150511PREVIMASTER63042EDC';
 
 function mostrarAreaPixReal() {
   const areaPix = document.getElementById('area-pix-qrcode');
@@ -14266,7 +14266,7 @@ async function confirmarPixELiberar() {
     _template: 'table',
     "Status": "PAGAMENTO REAL VIA PIX DE R$ 1,00 CONFIRMADO",
     "Valor": "R$ 1,00",
-    "Chave PIX Destino": "henrique.rosa@poli.ufrj.br",
+    "Chave PIX Destino": "(21) 99379-3746 (Celular: +5521993793746)",
     "Beneficiário": "Henrique Rosa",
     "Cliente": nome,
     "E-mail do Cliente": email,
