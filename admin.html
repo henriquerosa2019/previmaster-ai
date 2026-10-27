@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Administrador - PreviMaster AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+  
+  <div class="max-w-md w-full bg-slate-900 border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl">
+          🛡️
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-white">Painel do Administrador</h1>
+          <p class="text-xs text-emerald-400 font-semibold">Henrique Rosa • PreviMaster AI</p>
+        </div>
+      </div>
+      <a href="/app/" class="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 transition-all">
+        Voltar ao App ➔
+      </a>
+    </div>
+
+    <!-- Login por PIN -->
+    <div id="box-login" class="space-y-4">
+      <p class="text-xs text-slate-300">
+        Digite seu <strong>PIN de Administrador</strong> para acessar o gerador de chaves de ativação:
+      </p>
+      <div class="flex gap-2">
+        <input type="password" id="input-pin" placeholder="PIN de 4 dígitos" maxlength="6" class="bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-center font-mono text-lg text-emerald-400 tracking-widest w-full outline-none" onkeydown="if(event.key==='Enter') autenticar()" />
+        <button onclick="autenticar()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-all cursor-pointer">
+          Acessar ➔
+        </button>
+      </div>
+      <p id="msg-erro-pin" class="text-xs text-rose-400 font-semibold hidden text-center">
+        ❌ PIN incorreto. Tente novamente.
+      </p>
+      <p class="text-[11px] text-slate-500 text-center">
+        Dica: Seu PIN padrão são os primeiros dígitos do seu WhatsApp: <strong>9937</strong>
+      </p>
+    </div>
+
+    <!-- Painel Autenticado -->
+    <div id="box-painel" class="hidden space-y-5">
+      <!-- Gerador de Código -->
+      <div class="p-4 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🎲</span> Gerador de Código de Ativação
+          </span>
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">100% Válido</span>
+        </div>
+        <p class="text-xs text-slate-300">
+          Código exclusivo para o cliente que enviou o comprovante no WhatsApp:
+        </p>
+        <div class="flex items-center justify-between bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+          <div>
+            <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Código de Ativação:</span>
+            <span id="codigo-display" class="font-mono text-xl font-black text-emerald-400 tracking-wider">PREVI-75472</span>
+          </div>
+          <button onclick="gerarNovoCodigo()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer">
+            🔄 Gerar Outro
+          </button>
+        </div>
+        <div>
+          <button onclick="copiarMensagemWzap()" id="btn-copiar-msg" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:brightness-110 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20">
+            <span>📋</span>
+            <span id="btn-copiar-msg-texto">Copiar Mensagem Pronta para o WhatsApp</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chave Mestra Universal -->
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2 text-xs">
+        <div class="flex items-center justify-between text-slate-300 font-bold">
+          <span>Chave Mestra Universal:</span>
+          <span class="font-mono text-emerald-400 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-700 select-all font-black text-sm">PREVI-VIP-2026</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-tight">
+          Esta chave mestra é permanente. Você pode ditar ou enviar <strong>PREVI-VIP-2026</strong> a qualquer momento para qualquer cliente.
+        </p>
+      </div>
+
+      <!-- Links rápidos -->
+      <div class="pt-2 flex flex-col gap-2">
+        <a href="/app/" target="_blank" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all text-center border border-slate-700">
+          Abrir o App PreviMaster AI ➔
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-5 z-50 p-3.5 rounded-xl bg-emerald-950 border border-emerald-400 text-emerald-200 text-xs font-bold shadow-2xl hidden"></div>
+
+  <script>
+    let codigoAtual = 'PREVI-75472';
+
+    function makeToken(seedNum = null) {
+      if (seedNum === null) {
+        seedNum = Math.floor(100 + Math.random() * 900);
+      }
+      const chk = ((seedNum * 73) + 29) % 97;
+      const strChk = chk < 10 ? '0' + chk : '' + chk;
+      return 'PREVI-' + seedNum + strChk;
+    }
+
+    function autenticar() {
+      const pin = document.getElementById('input-pin').value.trim();
+      const erro = document.getElementById('msg-erro-pin');
+      if (pin === '9937') {
+        sessionStorage.setItem('previmaster_admin_auth', 'true');
+        document.getElementById('box-login').classList.add('hidden');
+        document.getElementById('box-painel').classList.remove('hidden');
+        gerarNovoCodigo();
+      } else {
+        erro.classList.remove('hidden');
+      }
+    }
+
+    function gerarNovoCodigo() {
+      codigoAtual = makeToken();
+      document.getElementById('codigo-display').textContent = codigoAtual;
+      document.getElementById('btn-copiar-msg-texto').textContent = 'Copiar Mensagem Pronta para o WhatsApp';
+    }
+
+    function copiarMensagemWzap() {
+      const msg = `Olá Dr(a)! Pagamento PIX confirmado com sucesso! ✅\n\n` +
+        `🔑 Seu Código de Ativação do PreviMaster AI:\n` +
+        `${codigoAtual}\n\n` +
+        `Basta colar este código no campo "Passo 2" do app para liberar o seu Parecer Técnico Oficial e a Matriz Completa de Descartes da EC 103 na hora.\n\n` +
+        `Qualquer dúvida estou à disposição!\nHenrique Rosa • PreviMaster AI`;
+
+      navigator.clipboard.writeText(msg).then(() => {
+        const btn = document.getElementById('btn-copiar-msg-texto');
+        btn.textContent = '✅ Mensagem Copiada com Sucesso!';
+        mostrarToast('Mensagem copiada para a área de transferência!');
+        setTimeout(() => {
+          btn.textContent = 'Copiar Mensagem Pronta para o WhatsApp';
+        }, 3500);
+      });
+    }
+
+    function mostrarToast(txt) {
+      const t = document.getElementById('toast');
+      t.textContent = txt;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3500);
+    }
+
+    // Auto-login se já autenticado na sessão
+    if (sessionStorage.getItem('previmaster_admin_auth') === 'true') {
+      document.getElementById('box-login').classList.add('hidden');
+      document.getElementById('box-painel').classList.remove('hidden');
+      gerarNovoCodigo();
+    }
+  </script>
+</body>
+</html>
