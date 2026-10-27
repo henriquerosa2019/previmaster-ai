@@ -72,6 +72,10 @@
           <span>🛡️</span>
           <span>Painel Admin</span>
         </a>
+        <button onclick="abrirModalInserirChave()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/40 hover:to-teal-600/40 text-emerald-300 hover:text-emerald-100 text-xs font-bold flex items-center gap-1.5 border border-emerald-500/60 transition-all shadow-md shadow-emerald-950/40 cursor-pointer" title="Já possui um código de ativação fornecido pelo Henrique? Ative aqui">
+          <span>🔑</span>
+          <span>Inserir Código de Ativação</span>
+        </button>
         <button id="btn-theme-toggle" onclick="alternarTema()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition-all shadow-sm cursor-pointer" title="Alternar entre Modo Escuro e Modo Claro">
           <span id="theme-icon">☀️</span>
           <span id="theme-text">Modo Claro</span>
@@ -1698,6 +1702,34 @@
     }
   </script>
 
+  <!-- Modal Dedicado para o Cliente Inserir Código de Ativação -->
+  <div id="modal-inserir-chave" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/40 max-w-md w-full shadow-2xl space-y-4 bg-slate-900/95">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🔑</span> Inserir Código de Ativação
+        </h3>
+        <button onclick="fecharModalInserirChave()" class="text-slate-400 hover:text-white text-xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Digite o <strong>Código de Ativação</strong> fornecido pelo Henrique no WhatsApp (ou a Chave Mestra) para desbloquear o Modo Pro e emitir o Parecer Técnico:
+      </p>
+      <div class="space-y-3 pt-1">
+        <input type="text" id="input-chave-direta" placeholder="Ex: PREVI-75472" class="w-full text-center font-mono uppercase tracking-widest text-emerald-300 bg-slate-950 border border-slate-700 focus:border-emerald-400 rounded-xl px-4 py-3 text-base font-bold outline-none transition-all placeholder:text-slate-600" onkeydown="if(event.key==='Enter') validarChaveDireta()" />
+        <button type="button" onclick="validarChaveDireta()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+          <span>🔓</span>
+          <span>Desbloquear Modo Pro & Parecer Técnico</span>
+        </button>
+        <div id="msg-erro-chave-direta" class="text-xs text-rose-400 font-semibold hidden text-center"></div>
+      </div>
+      <div class="pt-2 border-t border-slate-800/80 text-center">
+        <p class="text-[11px] text-slate-400">
+          Ainda não tem um código? <a href="javascript:fecharModalInserirChave();abrirCheckout('unitario')" class="text-emerald-400 hover:underline font-bold">Faça o Pix de R$ 1,00 aqui</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal do Administrador (Gestão de Códigos de Desbloqueio e Acessos) -->
   <div id="modal-admin" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/40 max-w-lg w-full shadow-2xl space-y-5 bg-slate-900/95 max-h-[92vh] overflow-y-auto">
@@ -1789,6 +1821,9 @@
       <span class="text-base group-hover:scale-110 transition-transform">🔓</span>
       <span>Desbloquear Lista Completa por R$ 1,00</span>
       <span class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-950 text-emerald-300 font-bold ml-0.5">PIX 1-CLIQUE</span>
+    </button>
+    <button onclick="abrirModalInserirChave()" class="block w-full text-center text-[11px] text-slate-300 hover:text-emerald-300 font-bold underline mt-1.5 drop-shadow cursor-pointer transition-colors">
+      🔑 Já possui um código de ativação?
     </button>
   </div>
 </body>

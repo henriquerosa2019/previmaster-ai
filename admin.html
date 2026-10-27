@@ -136,7 +136,9 @@
       const msg = `Olá Dr(a)! Pagamento PIX confirmado com sucesso! ✅\n\n` +
         `🔑 Seu Código de Ativação do PreviMaster AI:\n` +
         `${codigoAtual}\n\n` +
-        `Basta colar este código no campo "Passo 2" do app para liberar o seu Parecer Técnico Oficial e a Matriz Completa de Descartes da EC 103 na hora.\n\n` +
+        `👉 Para ativar automaticamente com 1 clique, acesse:\n` +
+        `https://previmasterai.vercel.app/app/?ativar=${codigoAtual}\n\n` +
+        `Ou se preferir, abra o app e digite o código no botão "🔑 Inserir Código de Ativação" no topo da página.\n\n` +
         `Qualquer dúvida estou à disposição!\nHenrique Rosa • PreviMaster AI`;
 
       navigator.clipboard.writeText(msg).then(() => {

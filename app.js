@@ -14625,3 +14625,78 @@ window.autenticarAdmin = autenticarAdmin;
 window.adminGerarNovoCodigo = adminGerarNovoCodigo;
 window.adminCopiarMensagemWzap = adminCopiarMensagemWzap;
 window.adminDesbloquearAgora = adminDesbloquearAgora;
+
+// =========================================================================
+// MODAL DEDICADO DE ATIVAÇÃO DE CHAVE PARA O CLIENTE & ATIVAÇÃO POR URL
+// =========================================================================
+
+function abrirModalInserirChave() {
+  const modal = document.getElementById('modal-inserir-chave');
+  const input = document.getElementById('input-chave-direta');
+  const erro = document.getElementById('msg-erro-chave-direta');
+  if (erro) erro.classList.add('hidden');
+  if (input) input.value = '';
+  if (modal) modal.classList.remove('hidden');
+  setTimeout(() => { if (input) input.focus(); }, 150);
+}
+
+function fecharModalInserirChave() {
+  const modal = document.getElementById('modal-inserir-chave');
+  if (modal) modal.classList.add('hidden');
+}
+
+function validarChaveDireta() {
+  const input = document.getElementById('input-chave-direta');
+  const erro = document.getElementById('msg-erro-chave-direta');
+  const codigo = (input ? input.value : '').trim();
+
+  if (!codigo) {
+    if (erro) {
+      erro.textContent = 'Por favor, digite o código de ativação recebido no WhatsApp.';
+      erro.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (verifyTokenPreviMaster(codigo)) {
+    fecharModalInserirChave();
+    mostrarToastSucesso(`🎉 Chave ${codigo.toUpperCase()} validada com sucesso! Acesso Pro Liberado.`);
+    liberarAcessoProInstantaneo(true);
+  } else {
+    if (erro) {
+      erro.textContent = '❌ Código inválido ou incorreto. Verifique os dígitos enviados no seu WhatsApp (ex: PREVI-XXXXX).';
+      erro.classList.remove('hidden');
+    }
+    if (input) {
+      input.classList.add('border-rose-500');
+      setTimeout(() => input.classList.remove('border-rose-500'), 3000);
+      input.focus();
+    }
+  }
+}
+
+// Auto-ativação instantânea se o cliente abrir o link com parâmetro na URL
+function checarAutoAtivacaoUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const chave = params.get('ativar') || params.get('chave') || params.get('token');
+    if (chave && verifyTokenPreviMaster(chave)) {
+      liberarAcessoProInstantaneo(false);
+      mostrarToastSucesso(`🎉 Acesso Pro ativado automaticamente com a chave ${chave.toUpperCase()}!`);
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  } catch (e) {
+    console.warn('Erro ao verificar auto-ativação por URL:', e);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', checarAutoAtivacaoUrl);
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  checarAutoAtivacaoUrl();
+}
+
+window.abrirModalInserirChave = abrirModalInserirChave;
+window.fecharModalInserirChave = fecharModalInserirChave;
+window.validarChaveDireta = validarChaveDireta;
+window.checarAutoAtivacaoUrl = checarAutoAtivacaoUrl;
