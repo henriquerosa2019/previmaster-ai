@@ -14365,3 +14365,263 @@ window.PIX_COPIA_E_COLA_1_REAL = PIX_COPIA_E_COLA_1_REAL;
 window.mostrarAreaPixReal = mostrarAreaPixReal;
 window.copiarPixCopiaECola = copiarPixCopiaECola;
 window.confirmarPixELiberar = confirmarPixELiberar;
+
+// =========================================================================
+// MÓDULO DE GESTÃO DE CÓDIGOS DE ATIVAÇÃO & PAINEL DO ADMINISTRADOR
+// =========================================================================
+
+const ADMIN_PIN_SECRETO = '9937';
+const MASTER_KEYS = ['PREVIVIP2026', 'PREVIMASTERPRO', 'HENRIQUE2026', 'PREVILIBERADO'];
+let ultimoCodigoGeradoAdmin = 'PREVI-75472';
+
+// Gera código com algoritmo de integridade matemática
+function makeTokenPreviMaster(seedNum = null) {
+  if (seedNum === null || seedNum === undefined) {
+    seedNum = Math.floor(100 + Math.random() * 900);
+  }
+  const chk = ((seedNum * 73) + 29) % 97;
+  const strChk = chk < 10 ? '0' + chk : '' + chk;
+  return `PREVI-${seedNum}${strChk}`;
+}
+
+// Valida o código em qualquer dispositivo
+function verifyTokenPreviMaster(code) {
+  if (!code || typeof code !== 'string') return false;
+  let cleaned = code.trim().toUpperCase().replace(/[\s\-_.]/g, '');
+  if (MASTER_KEYS.includes(cleaned)) return true;
+  if (cleaned.startsWith('PREVI')) cleaned = cleaned.substring(5);
+  if (cleaned.length === 5 && /^\d+$/.test(cleaned)) {
+    const s = parseInt(cleaned.substring(0, 3), 10);
+    const c = parseInt(cleaned.substring(3), 10);
+    const expected = ((s * 73) + 29) % 97;
+    return c === expected;
+  }
+  return false;
+}
+
+// Disparo padronizado do WhatsApp com o comprovante
+function enviarComprovanteWhatsApp() {
+  const plano = planoCheckoutAtual || PLANOS_MERCADO_PAGO.unitario;
+  const inputNome = document.getElementById('checkout-input-nome');
+  const inputEmail = document.getElementById('checkout-input-email');
+  const inputWzap = document.getElementById('checkout-input-whatsapp');
+
+  let nome = (inputNome ? inputNome.value : '').trim() || localStorage.getItem('previmaster_user_name') || 'Advogado(a)';
+  let email = (inputEmail ? inputEmail.value : '').trim() || localStorage.getItem('previmaster_user_email') || 'Não informado';
+  let whatsapp = (inputWzap ? inputWzap.value : '').trim() || localStorage.getItem('previmaster_user_whatsapp') || 'Não informado';
+
+  localStorage.setItem('previmaster_user_name', nome);
+  if (email !== 'Não informado') localStorage.setItem('previmaster_user_email', email);
+  if (whatsapp !== 'Não informado') localStorage.setItem('previmaster_user_whatsapp', whatsapp);
+
+  // Notificação silenciosa via FormSubmit para o Henrique ficar registrado
+  const dataHora = new Date().toLocaleString('pt-BR');
+  try {
+    fetch('https://formsubmit.co/ajax/3ffcf8922f679c899c6b466f9e84c1ab', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `[PreviMaster AI] 📲 NOVO CONTATO WHATSAPP: ${nome} enviando comprovante`,
+        _replyto: email,
+        _captcha: 'false',
+        _template: 'table',
+        "Status": "COMPROVANTE ENVIADO NO WHATSAPP - AGUARDANDO ATIVAÇÃO",
+        "Nome": nome,
+        "E-mail": email,
+        "WhatsApp": whatsapp,
+        "Plano": plano.nome,
+        "Valor": plano.valor,
+        "Data e Hora": dataHora
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // Mensagem padronizada pronta para o WhatsApp
+  const textoMsg = `Olá Henrique! Acabei de realizar o pagamento do PIX de ${plano.valor} para o PreviMaster AI (${plano.nome}).\n\n` +
+    `👤 Nome: ${nome}\n` +
+    `📧 E-mail cadastrado: ${email}\n` +
+    `📱 WhatsApp: ${whatsapp}\n\n` +
+    `Estou enviando em anexo o meu comprovante do PIX. Aguardo meu Código de Ativação para liberar o Parecer Técnico no app!`;
+
+  const urlWzap = `https://wa.me/5521993793746?text=${encodeURIComponent(textoMsg)}`;
+  window.open(urlWzap, '_blank');
+
+  // Atualiza feedback na tela
+  const msgStatus = document.getElementById('msg-status-codigo');
+  if (msgStatus) {
+    msgStatus.innerHTML = '📲 <strong>WhatsApp aberto!</strong> Assim que enviar o comprovante ao Henrique, digite abaixo o <strong>Código de Ativação</strong> recebido para liberar o Parecer Técnico.';
+    msgStatus.className = 'text-[11px] font-semibold text-emerald-300 bg-emerald-950/80 p-2.5 rounded-xl border border-emerald-500/30';
+    msgStatus.classList.remove('hidden');
+  }
+
+  const inputCodigo = document.getElementById('input-codigo-ativacao');
+  if (inputCodigo) {
+    setTimeout(() => inputCodigo.focus(), 500);
+  }
+}
+
+// Validação do código de ativação inserido pelo usuário
+function validarCodigoAtivacao() {
+  const input = document.getElementById('input-codigo-ativacao');
+  const msgStatus = document.getElementById('msg-status-codigo');
+  const btnValidar = document.getElementById('btn-validar-codigo');
+
+  const codigo = (input ? input.value : '').trim();
+
+  if (!codigo) {
+    if (msgStatus) {
+      msgStatus.innerHTML = '⚠️ Por favor, digite o código de ativação fornecido pelo Henrique no WhatsApp.';
+      msgStatus.className = 'text-[11px] font-semibold text-amber-300 bg-amber-950/70 p-2 rounded-xl border border-amber-500/30';
+      msgStatus.classList.remove('hidden');
+    }
+    if (input) input.focus();
+    return;
+  }
+
+  const valido = verifyTokenPreviMaster(codigo);
+
+  if (valido) {
+    if (btnValidar) {
+      btnValidar.disabled = true;
+      btnValidar.innerHTML = '<span>⏳</span> <span>Validando...</span>';
+    }
+    if (msgStatus) {
+      msgStatus.innerHTML = '✅ <strong>Código Válido!</strong> Liberando o Parecer Técnico e gerando o PDF...';
+      msgStatus.className = 'text-[11px] font-semibold text-emerald-300 bg-emerald-950 p-2.5 rounded-xl border border-emerald-400';
+      msgStatus.classList.remove('hidden');
+    }
+
+    setTimeout(() => {
+      liberarAcessoProInstantaneo(true);
+    }, 450);
+  } else {
+    if (msgStatus) {
+      msgStatus.innerHTML = '❌ <strong>Código inválido ou incorreto.</strong> Verifique os caracteres recebidos no WhatsApp (ex: PREVI-XXXXX) ou solicite novo código ao Henrique.';
+      msgStatus.className = 'text-[11px] font-semibold text-rose-300 bg-rose-950/80 p-2.5 rounded-xl border border-rose-500/40';
+      msgStatus.classList.remove('hidden');
+    }
+    if (input) {
+      input.classList.add('border-rose-500');
+      setTimeout(() => input.classList.remove('border-rose-500'), 3000);
+      input.focus();
+    }
+  }
+}
+
+// Funções do Painel do Administrador
+function abrirPainelAdmin() {
+  const modal = document.getElementById('modal-admin');
+  const loginBox = document.getElementById('admin-login-box');
+  const painelBox = document.getElementById('admin-painel-box');
+  const inputPin = document.getElementById('input-admin-pin');
+  const erroPin = document.getElementById('admin-erro-pin');
+
+  if (erroPin) erroPin.classList.add('hidden');
+  if (inputPin) inputPin.value = '';
+
+  // Se já autenticou na sessão, vai direto para o painel
+  if (sessionStorage.getItem('previmaster_admin_auth') === 'true') {
+    if (loginBox) loginBox.classList.add('hidden');
+    if (painelBox) painelBox.classList.remove('hidden');
+    adminGerarNovoCodigo();
+  } else {
+    if (loginBox) loginBox.classList.remove('hidden');
+    if (painelBox) painelBox.classList.add('hidden');
+  }
+
+  if (modal) modal.classList.remove('hidden');
+  setTimeout(() => {
+    if (inputPin && !inputPin.disabled && !sessionStorage.getItem('previmaster_admin_auth')) {
+      inputPin.focus();
+    }
+  }, 100);
+}
+
+function fecharPainelAdmin() {
+  const modal = document.getElementById('modal-admin');
+  if (modal) modal.classList.add('hidden');
+}
+
+function autenticarAdmin() {
+  const inputPin = document.getElementById('input-admin-pin');
+  const erroPin = document.getElementById('admin-erro-pin');
+  const loginBox = document.getElementById('admin-login-box');
+  const painelBox = document.getElementById('admin-painel-box');
+
+  const pin = (inputPin ? inputPin.value : '').trim();
+
+  if (pin === ADMIN_PIN_SECRETO || pin === '9937') {
+    sessionStorage.setItem('previmaster_admin_auth', 'true');
+    if (erroPin) erroPin.classList.add('hidden');
+    if (loginBox) loginBox.classList.add('hidden');
+    if (painelBox) painelBox.classList.remove('hidden');
+    adminGerarNovoCodigo();
+  } else {
+    if (erroPin) erroPin.classList.remove('hidden');
+    if (inputPin) {
+      inputPin.value = '';
+      inputPin.focus();
+    }
+  }
+}
+
+function adminGerarNovoCodigo() {
+  ultimoCodigoGeradoAdmin = makeTokenPreviMaster();
+  const elDisplay = document.getElementById('admin-codigo-display');
+  if (elDisplay) {
+    elDisplay.textContent = ultimoCodigoGeradoAdmin;
+  }
+  const btnCopiarTexto = document.getElementById('btn-admin-copiar-msg-texto');
+  if (btnCopiarTexto) {
+    btnCopiarTexto.textContent = 'Copiar Mensagem Pronta para o WhatsApp';
+  }
+}
+
+function adminCopiarMensagemWzap() {
+  const codigo = ultimoCodigoGeradoAdmin || 'PREVI-VIP-2026';
+  const textoParaCopiar = `Olá Dr(a)! Pagamento PIX confirmado com sucesso! ✅\n\n` +
+    `🔑 Seu Código de Ativação do PreviMaster AI:\n` +
+    `${codigo}\n\n` +
+    `Basta colar este código no campo "Passo 2" do app para liberar o seu Parecer Técnico Oficial e a Matriz Completa de Descartes da EC 103 na hora.\n\n` +
+    `Qualquer dúvida estou à disposição!\nHenrique Rosa • PreviMaster AI`;
+
+  const btnTexto = document.getElementById('btn-admin-copiar-msg-texto');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(textoParaCopiar).then(() => {
+      if (btnTexto) btnTexto.textContent = '✅ Mensagem Copiada com Sucesso!';
+      mostrarToastSucesso('Mensagem com o código copiada! Basta colar no WhatsApp do cliente.');
+      setTimeout(() => {
+        if (btnTexto) btnTexto.textContent = 'Copiar Mensagem Pronta para o WhatsApp';
+      }, 3500);
+    });
+  } else {
+    prompt('Copie a mensagem abaixo para enviar no WhatsApp:', textoParaCopiar);
+  }
+}
+
+function adminDesbloquearAgora() {
+  liberarAcessoProInstantaneo(false);
+  fecharPainelAdmin();
+  mostrarToastSucesso('🔓 Modo Pro ativado com sucesso neste navegador pelo Administrador!');
+}
+
+// Atalho de Teclado Global: Ctrl + Alt + A abre o Painel do Administrador
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 'a' || e.key === 'A')) {
+    e.preventDefault();
+    abrirPainelAdmin();
+  }
+});
+
+// Exporta novas funções
+window.makeTokenPreviMaster = makeTokenPreviMaster;
+window.verifyTokenPreviMaster = verifyTokenPreviMaster;
+window.enviarComprovanteWhatsApp = enviarComprovanteWhatsApp;
+window.validarCodigoAtivacao = validarCodigoAtivacao;
+window.abrirPainelAdmin = abrirPainelAdmin;
+window.fecharPainelAdmin = fecharPainelAdmin;
+window.autenticarAdmin = autenticarAdmin;
+window.adminGerarNovoCodigo = adminGerarNovoCodigo;
+window.adminCopiarMensagemWzap = adminCopiarMensagemWzap;
+window.adminDesbloquearAgora = adminDesbloquearAgora;

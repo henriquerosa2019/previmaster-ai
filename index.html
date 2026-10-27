@@ -1503,10 +1503,31 @@
               </div>
             </div>
 
-            <button type="button" onclick="confirmarPixELiberar()" id="btn-confirmar-pix" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/40 flex items-center justify-center gap-2 cursor-pointer animate-pulse">
-              <span>✅</span>
-              <span>Já Realizei o PIX de R$ 1,00 — Confirmar & Liberar PDF</span>
+            <!-- PASSO 1: ENVIAR COMPROVANTE VIA WHATSAPP -->
+            <button type="button" onclick="enviarComprovanteWhatsApp()" id="btn-enviar-wzap" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm transition-all shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+              <span>📲</span>
+              <span>Passo 1: Já Fiz o Pix — Enviar Comprovante no WhatsApp</span>
             </button>
+
+            <!-- PASSO 2: DIGITAR O CÓDIGO DE ATIVAÇÃO FORNECIDO PELO HENRIQUE -->
+            <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-emerald-500/40 text-left space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <span>🔑</span> Passo 2: Digite seu Código de Ativação
+                </span>
+                <span class="text-[10px] text-slate-400">Fornecido no WhatsApp</span>
+              </div>
+              <p class="text-[11px] text-slate-300 leading-tight">
+                Assim que você enviar o comprovante, o Henrique fornecerá o <strong>Código de Ativação</strong> no seu WhatsApp. Digite-o abaixo para destravar o app:
+              </p>
+              <div class="flex gap-2">
+                <input type="text" id="input-codigo-ativacao" placeholder="Ex: PREVI-75472" class="uppercase font-mono tracking-widest font-bold text-center bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-xs sm:text-sm text-emerald-300 w-full outline-none transition-all placeholder:text-slate-600" onkeydown="if(event.key==='Enter') validarCodigoAtivacao()" />
+                <button type="button" onclick="validarCodigoAtivacao()" id="btn-validar-codigo" class="px-4 py-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer shadow-md">
+                  🔓 Ativar & Gerar PDF
+                </button>
+              </div>
+              <div id="msg-status-codigo" class="text-[11px] font-semibold hidden"></div>
+            </div>
           </div>
         </div>
 
@@ -1564,7 +1585,11 @@
       <span>•</span>
       <a href="javascript:alert('Em conformidade com a Lei Geral de Proteção de Dados (LGPD)')" class="hover:text-white">Privacidade & LGPD</a>
       <span>•</span>
-      <a href="https://wa.me/" target="_blank" class="hover:text-white">Fale com um Especialista</a>
+      <a href="https://wa.me/5521993793746" target="_blank" class="hover:text-white">Fale com um Especialista</a>
+      <span>•</span>
+      <a href="javascript:abrirPainelAdmin()" class="text-slate-500 hover:text-emerald-400 font-semibold flex items-center gap-1 transition-colors">
+        <span>🔒</span> Área do Administrador
+      </a>
     </div>
     <p>PreviMaster AI • Software Computadorizado de Planejamento Previdenciário • Base Legal: EC 103/2019, Lei 8.213/91 e IN 128/2022</p>
     <p id="footer-segurado-info" class="text-[11px] text-slate-600">Calculado para Jorge Rubens Teste Demonstrativo • Índices oficiais INPC / IBGE / BACEN série SGS 188</p>
@@ -1666,6 +1691,91 @@
       carregarTutorialNaTelaPrincipal();
     }
   </script>
+
+  <!-- Modal do Administrador (Gestão de Códigos de Desbloqueio e Acessos) -->
+  <div id="modal-admin" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/40 max-w-lg w-full shadow-2xl space-y-5 bg-slate-900/95 max-h-[92vh] overflow-y-auto">
+      <div class="flex justify-between items-start pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🛡️</span>
+          <div>
+            <h3 class="text-base font-bold text-white">Painel do Administrador</h3>
+            <span class="text-xs text-emerald-400 font-semibold">Henrique Rosa • PreviMaster AI</span>
+          </div>
+        </div>
+        <button onclick="fecharPainelAdmin()" class="text-slate-400 hover:text-white text-xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Tela 1: Login por PIN -->
+      <div id="admin-login-box" class="space-y-4 py-3">
+        <p class="text-xs text-slate-300">
+          Digite seu PIN de Administrador para acessar a central de geração e validação de acessos:
+        </p>
+        <div class="flex gap-2">
+          <input type="password" id="input-admin-pin" placeholder="PIN de 4 dígitos" maxlength="6" class="bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-xl px-4 py-2.5 text-center font-mono text-lg text-emerald-400 tracking-widest w-full outline-none" onkeydown="if(event.key==='Enter') autenticarAdmin()" />
+          <button type="button" onclick="autenticarAdmin()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-all whitespace-nowrap cursor-pointer">
+            Acessar ➔
+          </button>
+        </div>
+        <p id="admin-erro-pin" class="text-xs text-rose-400 font-semibold hidden text-center">
+          ❌ PIN incorreto. Tente novamente.
+        </p>
+        <div class="text-[11px] text-slate-500 text-center">
+          Dica: Seu PIN padrão são os primeiros dígitos do seu WhatsApp: <strong>9937</strong>
+        </div>
+      </div>
+
+      <!-- Tela 2: Conteúdo Autenticado -->
+      <div id="admin-painel-box" class="hidden space-y-5">
+        <!-- Gerador de Código -->
+        <div class="p-4 rounded-2xl bg-slate-950 border border-emerald-500/40 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🎲</span> Gerador de Código de Ativação
+            </span>
+            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold">100% Válido</span>
+          </div>
+          <p class="text-xs text-slate-300">
+            Gere um código exclusivo para o cliente que enviou o comprovante no WhatsApp:
+          </p>
+          <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-[10px] text-slate-400 block">Código Gerado:</span>
+              <span id="admin-codigo-display" class="font-mono text-lg font-black text-emerald-400 tracking-wider">PREVI-75472</span>
+            </div>
+            <button type="button" onclick="adminGerarNovoCodigo()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all border border-slate-700 cursor-pointer">
+              🔄 Gerar Outro
+            </button>
+          </div>
+          <div>
+            <button type="button" onclick="adminCopiarMensagemWzap()" id="btn-admin-copiar-msg" class="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md">
+              <span>📋</span>
+              <span id="btn-admin-copiar-msg-texto">Copiar Mensagem Pronta para o WhatsApp</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chave Mestra Universal -->
+        <div class="p-3.5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-1.5 text-xs">
+          <div class="flex items-center justify-between text-slate-300 font-bold">
+            <span>Chave Mestra Universal:</span>
+            <span class="font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700 select-all">PREVI-VIP-2026</span>
+          </div>
+          <p class="text-[11px] text-slate-400 leading-tight">
+            Você também pode simplesmente enviar ou ditar <code>PREVI-VIP-2026</code> para qualquer cliente; ele libera o Modo Pro instantaneamente.
+          </p>
+        </div>
+
+        <!-- Botão de Ação Rápida para o Próprio Henrique -->
+        <div class="pt-1">
+          <button type="button" onclick="adminDesbloquearAgora()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span>⚡</span>
+            <span>Desbloquear Modo Pro Neste Navegador Agora</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Botão Flutuante de Ação Direta para Desbloqueio (Alta Conversão) -->
   <div id="btn-flutuante-desbloqueio" class="fixed bottom-6 right-6 z-40 no-print transition-all duration-300">
