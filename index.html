@@ -170,7 +170,7 @@
             </div>
           </div>
           <button onclick="abrirCheckout('unitario')" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 shrink-0 transition-all cursor-pointer">
-            <span>🔓</span> Desbloquear Lista Completa por R$ 29,90
+            <span>🔓</span> Desbloquear Lista Completa por R$ 1,00
           </button>
         </div>
       </div>
@@ -531,7 +531,7 @@
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
             <button onclick="abrirCheckout('unitario')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-              <span>🔓</span> Desbloquear Lista Completa por R$ 29,90
+              <span>🔓</span> Desbloquear Lista Completa por R$ 1,00
             </button>
             <button onclick="imprimirParecerMeuINSS()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-sky-600/30 flex items-center justify-center gap-1.5 transition-all cursor-pointer">
               <span>📄</span> Emitir Parecer Técnico com Fundamentação
@@ -564,7 +564,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
           <span class="text-slate-400">O Parecer em PDF gera as justificativas jurídicas prontas para protocolar no Meu INSS.</span>
           <button onclick="abrirModalPrecos()" class="text-amber-400 hover:text-amber-300 font-bold underline flex items-center gap-1 cursor-pointer">
-            Ver opções de emissão avulsa (R$ 29,90) ou plano de escritório →
+            Ver opções de emissão avulsa (R$ 1,00) ou plano de escritório →
           </button>
         </div>
       </div>
@@ -1053,18 +1053,18 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Pacote Unitário: R$ 29,90 -->
+          <!-- Pacote Unitário: R$ 1,00 -->
           <div class="p-5 rounded-2xl bg-slate-900/80 border border-sky-800/60 flex flex-col justify-between hover:border-sky-500 transition-all shadow-lg">
             <div>
               <div class="flex justify-between items-start">
                 <div>
                   <h5 class="text-base font-black text-white">Pacote Unitário (1 CNIS)</h5>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Ideal para consultas pontuais ou clientes avulsos</p>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Teste Real com Liberação Imediata do Parecer</p>
                 </div>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-800">Avulso</span>
               </div>
               <div class="my-4">
-                <span class="text-3xl font-black text-white font-mono">R$ 29,90</span>
+                <span class="text-3xl font-black text-white font-mono">R$ 1,00</span>
                 <span class="text-xs text-slate-400">/análise completa</span>
               </div>
               <ul class="space-y-2 text-xs text-slate-300">
@@ -1075,7 +1075,7 @@
               </ul>
             </div>
             <button onclick="abrirCheckout('unitario')" class="mt-5 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-center text-xs font-bold text-white transition-all block border border-slate-700 shadow-sm cursor-pointer">
-              Adquirir 1 Análise (R$ 29,90)
+              Adquirir 1 Análise (R$ 1,00)
             </button>
           </div>
 
@@ -1424,7 +1424,7 @@
           <span class="text-xs text-sky-300" id="checkout-plano-tipo">1 CNIS completo + Parecer em PDF</span>
         </div>
         <div class="text-right">
-          <span class="text-2xl font-black text-white font-mono" id="checkout-plano-valor">R$ 29,90</span>
+          <span class="text-2xl font-black text-white font-mono" id="checkout-plano-valor">R$ 1,00</span>
           <span class="text-[10px] text-emerald-400 block font-semibold">Liberação Imediata</span>
         </div>
       </div>
@@ -1458,21 +1458,56 @@
           Os dados do pedido e confirmação são enviados para você e para <strong>henrique.rosa@poli.ufrj.br</strong>.
         </span>
 
-        <!-- OPÇÃO 1 PRINCIPAL: PIX EM 1 CLIQUE COM APROVAÇÃO INSTANTÂNEA -->
-        <div class="p-4 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/60 space-y-3 shadow-lg shadow-emerald-950/40">
+        <!-- OPÇÃO 1 PRINCIPAL: PIX REAL DE R$ 1,00 COM QR CODE E COPIA E COLA -->
+        <div id="checkout-pix-box" class="p-4 rounded-2xl bg-emerald-950/40 border-2 border-emerald-500/60 space-y-3 shadow-lg shadow-emerald-950/40">
           <div class="flex items-center justify-between">
             <span class="text-xs font-black text-emerald-300 uppercase tracking-wide flex items-center gap-1.5">
-              <span>⚡</span> PIX com Aprovação Instantânea (1-Clique)
+              <span>⚡</span> PIX Real de R$ 1,00 • Aprovação Instantânea
             </span>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-slate-950">Mais Rápido</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            Libere o <strong>Parecer Técnico Oficial em PDF</strong> e a <strong>Lista Completa de Descartes</strong> na hora, <strong>sem recarregar a página</strong>.
+            Pague <strong>R$ 1,00 via PIX</strong> para testar na prática e liberar o <strong>Parecer Técnico Oficial em PDF</strong> e a <strong>Lista Completa de Descartes</strong> na hora, <strong>sem recarregar a página</strong>.
           </p>
-          <button type="button" onclick="executarCheckout1CliquePix()" id="btn-pix-1clique" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+          
+          <button type="button" onclick="mostrarAreaPixReal()" id="btn-mostrar-pix" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
             <span>⚡</span>
-            <span id="btn-pix-1clique-texto">Pagar com PIX & Liberar PDF Instantaneamente</span>
+            <span>Gerar QR Code PIX de R$ 1,00</span>
           </button>
+
+          <!-- Área com QR Code e Copia e Cola (revelada ao clicar) -->
+          <div id="area-pix-qrcode" class="hidden pt-3 border-t border-emerald-500/30 space-y-3 text-center">
+            <div class="flex flex-col items-center justify-center bg-white p-3 rounded-2xl w-fit mx-auto shadow-md">
+              <img id="img-pix-qrcode" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=00020126480014br.gov.bcb.pix0126henrique.rosa%40poli.ufrj.br52040000530398654041.005802BR5913HENRIQUE%20ROSA6014RIO%20DE%20JANEIRO62150511PREVIMASTER6304738A" alt="QR Code PIX R$ 1,00" class="w-40 h-40">
+              <span class="text-[10px] font-bold text-slate-800 mt-1">Escaneie com o app do seu Banco</span>
+            </div>
+            
+            <div class="text-left bg-slate-900/90 p-3 rounded-xl border border-emerald-500/30 space-y-2">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400 font-semibold">Chave PIX:</span>
+                <span class="font-mono text-emerald-400 font-bold select-all">henrique.rosa@poli.ufrj.br</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400 font-semibold">Valor Exato:</span>
+                <span class="font-mono text-yellow-400 font-bold">R$ 1,00</span>
+              </div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-slate-400 font-semibold">Beneficiário:</span>
+                <span class="text-slate-200 font-semibold">Henrique Rosa</span>
+              </div>
+              <div class="pt-1">
+                <button type="button" onclick="copiarPixCopiaECola()" class="w-full py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                  <span>📋</span>
+                  <span id="btn-copiar-pix-texto">Copiar Código PIX Copia e Cola (R$ 1,00)</span>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" onclick="confirmarPixELiberar()" id="btn-confirmar-pix" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-500 hover:brightness-110 text-slate-950 font-black text-sm transition-all shadow-xl shadow-emerald-500/40 flex items-center justify-center gap-2 cursor-pointer animate-pulse">
+              <span>✅</span>
+              <span>Já Realizei o PIX de R$ 1,00 — Confirmar & Liberar PDF</span>
+            </button>
+          </div>
         </div>
 
         <!-- OPÇÃO 2: CARTÃO DE CRÉDITO NO MERCADO PAGO -->
@@ -1485,7 +1520,7 @@
 
         <div class="pt-1 flex items-center gap-2">
           <div class="h-px bg-slate-800 flex-1"></div>
-          <span class="text-[10px] uppercase font-bold text-slate-500">Ou para Validação / Teste</span>
+          <span class="text-[10px] uppercase font-bold text-slate-500">Ou para Validação / Teste Rápido</span>
           <div class="h-px bg-slate-800 flex-1"></div>
         </div>
 
@@ -1636,7 +1671,7 @@
   <div id="btn-flutuante-desbloqueio" class="fixed bottom-6 right-6 z-40 no-print transition-all duration-300">
     <button onclick="abrirCheckout('unitario')" class="group relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs sm:text-sm shadow-2xl shadow-emerald-500/50 flex items-center gap-2.5 transition-all transform hover:-translate-y-0.5 active:translate-y-0 border border-emerald-300/40 cursor-pointer animate-pulse hover:animate-none">
       <span class="text-base group-hover:scale-110 transition-transform">🔓</span>
-      <span>Desbloquear Lista Completa por R$ 29,90</span>
+      <span>Desbloquear Lista Completa por R$ 1,00</span>
       <span class="hidden sm:inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-950 text-emerald-300 font-bold ml-0.5">PIX 1-CLIQUE</span>
     </button>
   </div>

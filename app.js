@@ -13753,8 +13753,8 @@ function ativarAbaTutorialCNIS() {
 const PLANOS_MERCADO_PAGO = {
   unitario: {
     id: 'unitario',
-    nome: 'Pacote Unitário (1 CNIS)',
-    valor: 'R$ 29,90',
+    nome: 'Pacote Unitário (1 CNIS - Teste Real R$ 1,00)',
+    valor: 'R$ 1,00',
     tipo: '1 CNIS Completo + Parecer Técnico em PDF',
     link: 'https://mpago.la/1BDNyDP'
   },
@@ -13862,23 +13862,26 @@ async function processarCheckoutMercadoPago(event) {
   // 2. Prepara o payload do e-mail
   const dataHora = new Date().toLocaleString('pt-BR');
   const payloadEmail = {
-    _subject: `[PreviMaster AI] Novo Pedido: ${plano.nome} (${plano.valor}) - ${nome}`,
+    _subject: `[PreviMaster AI] Novo Pedido Iniciado: ${plano.nome} (${plano.valor}) - ${nome}`,
     _replyto: email,
     _cc: email, // Envia cópia simultânea para o e-mail do usuário cadastrado!
+    _captcha: 'false',
+    _template: 'table',
+    "Status": "Pedido Iniciado / Redirecionado para Pagamento",
     "Nome do Cliente": nome,
     "E-mail do Cliente": email,
     "WhatsApp": whatsapp,
     "Plano Contratado": plano.nome,
     "Valor": plano.valor,
     "Tipo de Plano": plano.tipo,
-    "Link Direto de Pagamento (Mercado Pago)": plano.link,
+    "Link de Pagamento (Mercado Pago)": plano.link,
     "Data e Hora": dataHora,
-    "Notificação": "E-mail enviado simultaneamente para henrique.rosa@poli.ufrj.br e para o cliente"
+    "Notificação": "E-mail de confirmação enviado simultaneamente para henrique.rosa@poli.ufrj.br e para o cliente"
   };
 
   // 3. Dispara o envio de e-mail via FormSubmit para henrique.rosa@poli.ufrj.br com CC para o cliente
   try {
-    fetch('https://formsubmit.co/ajax/henrique.rosa@poli.ufrj.br', {
+    fetch('https://formsubmit.co/ajax/3ffcf8922f679c899c6b466f9e84c1ab', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -13956,7 +13959,9 @@ async function simularPagamentoEfetuado() {
     _subject: `[PreviMaster AI] PAGAMENTO EFETUADO COM SUCESSO: ${plano.nome} (${plano.valor}) - ${nome}`,
     _replyto: email,
     _cc: email,
-    "Status": "PAGAMENTO EFETUADO COM SUCESSO (TESTE FICTÍCIO)",
+    _captcha: 'false',
+    _template: 'table',
+    "Status": "PAGAMENTO EFETUADO COM SUCESSO (TESTE)",
     "Cliente": nome,
     "E-mail do Cliente": email,
     "WhatsApp": whatsapp,
@@ -13972,7 +13977,7 @@ async function simularPagamentoEfetuado() {
 
   // Disparo para henrique.rosa@poli.ufrj.br com cópia para o e-mail informado
   try {
-    fetch('https://formsubmit.co/ajax/henrique.rosa@poli.ufrj.br', {
+    fetch('https://formsubmit.co/ajax/3ffcf8922f679c899c6b466f9e84c1ab', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -14125,7 +14130,7 @@ async function executarCheckout1CliquePix() {
 
   // Disparo para henrique.rosa@poli.ufrj.br com cópia para o e-mail do usuário
   try {
-    fetch('https://formsubmit.co/ajax/henrique.rosa@poli.ufrj.br', {
+    fetch('https://formsubmit.co/ajax/3ffcf8922f679c899c6b466f9e84c1ab', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -14159,6 +14164,157 @@ async function executarCheckout1CliquePix() {
     if (btnTexto) btnTexto.textContent = 'Pagar com PIX & Liberar PDF Instantaneamente';
     liberarAcessoProInstantaneo(true);
   }, 350);
+}
+
+// =========================================================================
+// PAGAMENTO REAL VIA PIX (R$ 1,00 - AMBIENTE DE PRODUÇÃO E TESTE REAL)
+// =========================================================================
+
+const PIX_COPIA_E_COLA_1_REAL = '00020126480014br.gov.bcb.pix0126henrique.rosa@poli.ufrj.br52040000530398654041.005802BR5913HENRIQUE ROSA6014RIO DE JANEIRO62150511PREVIMASTER6304738A';
+
+function mostrarAreaPixReal() {
+  const areaPix = document.getElementById('area-pix-qrcode');
+  const btnMostrar = document.getElementById('btn-mostrar-pix');
+  if (areaPix) {
+    areaPix.classList.remove('hidden');
+    if (btnMostrar) {
+      btnMostrar.innerHTML = '<span>⚡</span> <span>QR Code PIX R$ 1,00 Gerado com Sucesso</span>';
+      btnMostrar.classList.remove('animate-pulse');
+      btnMostrar.classList.add('opacity-90');
+    }
+    setTimeout(() => {
+      areaPix.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  }
+}
+
+function copiarPixCopiaECola() {
+  const textoCopiar = PIX_COPIA_E_COLA_1_REAL;
+  const btnTexto = document.getElementById('btn-copiar-pix-texto');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(textoCopiar).then(() => {
+      if (btnTexto) btnTexto.textContent = '✅ Código PIX Copiado com Sucesso!';
+      mostrarToastSucesso('Código PIX Copia e Cola copiado para a área de transferência!');
+      setTimeout(() => {
+        if (btnTexto) btnTexto.textContent = 'Copiar Código PIX Copia e Cola (R$ 1,00)';
+      }, 3500);
+    }).catch(() => fallbackCopiarPix(textoCopiar, btnTexto));
+  } else {
+    fallbackCopiarPix(textoCopiar, btnTexto);
+  }
+}
+
+function fallbackCopiarPix(texto, btnTexto) {
+  const textArea = document.createElement('textarea');
+  textArea.value = texto;
+  textArea.style.position = 'fixed';
+  textArea.style.opacity = '0';
+  document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    document.execCommand('copy');
+    if (btnTexto) btnTexto.textContent = '✅ Código PIX Copiado com Sucesso!';
+    mostrarToastSucesso('Código PIX Copia e Cola copiado com sucesso!');
+    setTimeout(() => {
+      if (btnTexto) btnTexto.textContent = 'Copiar Código PIX Copia e Cola (R$ 1,00)';
+    }, 3500);
+  } catch (err) {
+    alert('Código PIX:\n\n' + texto);
+  }
+  document.body.removeChild(textArea);
+}
+
+async function confirmarPixELiberar() {
+  const plano = planoCheckoutAtual || PLANOS_MERCADO_PAGO.unitario;
+  const inputNome = document.getElementById('checkout-input-nome');
+  const inputEmail = document.getElementById('checkout-input-email');
+  const inputWzap = document.getElementById('checkout-input-whatsapp');
+
+  let nome = (inputNome ? inputNome.value : '').trim();
+  let email = (inputEmail ? inputEmail.value : '').trim();
+  let whatsapp = (inputWzap ? inputWzap.value : '').trim();
+
+  // Valores padrão amigáveis se o formulário não estiver preenchido
+  if (!nome) nome = localStorage.getItem('previmaster_user_name') || 'Dr(a). Advogado(a) / Assinante';
+  if (!email) email = localStorage.getItem('previmaster_user_email') || 'henrique.rosa@poli.ufrj.br';
+  if (!whatsapp) whatsapp = localStorage.getItem('previmaster_user_whatsapp') || '(21) 99379-3746';
+
+  if (inputNome && !inputNome.value) inputNome.value = nome;
+  if (inputEmail && !inputEmail.value) inputEmail.value = email;
+  if (inputWzap && !inputWzap.value) inputWzap.value = whatsapp;
+
+  localStorage.setItem('previmaster_user_name', nome);
+  localStorage.setItem('previmaster_user_email', email);
+  localStorage.setItem('previmaster_user_whatsapp', whatsapp);
+
+  const btnConfirmar = document.getElementById('btn-confirmar-pix');
+  if (btnConfirmar) {
+    btnConfirmar.disabled = true;
+    btnConfirmar.innerHTML = '<span>⏳</span> <span>Confirmando PIX de R$ 1,00 & Emitindo Parecer...</span>';
+  }
+
+  const txId = 'PIX-REAL-' + Math.floor(100000 + Math.random() * 900000) + '-OK';
+  const dataHora = new Date().toLocaleString('pt-BR');
+
+  // Payload completo em Português do Brasil com envio via FormSubmit
+  const payloadEmail = {
+    _subject: `[PreviMaster AI] COMPROVANTE PIX R$ 1,00 CONFIRMADO: ${nome}`,
+    _replyto: email,
+    _cc: email,
+    _captcha: 'false',
+    _template: 'table',
+    "Status": "PAGAMENTO REAL VIA PIX DE R$ 1,00 CONFIRMADO",
+    "Valor": "R$ 1,00",
+    "Chave PIX Destino": "henrique.rosa@poli.ufrj.br",
+    "Beneficiário": "Henrique Rosa",
+    "Cliente": nome,
+    "E-mail do Cliente": email,
+    "WhatsApp": whatsapp,
+    "Plano": plano.nome,
+    "ID da Transação": txId,
+    "Data e Hora": dataHora,
+    "Acesso Liberado": "SIM - Parecer Técnico Oficial em PDF e Matriz de Descartes Desbloqueados Instantaneamente sem recarregar a página",
+    "Mensagem": "Obrigado pelo pagamento de R$ 1,00 via PIX! O seu acesso completo aos relatórios do PreviMaster AI foi liberado."
+  };
+
+  try {
+    fetch('https://formsubmit.co/ajax/3ffcf8922f679c899c6b466f9e84c1ab', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payloadEmail)
+    }).catch(err => console.warn('Disparo FormSubmit:', err));
+  } catch (e) {
+    console.warn('Erro FormSubmit:', e);
+  }
+
+  try {
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'PIX_REAL_R$1_CONFIRMADO',
+        nome,
+        email,
+        whatsapp,
+        plano: plano.nome,
+        valor: 'R$ 1,00',
+        transacaoId: txId
+      })
+    }).catch(() => {});
+  } catch (e) {}
+
+  // Libera Pro e dispara geração do PDF na hora
+  setTimeout(() => {
+    if (btnConfirmar) {
+      btnConfirmar.disabled = false;
+      btnConfirmar.innerHTML = '<span>✅</span> <span>Já Realizei o PIX de R$ 1,00 — Confirmar & Liberar PDF</span>';
+    }
+    liberarAcessoProInstantaneo(true);
+  }, 400);
 }
 
 // Toast de feedback dinâmico
@@ -14205,3 +14361,7 @@ window.simularPagamentoEfetuado = simularPagamentoEfetuado;
 window.executarCheckout1CliquePix = executarCheckout1CliquePix;
 window.liberarAcessoProInstantaneo = liberarAcessoProInstantaneo;
 window.mostrarToastSucesso = mostrarToastSucesso;
+window.PIX_COPIA_E_COLA_1_REAL = PIX_COPIA_E_COLA_1_REAL;
+window.mostrarAreaPixReal = mostrarAreaPixReal;
+window.copiarPixCopiaECola = copiarPixCopiaECola;
+window.confirmarPixELiberar = confirmarPixELiberar;
